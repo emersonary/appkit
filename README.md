@@ -1,6 +1,6 @@
 # appkit
 
-Shared Go libraries used across Delphi projects. The module provides structured errors, logging, PostgreSQL history/audit generation, currency conversion, and an in-memory heaped cache.
+Shared Go libraries for backend services. The module provides structured errors, logging, PostgreSQL history/audit generation, currency conversion, and an in-memory heaped cache.
 
 ```
 github.com/emersonary/appkit
