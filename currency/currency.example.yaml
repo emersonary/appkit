@@ -1,0 +1,11 @@
+# Example currency configuration for appkit/currency.
+# Copy to currency.yaml in your project and list only the currencies you support.
+
+schema: public
+
+base_currency: USD
+
+currencies:
+  - USD
+  - EUR
+  - BRL
