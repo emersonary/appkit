@@ -1,0 +1,108 @@
+.appkit-login-workflow__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.appkit-login-workflow__tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border: 1px solid var(--appkit-auth-border, #e8dfd4);
+  background: var(--appkit-auth-surface, #fffdf9);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--appkit-auth-radius, 0.25rem);
+}
+
+.appkit-login-workflow__tab-icon {
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.82;
+}
+
+.appkit-login-workflow__tab.active .appkit-login-workflow__tab-icon {
+  opacity: 1;
+}
+
+.form-group label.appkit-field-label,
+.appkit-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+}
+
+.appkit-field-label__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--appkit-auth-muted, #6b5d62);
+}
+
+.appkit-field-label__icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.appkit-field-label__text {
+  display: inline-block;
+  line-height: 1.25;
+}
+
+.appkit-login-workflow__tab.active {
+  background: var(--appkit-auth-primary, #5c2438);
+  color: var(--appkit-auth-on-primary, #f5f0e8);
+  border-color: var(--appkit-auth-primary, #5c2438);
+}
+
+.appkit-login-workflow__divider {
+  text-align: center;
+  margin: 1.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--appkit-auth-muted, #6b5d62);
+}
+
+.appkit-login-workflow__oauth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.appkit-login-workflow__oauth-icon {
+  flex-shrink: 0;
+}
+
+.appkit-login-workflow__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.appkit-login-workflow__submit-icon {
+  flex-shrink: 0;
+}
+
+.appkit-login-workflow__forgot-row {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.appkit-login-workflow__back-row {
+  text-align: center;
+  margin-top: 1.5rem;
+}

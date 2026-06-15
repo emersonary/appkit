@@ -6,7 +6,7 @@ The Go module path is **`github.com/emersonary/appkit`**. It must match the Git 
 
 ## 1. Push this module
 
-From the `appkit` directory:
+From the repository root (`appkit/`) or this module directory (`go/`):
 
 ```bash
 git add .
@@ -66,7 +66,7 @@ Remove any local `replace` directive:
 
 ```go
 // delete after publishing:
-// replace github.com/emersonary/appkit => ../appkit
+// replace github.com/emersonary/appkit => ../appkit/go/go
 ```
 
 Then:
@@ -90,28 +90,48 @@ import (
 
 ## 5. Update existing projects
 
-### via-jeri (`backend/go.mod`)
+### via-jeri (monorepo root)
 
-While developing locally:
+This repository is the **source of truth** for appkit (Go + `@emersonary/appkit-accounts`), the posts service, and shared protos.
+
+While developing locally, consumers in this repo use [`go.work`](../../go.work) and `replace` directives:
 
 ```go
 require github.com/emersonary/appkit v0.0.0
-replace github.com/emersonary/appkit => ../appkit
+replace github.com/emersonary/appkit => ../appkit/go
 ```
 
-After publishing:
+Posts API (`services/posts/api/go.mod`):
 
 ```go
-require github.com/emersonary/appkit v0.1.0
+replace github.com/emersonary/appkit => ../../../appkit/go
 ```
 
-Remove the `replace` line.
+After publishing appkit tags, remove `replace` lines and `go get` the version in each module.
+
+See [`docs/MONOREPO.md`](../../docs/MONOREPO.md) for layout and publishing services.
+
+See [`../web/accounts/README.md`](../web/accounts/README.md) for the accounts TypeScript/React package (`@emersonary/appkit-accounts`).
 
 ### sahar (`api/go.mod`)
 
 Same pattern — swap the local `replace` for a tagged version once `v0.1.0` is pushed.
 
 ## 6. Releasing updates
+
+After changing `proto/auth/v1/auth.proto`, regenerate stubs from the **appkit repo root**:
+
+```bash
+make proto
+# Windows without GNU make:
+# protoc -I proto --go_out=go --go_opt=module=github.com/emersonary/appkit \
+#   --go-grpc_out=go --go-grpc_opt=module=github.com/emersonary/appkit \
+#   --connect-go_out=go --connect-go_opt=module=github.com/emersonary/appkit \
+#   proto/auth/v1/auth.proto
+# cd web/accounts && npm run generate:auth-proto
+```
+
+Commit generated `go/gen/` and `web/accounts/src/gen/` with the proto change, then tag.
 
 ```bash
 git add .
@@ -145,7 +165,7 @@ jobs:
         with:
           go-version: "1.23"
       - run: git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
-      - run: go test ./...
+      - run: cd go && go test ./...
 ```
 
 ## Checklist

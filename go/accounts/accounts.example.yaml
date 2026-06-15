@@ -1,0 +1,27 @@
+schema: auth
+
+tenancy:
+  enabled: false
+  default_tenant_id: sahar
+
+session:
+  access_token_ttl: 24h
+
+urls:
+  frontend_url: http://localhost:5174
+  api_public_url: http://localhost:8082
+
+tokens:
+  verification_token_ttl: 24h
+  password_reset_token_ttl: 1h
+
+oauth:
+  state_cookie_name: sahar_oauth_state
+  google:
+    enabled: true
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8082/auth/google/callback
+
+features:
+  admin_flag: true

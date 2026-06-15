@@ -1,26 +1,11 @@
-# Binaries
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Dependencies
+web/accounts/node_modules/
 
-# Test artifacts
-*.test
-*.out
-coverage.out
-coverage.html
+# Build output
+web/accounts/dist/
 
-# Go workspace
-go.work
-go.work.sum
-
-# IDE
+# IDE / OS
 .idea/
 .vscode/
-*.swp
-*.swo
-
-# OS
 .DS_Store
 Thumbs.db

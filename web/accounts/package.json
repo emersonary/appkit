@@ -1,0 +1,31 @@
+{
+  "name": "@emersonary/appkit-accounts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared accounts UI, Connect client, and auth workflow for appkit consumer apps",
+  "scripts": {
+    "generate:auth-proto": "node ./scripts/generate-auth-proto.mjs",
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-web": "^1.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protobuf": "^1.10.1",
+    "@bufbuild/protoc-gen-es": "^1.10.1",
+    "@connectrpc/connect": "1.7.0",
+    "@connectrpc/connect-web": "1.7.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.8.3"
+  }
+}

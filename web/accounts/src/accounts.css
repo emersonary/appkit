@@ -1,0 +1,116 @@
+.appkit-account-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.appkit-account-menu__trigger,
+.appkit-account-menu__sign-in-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.appkit-account-menu__sign-in-trigger,
+.appkit-account-menu__avatar {
+  --appkit-account-trigger-size: 2rem;
+  --appkit-account-trigger-radius: 0.25rem;
+  --appkit-account-trigger-border: rgba(255, 255, 255, 0.35);
+  --appkit-account-trigger-bg: transparent;
+  --appkit-account-trigger-fg: currentColor;
+  --appkit-account-trigger-hover-border: #c9a86c;
+
+  width: var(--appkit-account-trigger-size);
+  height: var(--appkit-account-trigger-size);
+  border: 2px solid var(--appkit-account-trigger-border);
+  border-radius: var(--appkit-account-trigger-radius);
+  background: var(--appkit-account-trigger-bg);
+  color: var(--appkit-account-trigger-fg);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.appkit-account-menu__sign-in-trigger:hover,
+.appkit-account-menu__trigger:hover .appkit-account-menu__avatar,
+.appkit-account-menu__trigger[aria-expanded='true'] .appkit-account-menu__avatar {
+  border-color: var(--appkit-account-trigger-hover-border);
+  color: var(--appkit-account-trigger-hover-border);
+}
+
+.appkit-account-menu__sign-in-icon,
+.appkit-account-menu__sign-in-trigger svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.appkit-account-menu__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.appkit-account-menu__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.appkit-account-menu__avatar-initials {
+  display: block;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.appkit-account-menu__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  inset-inline-end: 0;
+  z-index: 200;
+  min-width: 10rem;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--appkit-account-trigger-radius, 0.25rem);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.appkit-account-menu__panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.appkit-account-menu__panel-email {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  word-break: break-all;
+}
+
+.appkit-account-menu__menu-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: var(--appkit-account-trigger-radius, 0.25rem);
+  background: transparent;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.appkit-account-menu__menu-item + .appkit-account-menu__menu-item {
+  margin-top: 0.5rem;
+}
