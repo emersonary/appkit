@@ -42,6 +42,7 @@ func (h *connectAccountService) GetSession(
 	ctx context.Context,
 	req *connect.Request[accountv1.GetSessionRequest],
 ) (*connect.Response[accountv1.SessionResponse], error) {
+	ctx = ContextWithAuthorizationHeader(ctx, req.Header().Get("Authorization"))
 	resp, err := h.inner.GetSession(ctx, req.Msg)
 	if err != nil {
 		return nil, ToConnectError(err)

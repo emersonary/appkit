@@ -48,6 +48,17 @@ func TestAccountServer_Login_InvalidArgument(t *testing.T) {
 	assertGRPCCode(t, err, codes.InvalidArgument)
 }
 
+func TestBearerToken_FromConnectAuthorizationHeader(t *testing.T) {
+	ctx := ContextWithAuthorizationHeader(context.Background(), "Bearer token-abc")
+	token, err := BearerToken(ctx)
+	if err != nil {
+		t.Fatalf("BearerToken: %v", err)
+	}
+	if token != "token-abc" {
+		t.Fatalf("token: got %q", token)
+	}
+}
+
 func TestAccountServer_GetSession_MissingAuthorization(t *testing.T) {
 	s := NewAccountServer(mustTestService(t))
 

@@ -24,6 +24,14 @@ func WithAccountID(ctx context.Context, accountID string) context.Context {
 	return context.WithValue(ctx, accountIDKey, accountID)
 }
 
+// ContextWithAuthorizationHeader maps a Connect/HTTP Authorization header into gRPC metadata.
+func ContextWithAuthorizationHeader(ctx context.Context, authorization string) context.Context {
+	if authorization == "" {
+		return ctx
+	}
+	return metadata.NewIncomingContext(ctx, metadata.Pairs("authorization", authorization))
+}
+
 func BearerToken(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
