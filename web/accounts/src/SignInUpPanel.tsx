@@ -51,7 +51,7 @@ export function SignInUpPanel({
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
-  const [blockAutofill, setBlockAutofill] = useState(true);
+  const [blockAutofill, setBlockAutofill] = useState(mode === 'register');
 
   function switchMode(next: SignInUpMode) {
     onModeChange(next);
@@ -103,9 +103,11 @@ export function SignInUpPanel({
     : {};
 
   const loginEmailProps = !isRegister
-    ? { autoComplete: 'username' as const, readOnly: false as const }
-    : {};
-  const loginPasswordProps = !isRegister ? { autoComplete: 'current-password' as const, readOnly: false as const } : {};
+    ? ({ autoComplete: 'email' as const, name: 'email', readOnly: false as const })
+    : ({ name: 'accounts-workflow-email' as const });
+  const loginPasswordProps = !isRegister
+    ? ({ autoComplete: 'current-password' as const, name: 'password', readOnly: false as const })
+    : ({ name: 'accounts-workflow-password' as const });
 
   return (
     <>
@@ -138,7 +140,7 @@ export function SignInUpPanel({
           .filter(Boolean)
           .join(' ')}
         onSubmit={handleSubmit}
-        autoComplete="off"
+        autoComplete={isRegister ? 'off' : 'on'}
         key={mode}
       >
         {isRegister && (
@@ -159,15 +161,14 @@ export function SignInUpPanel({
           </FieldLabel>
           <input
             id="accounts-workflow-email"
-            name="accounts-workflow-email"
             className={classNames.input}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onFocus={isRegister ? enableInput : undefined}
             required
-            {...registerAntiAutofill}
             {...loginEmailProps}
+            {...registerAntiAutofill}
           />
         </div>
         {mode === 'register' && (
@@ -225,7 +226,6 @@ export function SignInUpPanel({
           </FieldLabel>
           <input
             id="accounts-workflow-password"
-            name="accounts-workflow-password"
             className={classNames.input}
             type="password"
             value={password}
@@ -233,8 +233,8 @@ export function SignInUpPanel({
             onFocus={isRegister ? enableInput : undefined}
             required
             minLength={6}
-            {...registerAntiAutofill}
             {...loginPasswordProps}
+            {...registerAntiAutofill}
           />
           {mode === 'login' && renderForgotPasswordLink && (
             <div className={classNames.forgotRow ?? 'appkit-login-workflow__forgot-row'}>
