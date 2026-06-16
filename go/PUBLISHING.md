@@ -107,11 +107,17 @@ Posts API (`services/posts/api/go.mod`):
 replace github.com/emersonary/appkit => ../../../appkit/go
 ```
 
+Accounts block (`blocks/account/go/go.mod`):
+
+```go
+replace github.com/emersonary/appkit => ../../../go
+```
+
 After publishing appkit tags, remove `replace` lines and `go get` the version in each module.
 
 See [`docs/MONOREPO.md`](../../docs/MONOREPO.md) for layout and publishing services.
 
-See [`../web/accounts/README.md`](../web/accounts/README.md) for the accounts TypeScript/React package (`@emersonary/appkit-accounts`).
+See [`../blocks/account/web/README.md`](../blocks/account/web/README.md) for the accounts TypeScript/React package (`@emersonary/appkit-accounts`).
 
 ### sahar (`api/go.mod`)
 
@@ -128,10 +134,10 @@ make proto
 #   --go-grpc_out=go --go-grpc_opt=module=github.com/emersonary/appkit \
 #   --connect-go_out=go --connect-go_opt=module=github.com/emersonary/appkit \
 #   proto/auth/v1/auth.proto
-# cd web/accounts && npm run generate:auth-proto
+# cd blocks/account/web && npm run generate:auth-proto
 ```
 
-Commit generated `go/gen/` and `web/accounts/src/gen/` with the proto change, then tag.
+Commit generated `blocks/account/go/gen/` and `blocks/account/web/src/gen/` with the proto change, then tag.
 
 ```bash
 git add .

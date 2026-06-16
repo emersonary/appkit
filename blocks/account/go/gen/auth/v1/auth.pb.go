@@ -837,7 +837,7 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"\x15GetVerificationStatus\x12%.auth.v1.GetVerificationStatusRequest\x1a&.auth.v1.GetVerificationStatusResponse\x12l\n" +
 	"\x17ResendVerificationEmail\x12'.auth.v1.ResendVerificationEmailRequest\x1a(.auth.v1.ResendVerificationEmailResponse\x12c\n" +
 	"\x14RequestPasswordReset\x12$.auth.v1.RequestPasswordResetRequest\x1a%.auth.v1.RequestPasswordResetResponse\x12N\n" +
-	"\rResetPassword\x12\x1d.auth.v1.ResetPasswordRequest\x1a\x1e.auth.v1.ResetPasswordResponseB1Z/github.com/emersonary/appkit/gen/auth/v1;authv1b\x06proto3"
+	"\rResetPassword\x12\x1d.auth.v1.ResetPasswordRequest\x1a\x1e.auth.v1.ResetPasswordResponseB:Z8github.com/emersonary/appkit/accounts/gen/auth/v1;authv1b\x06proto3"
 
 var (
 	file_auth_v1_auth_proto_rawDescOnce sync.Once

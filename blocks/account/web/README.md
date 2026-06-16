@@ -18,7 +18,7 @@ Styling is headless — pass `classNames` and `labels` from the host app.
 
 ```json
 "workspaces": [
-  "appkit/web/accounts"
+  "appkit/blocks/account/web"
 ]
 ```
 
@@ -27,7 +27,7 @@ Styling is headless — pass `classNames` and `labels` from the host app.
 ```json
 {
   "dependencies": {
-    "@emersonary/appkit-accounts": "file:../../via-jeri/appkit/web/accounts"
+    "@emersonary/appkit-accounts": "file:../../via-jeri/appkit/blocks/account/web"
   }
 }
 ```
@@ -45,7 +45,7 @@ cd ../sahar/web && npm install
 // vite.config.ts
 import path from 'node:path';
 
-const accountsPkg = path.resolve(__dirname, '../via-jeri/appkit/web/accounts/src/index.ts');
+const accountsPkg = path.resolve(__dirname, '../via-jeri/appkit/blocks/account/web/src/index.ts');
 
 export default defineConfig({
   resolve: {
@@ -56,7 +56,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      allow: [repoRoot, path.resolve(repoRoot, '../via-jeri/appkit/web/accounts')],
+      allow: [repoRoot, path.resolve(repoRoot, '../via-jeri/appkit/blocks/account/web')],
     },
   },
 });
@@ -90,7 +90,7 @@ const authClient = createConnectAuthClient({
 ### 5. Regenerate proto stubs
 
 ```bash
-cd via-jeri/appkit/web/accounts
+cd via-jeri/appkit/blocks/account/web
 npm run generate:auth-proto
 ```
 

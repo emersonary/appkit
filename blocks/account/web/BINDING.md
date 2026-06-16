@@ -8,7 +8,7 @@ Checklist for linking this package to `sahar/web`.
 via-jeri/appkit/
   proto/auth/v1/auth.proto     ← source of truth
   go/accounts/                 ← Go backend service
-  web/accounts/                ← this npm package
+blocks/account/web/                ← this npm package
 sahar/
   proto/auth/v1/auth.proto     ← synced copy (go_package differs)
   web/src/accounts/            ← Sahar-only glue (AuthWorkflow, membership)
@@ -21,21 +21,21 @@ sahar/
 `via-jeri/package.json` workspace entry:
 
 ```json
-"appkit/web/accounts"
+"appkit/blocks/account/web"
 ```
 
 `sahar/web/package.json`:
 
 ```json
-"@emersonary/appkit-accounts": "file:../../via-jeri/appkit/web/accounts"
+"@emersonary/appkit-accounts": "file:../../via-jeri/appkit/blocks/account/web"
 ```
 
 Run `npm install` in both roots.
 
 ### 2. Vite config (`sahar/web/vite.config.ts`)
 
-- Alias `@emersonary/appkit-accounts` → `.../appkit/web/accounts/src/index.ts`
-- Add `appkit/web/accounts` to `server.fs.allow`
+- Alias `@emersonary/appkit-accounts` → `.../appkit/blocks/account/web/src/index.ts`
+- Add `appkit/blocks/account/web` to `server.fs.allow`
 - Keep `dedupe: ['react', 'react-dom']`
 
 ### 3. Sahar glue files (stay in Sahar, not appkit)
@@ -63,7 +63,7 @@ Replace `@emersonary/appkit-ui` with `@emersonary/appkit-accounts` in:
 node via-jeri/scripts/sync-auth-proto-to-sahar.mjs
 
 # Regenerate stubs
-cd via-jeri/appkit/web/accounts && npm run generate:auth-proto
+cd via-jeri/appkit/blocks/account/web && npm run generate:auth-proto
 cd sahar && make proto-go
 cd sahar/web && npm run generate:proto
 ```

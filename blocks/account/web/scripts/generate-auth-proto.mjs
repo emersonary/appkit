@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const accountsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const appkitRoot = resolve(accountsRoot, '../..');
+const appkitRoot = resolve(accountsRoot, '../../..');
 const viaJeriRoot = resolve(appkitRoot, '..');
 const protoDir = join(appkitRoot, 'proto');
 const outDir = join(accountsRoot, 'src', 'gen');
@@ -44,4 +44,4 @@ execFileSync(
   { stdio: 'inherit' },
 );
 
-console.log('Generated auth TypeScript into appkit/web/accounts/src/gen/');
+console.log('Generated auth TypeScript into appkit/blocks/account/web/src/gen/');

@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/emersonary/appkit/gen/auth/v1"
+	v1 "github.com/emersonary/appkit/accounts/gen/auth/v1"
 	http "net/http"
 	strings "strings"
 )
