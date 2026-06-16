@@ -22,7 +22,7 @@ oauth:
   state_cookie_name: sahar_oauth_state
   google:
     enabled: true
-    redirect_url: http://localhost:8082/auth/google/callback
+    redirect_url: http://localhost:8082/account/google/callback
 
 features:
   admin_flag: true
@@ -58,7 +58,7 @@ svc.RegisterProvider(googleoauth.New(googleoauth.Config{...}))
 ## HTTP routes
 
 ```go
-accounthttp.New(svc, googleProvider).RegisterRoutes(mux)
+accounthttp.New(svc).RegisterRoutes(mux)
 ```
 
-Registers: `GET /auth/google`, `GET /auth/google/callback`, `GET /auth/verify-email`.
+Registers: `GET /account/google`, `GET /account/google/callback`, `GET /account/verify-email`.

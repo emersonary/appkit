@@ -4,5 +4,5 @@ export function googleAccountsLoginUrl(baseUrl?: string): string {
   if (!isAccountsApiConfigured(baseUrl)) {
     throw new Error('Accounts API is not configured');
   }
-  return accountsHttpUrl('/auth/google', baseUrl);
+  return accountsHttpUrl('/account/google', baseUrl);
 }

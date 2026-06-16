@@ -10,7 +10,6 @@ import (
 	"github.com/emersonary/appkit/accounts/gen/account/v1/accountv1connect"
 	accounthttp "github.com/emersonary/appkit/accounts/http"
 	"github.com/emersonary/appkit/accounts"
-	"github.com/emersonary/appkit/accounts/oauth"
 )
 
 // Block wires account transport (Connect, gRPC, default REST) around a Service.
@@ -19,26 +18,32 @@ type Block struct {
 	accountServer *AccountServer
 }
 
-func NewBlock(svc *accounts.Service) *Block {
-	return &Block{
-		Service:       svc,
-		accountServer: NewAccountServer(svc),
-	}
-}
-
-// HTTPRoute registers an extra REST or WebSocket handler on the shared mux.
+// HTTPRoute registers an optional extra REST or WebSocket handler owned by the account block.
 type HTTPRoute struct {
 	Pattern string
 	Handler http.Handler
 }
 
-// HTTPMount configures HTTP registration for the block.
-type HTTPMount struct {
-	OAuthProvider  oauth.Provider
+// Mount configures where account transport is registered. Fields are optional; pass nil to
+// NewBlock when only the service wrapper is needed (e.g. unit tests).
+type Mount struct {
+	HTTPMux        *http.ServeMux
+	GRPCServer     *grpc.Server
 	ConnectOptions []connect.HandlerOption
 	ExtraRoutes    []HTTPRoute
-	// RegisterExtra mounts app-specific REST or WebSocket routes before block defaults.
-	RegisterExtra func(mux *http.ServeMux)
+}
+
+// NewBlock builds the account transport block and, when mount is non-nil, registers all
+// account endpoints on the given HTTP mux and/or gRPC server.
+func NewBlock(svc *accounts.Service, mount *Mount) *Block {
+	b := &Block{
+		Service:       svc,
+		accountServer: NewAccountServer(svc),
+	}
+	if mount != nil {
+		b.mount(mount)
+	}
+	return b
 }
 
 // AccountServer returns the gRPC/Connect implementation for advanced wiring.
@@ -51,23 +56,19 @@ func (b *Block) ConnectHandler(opts ...connect.HandlerOption) (mountPath string,
 	return accountv1connect.NewAccountServiceHandler(newConnectAccountService(b.accountServer), opts...)
 }
 
-// MountHTTP registers default account REST routes, Connect, and any extra routes.
-func (b *Block) MountHTTP(mux *http.ServeMux, mount HTTPMount) {
-	if mount.RegisterExtra != nil {
-		mount.RegisterExtra(mux)
+func (b *Block) mount(m *Mount) {
+	if m.HTTPMux != nil {
+		for _, route := range m.ExtraRoutes {
+			m.HTTPMux.Handle(route.Pattern, route.Handler)
+		}
+		accounthttp.New(b.Service).RegisterRoutes(m.HTTPMux)
+		path, handler := accountv1connect.NewAccountServiceHandler(
+			newConnectAccountService(b.accountServer),
+			m.ConnectOptions...,
+		)
+		m.HTTPMux.Handle(path, handler)
 	}
-	for _, route := range mount.ExtraRoutes {
-		mux.Handle(route.Pattern, route.Handler)
+	if m.GRPCServer != nil {
+		accountv1.RegisterAccountServiceServer(m.GRPCServer, b.accountServer)
 	}
-	accounthttp.New(b.Service, mount.OAuthProvider).RegisterRoutes(mux)
-	path, handler := accountv1connect.NewAccountServiceHandler(
-		newConnectAccountService(b.accountServer),
-		mount.ConnectOptions...,
-	)
-	mux.Handle(path, handler)
-}
-
-// RegisterGRPC registers AccountService on a gRPC server.
-func (b *Block) RegisterGRPC(grpcServer *grpc.Server) {
-	accountv1.RegisterAccountServiceServer(grpcServer, b.accountServer)
 }

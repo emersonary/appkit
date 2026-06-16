@@ -16,14 +16,18 @@ type Server struct {
 	provider oauth.Provider
 }
 
-func New(svc *accounts.Service, provider oauth.Provider) *Server {
+func New(svc *accounts.Service) *Server {
+	var provider oauth.Provider
+	if p, ok := svc.OAuthProvider(oauth.ProviderGoogle); ok {
+		provider = p
+	}
 	return &Server{svc: svc, provider: provider}
 }
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /auth/verify-email", s.handleVerifyEmail)
-	mux.HandleFunc("GET /auth/google", s.handleGoogleLogin)
-	mux.HandleFunc("GET /auth/google/callback", s.handleGoogleCallback)
+	mux.HandleFunc("GET /account/verify-email", s.handleVerifyEmail)
+	mux.HandleFunc("GET /account/google", s.handleGoogleLogin)
+	mux.HandleFunc("GET /account/google/callback", s.handleGoogleCallback)
 }
 
 func (s *Server) handleVerifyEmail(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +146,7 @@ func (s *Server) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirectURL := fmt.Sprintf(
-		"%s/auth/callback?access_token=%s",
+		"%s/account/callback?access_token=%s",
 		cfg.URLs.FrontendURL,
 		url.QueryEscape(session.AccessToken),
 	)
@@ -151,7 +155,7 @@ func (s *Server) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) redirectWithError(w http.ResponseWriter, r *http.Request, code string) {
 	redirectURL := fmt.Sprintf(
-		"%s/auth/callback?error=%s",
+		"%s/account/callback?error=%s",
 		s.svc.Config().URLs.FrontendURL,
 		url.QueryEscape(code),
 	)

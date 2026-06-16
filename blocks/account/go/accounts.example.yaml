@@ -21,7 +21,7 @@ oauth:
     enabled: true
     client_id: ""
     client_secret: ""
-    redirect_url: http://localhost:8082/auth/google/callback
+    redirect_url: http://localhost:8082/account/google/callback
 
 features:
   admin_flag: true

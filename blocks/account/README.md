@@ -16,22 +16,17 @@ blocks/account/
 
 ```go
 svc, err := accounts.NewService(sqlDB, cfg, secrets, accounts.Options{Mailer: mailer})
-block := transport.NewBlock(svc)
 
-// HTTP: Connect RPC + default REST + your routes
-block.MountHTTP(mux, transport.HTTPMount{
-    OAuthProvider: googleProvider,
-    RegisterExtra: func(mux *http.ServeMux) {
-        mux.HandleFunc("GET /healthz", handleHealth)
-        // REST or WebSocket handlers
-    },
-    ExtraRoutes: []transport.HTTPRoute{
-        {Pattern: "/ws", Handler: wsHandler},
-    },
+mux := http.NewServeMux()
+grpcSrv := grpc.NewServer(/* app interceptors */)
+
+	block := transport.NewBlock(svc, &transport.Mount{
+    HTTPMux:    mux,
+    GRPCServer: grpcSrv,
 })
 
-// gRPC
-block.RegisterGRPC(grpcServer)
+// App-owned routes (not accounts)
+mux.HandleFunc("GET /healthz", handleHealth)
 ```
 
 `Service` methods (`Login`, `Register`, `SessionFromToken`, …) stay public for direct use in tests, jobs, and app-specific HTTP.

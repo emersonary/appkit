@@ -296,7 +296,7 @@ func (s *Service) sendVerificationEmail(ctx context.Context, account Account) er
 	}
 
 	verifyURL := fmt.Sprintf(
-		"%s/auth/verify-email?token=%s",
+		"%s/account/verify-email?token=%s",
 		s.cfg.URLs.APIPublicURL,
 		plain,
 	)
