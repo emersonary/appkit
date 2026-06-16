@@ -10,7 +10,7 @@ via-jeri/appkit/
   blocks/account/go/                      ← Go backend service
   blocks/account/web/                     ← this npm package
 sahar/
-  proto/auth/v1/auth.proto              ← synced copy (go_package differs)
+  proto/account/v1/account.proto        ← synced copy (go_package differs)
   web/src/accounts/                     ← Sahar-only glue (AuthWorkflow, membership)
 ```
 

@@ -1,5 +1,5 @@
 import { GetSessionRequest, LogoutRequest } from '../gen/v1/account_pb';
-import { AuthService } from '../gen/v1/account_connect';
+import { AccountService } from '../gen/v1/account_connect';
 import type { AccountSession, AccountsAuthClient } from '../types';
 import { fromConnectError } from './connectErrors';
 import { createAccountsAuthClient } from './transport';
@@ -12,7 +12,7 @@ export type CreateConnectAuthClientOptions = {
 
 function toSession(response: {
   accessToken: string;
-  user?: {
+  account?: {
     id: string;
     email: string;
     firstName?: string;
@@ -24,12 +24,12 @@ function toSession(response: {
   return {
     accessToken: response.accessToken,
     user: {
-      id: response.user?.id ?? '',
-      email: response.user?.email ?? '',
-      firstName: response.user?.firstName || undefined,
-      lastName: response.user?.lastName || undefined,
-      avatarUrl: response.user?.avatarUrl || undefined,
-      isAdmin: response.user?.isAdmin ?? false,
+      id: response.account?.id ?? '',
+      email: response.account?.email ?? '',
+      firstName: response.account?.firstName || undefined,
+      lastName: response.account?.lastName || undefined,
+      avatarUrl: response.account?.avatarUrl || undefined,
+      isAdmin: response.account?.isAdmin ?? false,
     },
   };
 }
@@ -42,7 +42,7 @@ export function createConnectAuthClient({
   baseUrl = '',
   storage,
 }: CreateConnectAuthClientOptions): AccountsAuthClient {
-  const client = createAccountsAuthClient(AuthService, { baseUrl, storage });
+  const client = createAccountsAuthClient(AccountService, { baseUrl, storage });
 
   return {
     async login(email, password) {
@@ -71,7 +71,7 @@ export function createConnectAuthClient({
           storage.write(null);
           return {
             verificationRequired: true,
-            email: response.session?.user?.email ?? email.trim(),
+            email: response.session?.account?.email ?? email.trim(),
           };
         }
         const session = toSession(response.session!);

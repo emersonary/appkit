@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: v1/account.proto
 
-package authv1
+package accountv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type User struct {
+type Account struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
@@ -34,20 +34,20 @@ type User struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *User) Reset() {
-	*x = User{}
+func (x *Account) Reset() {
+	*x = Account{}
 	mi := &file_v1_account_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *User) String() string {
+func (x *Account) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*User) ProtoMessage() {}
+func (*Account) ProtoMessage() {}
 
-func (x *User) ProtoReflect() protoreflect.Message {
+func (x *Account) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_account_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -59,54 +59,54 @@ func (x *User) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use User.ProtoReflect.Descriptor instead.
-func (*User) Descriptor() ([]byte, []int) {
+// Deprecated: Use Account.ProtoReflect.Descriptor instead.
+func (*Account) Descriptor() ([]byte, []int) {
 	return file_v1_account_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *User) GetId() string {
+func (x *Account) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *User) GetEmail() string {
+func (x *Account) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *User) GetFirstName() string {
+func (x *Account) GetFirstName() string {
 	if x != nil {
 		return x.FirstName
 	}
 	return ""
 }
 
-func (x *User) GetEmailVerified() bool {
+func (x *Account) GetEmailVerified() bool {
 	if x != nil {
 		return x.EmailVerified
 	}
 	return false
 }
 
-func (x *User) GetAvatarUrl() string {
+func (x *Account) GetAvatarUrl() string {
 	if x != nil {
 		return x.AvatarUrl
 	}
 	return ""
 }
 
-func (x *User) GetIsAdmin() bool {
+func (x *Account) GetIsAdmin() bool {
 	if x != nil {
 		return x.IsAdmin
 	}
 	return false
 }
 
-func (x *User) GetLastName() string {
+func (x *Account) GetLastName() string {
 	if x != nil {
 		return x.LastName
 	}
@@ -396,7 +396,7 @@ func (x *RegisterResponse) GetSession() *SessionResponse {
 type SessionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Account       *Account               `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -438,9 +438,9 @@ func (x *SessionResponse) GetAccessToken() string {
 	return ""
 }
 
-func (x *SessionResponse) GetUser() *User {
+func (x *SessionResponse) GetAccount() *Account {
 	if x != nil {
-		return x.User
+		return x.Account
 	}
 	return nil
 }
@@ -785,8 +785,9 @@ var File_v1_account_proto protoreflect.FileDescriptor
 
 const file_v1_account_proto_rawDesc = "" +
 	"\n" +
-	"\x10v1/account.proto\x12\aauth.v1\"\xc9\x01\n" +
-	"\x04User\x12\x0e\n" +
+	"\x10v1/account.proto\x12\n" +
+	"account.v1\"\xcc\x01\n" +
+	"\aAccount\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1d\n" +
 	"\n" +
@@ -807,13 +808,13 @@ const file_v1_account_proto_rawDesc = "" +
 	"\tlast_name\x18\x04 \x01(\tR\blastName\"\x13\n" +
 	"\x11GetSessionRequest\"\x0f\n" +
 	"\rLogoutRequest\"\x10\n" +
-	"\x0eLogoutResponse\"{\n" +
+	"\x0eLogoutResponse\"~\n" +
 	"\x10RegisterResponse\x123\n" +
-	"\x15verification_required\x18\x01 \x01(\bR\x14verificationRequired\x122\n" +
-	"\asession\x18\x02 \x01(\v2\x18.auth.v1.SessionResponseR\asession\"W\n" +
+	"\x15verification_required\x18\x01 \x01(\bR\x14verificationRequired\x125\n" +
+	"\asession\x18\x02 \x01(\v2\x1b.account.v1.SessionResponseR\asession\"c\n" +
 	"\x0fSessionResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12!\n" +
-	"\x04user\x18\x02 \x01(\v2\r.auth.v1.UserR\x04user\"4\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12-\n" +
+	"\aaccount\x18\x02 \x01(\v2\x13.account.v1.AccountR\aaccount\"4\n" +
 	"\x1cGetVerificationStatusRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\";\n" +
 	"\x1dGetVerificationStatusResponse\x12\x1a\n" +
@@ -827,17 +828,17 @@ const file_v1_account_proto_rawDesc = "" +
 	"\x14ResetPasswordRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"\x17\n" +
-	"\x15ResetPasswordResponse2\x92\x05\n" +
-	"\vAuthService\x128\n" +
-	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x18.auth.v1.SessionResponse\x12?\n" +
-	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x19.auth.v1.RegisterResponse\x12B\n" +
+	"\x15ResetPasswordResponse2\xc5\x05\n" +
+	"\x0eAccountService\x12>\n" +
+	"\x05Login\x12\x18.account.v1.LoginRequest\x1a\x1b.account.v1.SessionResponse\x12E\n" +
+	"\bRegister\x12\x1b.account.v1.RegisterRequest\x1a\x1c.account.v1.RegisterResponse\x12H\n" +
 	"\n" +
-	"GetSession\x12\x1a.auth.v1.GetSessionRequest\x1a\x18.auth.v1.SessionResponse\x129\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\x12f\n" +
-	"\x15GetVerificationStatus\x12%.auth.v1.GetVerificationStatusRequest\x1a&.auth.v1.GetVerificationStatusResponse\x12l\n" +
-	"\x17ResendVerificationEmail\x12'.auth.v1.ResendVerificationEmailRequest\x1a(.auth.v1.ResendVerificationEmailResponse\x12c\n" +
-	"\x14RequestPasswordReset\x12$.auth.v1.RequestPasswordResetRequest\x1a%.auth.v1.RequestPasswordResetResponse\x12N\n" +
-	"\rResetPassword\x12\x1d.auth.v1.ResetPasswordRequest\x1a\x1e.auth.v1.ResetPasswordResponseB:Z8github.com/emersonary/appkit/accounts/gen/auth/v1;authv1b\x06proto3"
+	"GetSession\x12\x1d.account.v1.GetSessionRequest\x1a\x1b.account.v1.SessionResponse\x12?\n" +
+	"\x06Logout\x12\x19.account.v1.LogoutRequest\x1a\x1a.account.v1.LogoutResponse\x12l\n" +
+	"\x15GetVerificationStatus\x12(.account.v1.GetVerificationStatusRequest\x1a).account.v1.GetVerificationStatusResponse\x12r\n" +
+	"\x17ResendVerificationEmail\x12*.account.v1.ResendVerificationEmailRequest\x1a+.account.v1.ResendVerificationEmailResponse\x12i\n" +
+	"\x14RequestPasswordReset\x12'.account.v1.RequestPasswordResetRequest\x1a(.account.v1.RequestPasswordResetResponse\x12T\n" +
+	"\rResetPassword\x12 .account.v1.ResetPasswordRequest\x1a!.account.v1.ResetPasswordResponseB@Z>github.com/emersonary/appkit/accounts/gen/account/v1;accountv1b\x06proto3"
 
 var (
 	file_v1_account_proto_rawDescOnce sync.Once
@@ -853,42 +854,42 @@ func file_v1_account_proto_rawDescGZIP() []byte {
 
 var file_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_v1_account_proto_goTypes = []any{
-	(*User)(nil),                            // 0: auth.v1.User
-	(*LoginRequest)(nil),                    // 1: auth.v1.LoginRequest
-	(*RegisterRequest)(nil),                 // 2: auth.v1.RegisterRequest
-	(*GetSessionRequest)(nil),               // 3: auth.v1.GetSessionRequest
-	(*LogoutRequest)(nil),                   // 4: auth.v1.LogoutRequest
-	(*LogoutResponse)(nil),                  // 5: auth.v1.LogoutResponse
-	(*RegisterResponse)(nil),                // 6: auth.v1.RegisterResponse
-	(*SessionResponse)(nil),                 // 7: auth.v1.SessionResponse
-	(*GetVerificationStatusRequest)(nil),    // 8: auth.v1.GetVerificationStatusRequest
-	(*GetVerificationStatusResponse)(nil),   // 9: auth.v1.GetVerificationStatusResponse
-	(*ResendVerificationEmailRequest)(nil),  // 10: auth.v1.ResendVerificationEmailRequest
-	(*ResendVerificationEmailResponse)(nil), // 11: auth.v1.ResendVerificationEmailResponse
-	(*RequestPasswordResetRequest)(nil),     // 12: auth.v1.RequestPasswordResetRequest
-	(*RequestPasswordResetResponse)(nil),    // 13: auth.v1.RequestPasswordResetResponse
-	(*ResetPasswordRequest)(nil),            // 14: auth.v1.ResetPasswordRequest
-	(*ResetPasswordResponse)(nil),           // 15: auth.v1.ResetPasswordResponse
+	(*Account)(nil),                         // 0: account.v1.Account
+	(*LoginRequest)(nil),                    // 1: account.v1.LoginRequest
+	(*RegisterRequest)(nil),                 // 2: account.v1.RegisterRequest
+	(*GetSessionRequest)(nil),               // 3: account.v1.GetSessionRequest
+	(*LogoutRequest)(nil),                   // 4: account.v1.LogoutRequest
+	(*LogoutResponse)(nil),                  // 5: account.v1.LogoutResponse
+	(*RegisterResponse)(nil),                // 6: account.v1.RegisterResponse
+	(*SessionResponse)(nil),                 // 7: account.v1.SessionResponse
+	(*GetVerificationStatusRequest)(nil),    // 8: account.v1.GetVerificationStatusRequest
+	(*GetVerificationStatusResponse)(nil),   // 9: account.v1.GetVerificationStatusResponse
+	(*ResendVerificationEmailRequest)(nil),  // 10: account.v1.ResendVerificationEmailRequest
+	(*ResendVerificationEmailResponse)(nil), // 11: account.v1.ResendVerificationEmailResponse
+	(*RequestPasswordResetRequest)(nil),     // 12: account.v1.RequestPasswordResetRequest
+	(*RequestPasswordResetResponse)(nil),    // 13: account.v1.RequestPasswordResetResponse
+	(*ResetPasswordRequest)(nil),            // 14: account.v1.ResetPasswordRequest
+	(*ResetPasswordResponse)(nil),           // 15: account.v1.ResetPasswordResponse
 }
 var file_v1_account_proto_depIdxs = []int32{
-	7,  // 0: auth.v1.RegisterResponse.session:type_name -> auth.v1.SessionResponse
-	0,  // 1: auth.v1.SessionResponse.user:type_name -> auth.v1.User
-	1,  // 2: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
-	2,  // 3: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
-	3,  // 4: auth.v1.AuthService.GetSession:input_type -> auth.v1.GetSessionRequest
-	4,  // 5: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
-	8,  // 6: auth.v1.AuthService.GetVerificationStatus:input_type -> auth.v1.GetVerificationStatusRequest
-	10, // 7: auth.v1.AuthService.ResendVerificationEmail:input_type -> auth.v1.ResendVerificationEmailRequest
-	12, // 8: auth.v1.AuthService.RequestPasswordReset:input_type -> auth.v1.RequestPasswordResetRequest
-	14, // 9: auth.v1.AuthService.ResetPassword:input_type -> auth.v1.ResetPasswordRequest
-	7,  // 10: auth.v1.AuthService.Login:output_type -> auth.v1.SessionResponse
-	6,  // 11: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterResponse
-	7,  // 12: auth.v1.AuthService.GetSession:output_type -> auth.v1.SessionResponse
-	5,  // 13: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutResponse
-	9,  // 14: auth.v1.AuthService.GetVerificationStatus:output_type -> auth.v1.GetVerificationStatusResponse
-	11, // 15: auth.v1.AuthService.ResendVerificationEmail:output_type -> auth.v1.ResendVerificationEmailResponse
-	13, // 16: auth.v1.AuthService.RequestPasswordReset:output_type -> auth.v1.RequestPasswordResetResponse
-	15, // 17: auth.v1.AuthService.ResetPassword:output_type -> auth.v1.ResetPasswordResponse
+	7,  // 0: account.v1.RegisterResponse.session:type_name -> account.v1.SessionResponse
+	0,  // 1: account.v1.SessionResponse.account:type_name -> account.v1.Account
+	1,  // 2: account.v1.AccountService.Login:input_type -> account.v1.LoginRequest
+	2,  // 3: account.v1.AccountService.Register:input_type -> account.v1.RegisterRequest
+	3,  // 4: account.v1.AccountService.GetSession:input_type -> account.v1.GetSessionRequest
+	4,  // 5: account.v1.AccountService.Logout:input_type -> account.v1.LogoutRequest
+	8,  // 6: account.v1.AccountService.GetVerificationStatus:input_type -> account.v1.GetVerificationStatusRequest
+	10, // 7: account.v1.AccountService.ResendVerificationEmail:input_type -> account.v1.ResendVerificationEmailRequest
+	12, // 8: account.v1.AccountService.RequestPasswordReset:input_type -> account.v1.RequestPasswordResetRequest
+	14, // 9: account.v1.AccountService.ResetPassword:input_type -> account.v1.ResetPasswordRequest
+	7,  // 10: account.v1.AccountService.Login:output_type -> account.v1.SessionResponse
+	6,  // 11: account.v1.AccountService.Register:output_type -> account.v1.RegisterResponse
+	7,  // 12: account.v1.AccountService.GetSession:output_type -> account.v1.SessionResponse
+	5,  // 13: account.v1.AccountService.Logout:output_type -> account.v1.LogoutResponse
+	9,  // 14: account.v1.AccountService.GetVerificationStatus:output_type -> account.v1.GetVerificationStatusResponse
+	11, // 15: account.v1.AccountService.ResendVerificationEmail:output_type -> account.v1.ResendVerificationEmailResponse
+	13, // 16: account.v1.AccountService.RequestPasswordReset:output_type -> account.v1.RequestPasswordResetResponse
+	15, // 17: account.v1.AccountService.ResetPassword:output_type -> account.v1.ResetPasswordResponse
 	10, // [10:18] is the sub-list for method output_type
 	2,  // [2:10] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name

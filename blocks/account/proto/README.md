@@ -4,7 +4,7 @@ Language-neutral auth/account API contract for the account block.
 
 | File | Consumers |
 |------|-----------|
-| `v1/account.proto` | `go/gen/auth/v1/`, `web/src/gen/v1/` |
+| `v1/account.proto` | `go/gen/account/v1/`, `web/src/gen/v1/` |
 
 ## Workflow
 
