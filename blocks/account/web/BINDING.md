@@ -6,12 +6,12 @@ Checklist for linking this package to `sahar/web`.
 
 ```
 via-jeri/appkit/
-  proto/auth/v1/auth.proto     ← source of truth
-  go/accounts/                 ← Go backend service
-blocks/account/web/                ← this npm package
+  blocks/account/proto/v1/account.proto   ← source of truth
+  blocks/account/go/                      ← Go backend service
+  blocks/account/web/                     ← this npm package
 sahar/
-  proto/auth/v1/auth.proto     ← synced copy (go_package differs)
-  web/src/accounts/            ← Sahar-only glue (AuthWorkflow, membership)
+  proto/auth/v1/auth.proto              ← synced copy (go_package differs)
+  web/src/accounts/                     ← Sahar-only glue (AuthWorkflow, membership)
 ```
 
 ## Steps
@@ -59,7 +59,7 @@ Replace `@emersonary/appkit-ui` with `@emersonary/appkit-accounts` in:
 ### 5. Proto workflow
 
 ```bash
-# Sync auth.proto appkit → Sahar
+# Sync account.proto appkit → Sahar
 node via-jeri/scripts/sync-auth-proto-to-sahar.mjs
 
 # Regenerate stubs

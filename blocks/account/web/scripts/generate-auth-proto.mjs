@@ -4,9 +4,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const accountsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const appkitRoot = resolve(accountsRoot, '../../..');
-const viaJeriRoot = resolve(appkitRoot, '..');
-const protoDir = join(appkitRoot, 'proto');
+const accountBlockRoot = resolve(accountsRoot, '..');
+const viaJeriRoot = resolve(accountBlockRoot, '../../..');
+const protoDir = join(accountBlockRoot, 'proto');
 const outDir = join(accountsRoot, 'src', 'gen');
 
 function plugin(name) {
@@ -24,7 +24,7 @@ function plugin(name) {
   return join(candidates[0], win ? `${name}.cmd` : name);
 }
 
-const protoFile = join(protoDir, 'auth', 'v1', 'auth.proto');
+const protoFile = join(protoDir, 'v1', 'account.proto');
 
 mkdirSync(outDir, { recursive: true });
 
@@ -44,4 +44,4 @@ execFileSync(
   { stdio: 'inherit' },
 );
 
-console.log('Generated auth TypeScript into appkit/blocks/account/web/src/gen/');
+console.log('Generated account TypeScript into appkit/blocks/account/web/src/gen/');

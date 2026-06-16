@@ -125,15 +125,15 @@ Same pattern — swap the local `replace` for a tagged version once `v0.1.0` is 
 
 ## 6. Releasing updates
 
-After changing `proto/auth/v1/auth.proto`, regenerate stubs from the **appkit repo root**:
+After changing `blocks/account/proto/v1/account.proto`, regenerate stubs from the **appkit repo root**:
 
 ```bash
 make proto
 # Windows without GNU make:
-# protoc -I proto --go_out=go --go_opt=module=github.com/emersonary/appkit \
-#   --go-grpc_out=go --go-grpc_opt=module=github.com/emersonary/appkit \
-#   --connect-go_out=go --connect-go_opt=module=github.com/emersonary/appkit \
-#   proto/auth/v1/auth.proto
+# protoc -I blocks/account/proto --go_out=blocks/account/go --go_opt=module=github.com/emersonary/appkit/accounts \
+#   --go-grpc_out=blocks/account/go --go-grpc_opt=module=github.com/emersonary/appkit/accounts \
+#   --connect-go_out=blocks/account/go --connect-go_opt=module=github.com/emersonary/appkit/accounts \
+#   blocks/account/proto/v1/account.proto
 # cd blocks/account/web && npm run generate:auth-proto
 ```
 

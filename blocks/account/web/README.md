@@ -6,7 +6,7 @@ React accounts library: login/register workflow, header menu, Connect auth clien
 
 - **UI:** `ConnectedLoginWorkflow`, `LoginWorkflow`, `AccountMenu`, `AccountsProvider`, …
 - **API:** `createConnectAuthClient`, `createLocalStorageSessionStorage`, `AccountsError`
-- **Proto:** generated TS from `appkit/proto/auth/v1/auth.proto` (`npm run generate:auth-proto`)
+- **Proto:** generated TS from `appkit/blocks/account/proto/v1/account.proto` (`npm run generate:auth-proto`)
 
 Styling is headless — pass `classNames` and `labels` from the host app.
 

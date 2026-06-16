@@ -1,5 +1,5 @@
-PROTO_DIR := proto
-AUTH_PROTO := $(PROTO_DIR)/auth/v1/auth.proto
+PROTO_DIR := blocks/account/proto
+ACCOUNT_PROTO := $(PROTO_DIR)/v1/account.proto
 GO_MODULE := github.com/emersonary/appkit
 ACCOUNTS_GO_MODULE := github.com/emersonary/appkit/accounts
 GO_DIR := go
@@ -15,7 +15,7 @@ proto-go:
 		--go_out=$(ACCOUNTS_GO_DIR) --go_opt=module=$(ACCOUNTS_GO_MODULE) \
 		--go-grpc_out=$(ACCOUNTS_GO_DIR) --go-grpc_opt=module=$(ACCOUNTS_GO_MODULE) \
 		--connect-go_out=$(ACCOUNTS_GO_DIR) --connect-go_opt=module=$(ACCOUNTS_GO_MODULE) \
-		$(AUTH_PROTO)
+		$(ACCOUNT_PROTO)
 
 proto-ts:
 	cd $(ACCOUNTS_WEB_DIR) && npm run generate:auth-proto

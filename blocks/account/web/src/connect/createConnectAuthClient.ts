@@ -1,5 +1,5 @@
-import { GetSessionRequest, LogoutRequest } from '../gen/auth/v1/auth_pb';
-import { AuthService } from '../gen/auth/v1/auth_connect';
+import { GetSessionRequest, LogoutRequest } from '../gen/v1/account_pb';
+import { AuthService } from '../gen/v1/account_connect';
 import type { AccountSession, AccountsAuthClient } from '../types';
 import { fromConnectError } from './connectErrors';
 import { createAccountsAuthClient } from './transport';
