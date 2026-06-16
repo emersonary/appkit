@@ -61,7 +61,7 @@ export function SignInUpPanel({
     setPassword('');
     setConfirmPassword('');
     setLocalError(null);
-    setBlockAutofill(true);
+    setBlockAutofill(next === 'register');
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -82,6 +82,30 @@ export function SignInUpPanel({
 
   const showOAuth = mode === 'login' && showGoogle && Boolean(googleOAuthUrl || onGoogleClick);
   const requiredMarker = labels.requiredMarker;
+  const isRegister = mode === 'register';
+  const guardAutofill = isRegister && blockAutofill;
+
+  function enableInput() {
+    setBlockAutofill(false);
+  }
+
+  const registerAntiAutofill = isRegister
+    ? ({
+        readOnly: guardAutofill,
+        onFocus: enableInput,
+        autoComplete: 'off' as const,
+        'aria-autocomplete': 'none' as const,
+        'data-lpignore': 'true',
+        'data-1p-ignore': true,
+        'data-bwignore': true,
+        'data-form-type': 'other',
+      })
+    : {};
+
+  const loginEmailProps = !isRegister
+    ? { autoComplete: 'username' as const, readOnly: false as const }
+    : {};
+  const loginPasswordProps = !isRegister ? { autoComplete: 'current-password' as const, readOnly: false as const } : {};
 
   return (
     <>
@@ -109,7 +133,20 @@ export function SignInUpPanel({
         </p>
       )}
       {verifiedBanner}
-      <form className={classNames.card ?? classNames.form} onSubmit={handleSubmit} autoComplete="off" key={mode}>
+      <form
+        className={[classNames.card ?? classNames.form, isRegister ? 'appkit-login-workflow__form--register' : '']
+          .filter(Boolean)
+          .join(' ')}
+        onSubmit={handleSubmit}
+        autoComplete="off"
+        key={mode}
+      >
+        {isRegister && (
+          <div className="appkit-login-workflow__autofill-trap" aria-hidden="true">
+            <input type="text" name="username" autoComplete="username" tabIndex={-1} defaultValue="" />
+            <input type="password" name="password" autoComplete="current-password" tabIndex={-1} defaultValue="" />
+          </div>
+        )}
         <div className={classNames.field}>
           <FieldLabel
             className={classNames.label}
@@ -127,10 +164,10 @@ export function SignInUpPanel({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onFocus={() => setBlockAutofill(false)}
-            readOnly={blockAutofill}
+            onFocus={isRegister ? enableInput : undefined}
             required
-            autoComplete="off"
+            {...registerAntiAutofill}
+            {...loginEmailProps}
           />
         </div>
         {mode === 'register' && (
@@ -152,10 +189,8 @@ export function SignInUpPanel({
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                onFocus={() => setBlockAutofill(false)}
-                readOnly={blockAutofill}
                 required
-                autoComplete="given-name"
+                {...registerAntiAutofill}
               />
             </div>
             <div className={classNames.field}>
@@ -173,9 +208,7 @@ export function SignInUpPanel({
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                onFocus={() => setBlockAutofill(false)}
-                readOnly={blockAutofill}
-                autoComplete="family-name"
+                {...registerAntiAutofill}
               />
             </div>
           </>
@@ -197,11 +230,11 @@ export function SignInUpPanel({
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onFocus={() => setBlockAutofill(false)}
-            readOnly={blockAutofill}
+            onFocus={isRegister ? enableInput : undefined}
             required
             minLength={6}
-            autoComplete="new-password"
+            {...registerAntiAutofill}
+            {...loginPasswordProps}
           />
           {mode === 'login' && renderForgotPasswordLink && (
             <div className={classNames.forgotRow ?? 'appkit-login-workflow__forgot-row'}>
@@ -227,11 +260,9 @@ export function SignInUpPanel({
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              onFocus={() => setBlockAutofill(false)}
-              readOnly={blockAutofill}
               required
               minLength={6}
-              autoComplete="new-password"
+              {...registerAntiAutofill}
             />
           </div>
         )}

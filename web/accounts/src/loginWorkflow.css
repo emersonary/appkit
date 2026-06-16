@@ -106,3 +106,16 @@
   text-align: center;
   margin-top: 1.5rem;
 }
+
+.appkit-login-workflow__form--register {
+  position: relative;
+}
+
+.appkit-login-workflow__autofill-trap {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
