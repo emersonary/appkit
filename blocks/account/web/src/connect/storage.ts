@@ -5,7 +5,7 @@ export type AccountsSessionStorage = {
   write: (session: AccountSession | null) => void;
 };
 
-const DEFAULT_KEY = 'appkit_auth_session';
+const DEFAULT_KEY = 'appkit_account_session';
 
 export function createLocalStorageSessionStorage(key = DEFAULT_KEY): AccountsSessionStorage {
   return {

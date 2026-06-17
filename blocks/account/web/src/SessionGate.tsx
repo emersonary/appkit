@@ -8,9 +8,9 @@ export function SessionGate({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const { isAuthenticated, isInitialized } = useAccountsSession();
+  const { hasAccount, isInitialized } = useAccountsSession();
   if (!isInitialized) return null;
-  return isAuthenticated ? children : fallback;
+  return hasAccount ? children : fallback;
 }
 
 export function GuestGate({
@@ -20,7 +20,7 @@ export function GuestGate({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const { isAuthenticated, isInitialized } = useAccountsSession();
+  const { hasAccount, isInitialized } = useAccountsSession();
   if (!isInitialized) return null;
-  return !isAuthenticated ? children : fallback;
+  return !hasAccount ? children : fallback;
 }

@@ -24,7 +24,7 @@ export function accountsHttpUrl(path: string, configured?: string): string {
 }
 
 export function createAccountsConnectTransport({ baseUrl = '', storage }: CreateConnectTransportOptions) {
-  const authInterceptor: Interceptor = (next) => async (req) => {
+  const accountSessionInterceptor: Interceptor = (next) => async (req) => {
     const session = storage.read();
     if (session?.accessToken) {
       req.header.set('Authorization', `Bearer ${session.accessToken}`);
@@ -34,11 +34,11 @@ export function createAccountsConnectTransport({ baseUrl = '', storage }: Create
 
   return createConnectTransport({
     baseUrl,
-    interceptors: [authInterceptor],
+    interceptors: [accountSessionInterceptor],
   });
 }
 
-export function createAccountsAuthClient<T extends Parameters<typeof createClient>[0]>(
+export function createAccountsClient<T extends Parameters<typeof createClient>[0]>(
   service: T,
   options: CreateConnectTransportOptions,
 ) {

@@ -11,7 +11,7 @@ export type ConnectedLoginWorkflowProps = Omit<
   | 'showGoogle'
 > & {
   apiBaseUrl?: string;
-  onAuthError?: UseLoginWorkflowHandlersOptions['onAuthError'];
+  onAccountError?: UseLoginWorkflowHandlersOptions['onAccountError'];
   mapResetError?: UseLoginWorkflowHandlersOptions['mapResetError'];
   onLogin?: LoginWorkflowProps['onLogin'];
   onRegister?: LoginWorkflowProps['onRegister'];
@@ -19,7 +19,7 @@ export type ConnectedLoginWorkflowProps = Omit<
 
 export function ConnectedLoginWorkflow({
   apiBaseUrl = '',
-  onAuthError,
+  onAccountError,
   mapResetError,
   classifyResetError,
   onLogin: onLoginOverride,
@@ -29,7 +29,7 @@ export function ConnectedLoginWorkflow({
 }: ConnectedLoginWorkflowProps) {
   const handlers = useLoginWorkflowHandlers({
     apiBaseUrl,
-    onAuthError,
+    onAccountError,
     mapResetError: classifyResetError ?? mapResetError,
   });
 

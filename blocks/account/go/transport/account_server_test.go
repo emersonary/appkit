@@ -74,7 +74,7 @@ func TestAccountServer_GetSession_MissingAuthorization(t *testing.T) {
 
 func mustTestService(t *testing.T) *accounts.Service {
 	t.Helper()
-	svc, err := accounts.NewService(nil, accounts.Config{
+	svc, err := accounts.New(nil, accounts.Config{
 		Schema: "accounts",
 		Tenancy: accounts.TenancyConfig{DefaultTenantID: "default"},
 	}, accounts.Secrets{JWTSecret: "test-secret"}, accounts.Options{})

@@ -15,6 +15,6 @@ Language-neutral auth/account API contract for the account block.
    make proto
    ```
 
-3. Sahar copies `account.proto` with its own `go_package` via `via-jeri/scripts/sync-auth-proto-to-sahar.mjs`.
+3. Sahar copies `account.proto` with its own `go_package` via `via-jeri/scripts/sync-account-proto-to-sahar.mjs`.
 
 Do not edit generated `gen/` trees by hand.

@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-	Level  string
-	Format string
+	Level  string `mapstructure:"level" json:"level"`
+	Format string `mapstructure:"format" json:"format"`
 }
 
 func New(cfg Config) (*zap.Logger, error) {

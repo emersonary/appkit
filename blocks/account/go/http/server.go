@@ -18,7 +18,7 @@ type Server struct {
 
 func New(svc *accounts.Service) *Server {
 	var provider oauth.Provider
-	if p, ok := svc.OAuthProvider(oauth.ProviderGoogle); ok {
+	if p, ok := svc.OAccountProvider(oauth.ProviderGoogle); ok {
 		provider = p
 	}
 	return &Server{svc: svc, provider: provider}

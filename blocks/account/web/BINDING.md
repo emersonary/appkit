@@ -11,7 +11,7 @@ via-jeri/appkit/
   blocks/account/web/                     ← this npm package
 sahar/
   proto/account/v1/account.proto        ← synced copy (go_package differs)
-  web/src/accounts/                     ← Sahar-only glue (AuthWorkflow, membership)
+  web/src/accounts/                     ← Sahar-only glue (AccountWorkflow, membership)
 ```
 
 ## Steps
@@ -42,28 +42,28 @@ Run `npm install` in both roots.
 
 | File | Role |
 |------|------|
-| `accounts/connect/saharAuthClient.ts` | `createConnectAuthClient` + `sahar_auth_session` storage |
-| `accounts/context/AuthContext.tsx` | `AccountsProvider` + membership + i18n errors |
-| `accounts/pages/AuthWorkflow.tsx` | Hero, i18n, routing → `ConnectedLoginWorkflow` |
+| `accounts/connect/saharAccountClient.ts` | `createConnectAccountClient` + `sahar_account_session` storage |
+| `accounts/context/AccountContext.tsx` | `AccountsProvider` + membership + i18n errors |
+| `accounts/pages/AccountWorkflow.tsx` | Hero, i18n, routing → `ConnectedLoginWorkflow` |
 | `accounts/components/UserAccountMenu.tsx` | `AccountMenu` + Sahar theme CSS |
 
 ### 4. Imports — use the new package name
 
 Replace `@emersonary/appkit-ui` with `@emersonary/appkit-accounts` in:
 
-- `AuthContext.tsx`
-- `saharAuthClient.ts`
-- `AuthWorkflow.tsx`
+- `AccountContext.tsx`
+- `saharAccountClient.ts`
+- `AccountWorkflow.tsx`
 - `UserAccountMenu.tsx`
 
 ### 5. Proto workflow
 
 ```bash
 # Sync account.proto appkit → Sahar
-node via-jeri/scripts/sync-auth-proto-to-sahar.mjs
+node via-jeri/scripts/sync-account-proto-to-sahar.mjs
 
 # Regenerate stubs
-cd via-jeri/appkit/blocks/account/web && npm run generate:auth-proto
+cd via-jeri/appkit/blocks/account/web && npm run generate:account-proto
 cd sahar && make proto-go
 cd sahar/web && npm run generate:proto
 ```

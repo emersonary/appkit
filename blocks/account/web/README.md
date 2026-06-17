@@ -1,12 +1,12 @@
 # @emersonary/appkit-accounts
 
-React accounts library: login/register workflow, header menu, Connect auth client, shared `auth.proto` stubs.
+React accounts library: login/register workflow, header menu, Connect account client, shared `account.proto` stubs.
 
 ## What's included
 
 - **UI:** `ConnectedLoginWorkflow`, `LoginWorkflow`, `AccountMenu`, `AccountsProvider`, …
-- **API:** `createConnectAuthClient`, `createLocalStorageSessionStorage`, `AccountsError`
-- **Proto:** generated TS from `appkit/blocks/account/proto/v1/account.proto` (`npm run generate:auth-proto`)
+- **API:** `createConnectAccountClient`, `createLocalStorageSessionStorage`, `AccountsError`
+- **Proto:** generated TS from `appkit/blocks/account/proto/v1/account.proto` (`npm run generate:account-proto`)
 
 Styling is headless — pass `classNames` and `labels` from the host app.
 
@@ -69,20 +69,20 @@ import {
   AccountsProvider,
   ConnectedLoginWorkflow,
   AccountMenu,
-  createConnectAuthClient,
+  createConnectAccountClient,
   createLocalStorageSessionStorage,
 } from '@emersonary/appkit-accounts';
 ```
 
-### 4. Wire auth client + provider
+### 4. Wire account client + provider
 
 ```tsx
-const authClient = createConnectAuthClient({
+const accountClient = createConnectAccountClient({
   baseUrl: '', // or VITE_API_URL
-  storage: createLocalStorageSessionStorage('my_app_auth_session'),
+  storage: createLocalStorageSessionStorage('my_app_account_session'),
 });
 
-<AccountsProvider tenancy={{ enabled: false }} authClient={authClient}>
+<AccountsProvider tenancy={{ enabled: false }} accountClient={accountClient}>
   {children}
 </AccountsProvider>
 ```
@@ -91,7 +91,7 @@ const authClient = createConnectAuthClient({
 
 ```bash
 cd via-jeri/appkit/blocks/account/web
-npm run generate:auth-proto
+npm run generate:account-proto
 ```
 
 Sahar API proto stays synced separately:

@@ -21,7 +21,7 @@ export type LoginWorkflowHandlers = {
 
 export type UseLoginWorkflowHandlersOptions = {
   apiBaseUrl?: string;
-  onAuthError?: (err: unknown) => void;
+  onAccountError?: (err: unknown) => void;
   mapResetError?: (err: unknown) => string | null;
 };
 
@@ -34,7 +34,7 @@ function defaultClassifyResetError(err: unknown): string | null {
 
 export function useLoginWorkflowHandlers({
   apiBaseUrl = '',
-  onAuthError,
+  onAccountError,
   mapResetError,
 }: UseLoginWorkflowHandlersOptions = {}): LoginWorkflowHandlers {
   const {
@@ -52,11 +52,11 @@ export function useLoginWorkflowHandlers({
       try {
         return await fn();
       } catch (err) {
-        onAuthError?.(err);
+        onAccountError?.(err);
         throw err;
       }
     },
-    [onAuthError],
+    [onAccountError],
   );
 
   const onLogin = useCallback(

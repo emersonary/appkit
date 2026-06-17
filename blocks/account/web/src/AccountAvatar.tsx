@@ -1,10 +1,10 @@
-import type { AccountUser, AccountsClassNames } from './types';
+import type { Account, AccountsClassNames } from './types';
 import { useAccountsConfig } from './context';
 import { mergeAccountClassNames } from './defaultClassNames';
-import { accountUserFullName, accountUserInitials } from './names';
+import { accountFullName, accountInitials } from './names';
 
 type AccountAvatarProps = {
-  user: AccountUser;
+  account: Account;
   className?: string;
   /** Header trigger: rounded square with initials (matches sign-in trigger shape). */
   variant?: 'default' | 'trigger';
@@ -12,7 +12,7 @@ type AccountAvatarProps = {
 };
 
 export function AccountAvatar({
-  user,
+  account,
   className,
   variant = 'default',
   classNames: classNamesProp,
@@ -20,12 +20,12 @@ export function AccountAvatar({
   const { classNames: ctxClassNames } = useAccountsConfig();
   const classNames = mergeAccountClassNames(ctxClassNames, classNamesProp);
   const rootClass = [classNames.avatar, className].filter(Boolean).join(' ');
-  const label = accountUserFullName(user) || user.email;
+  const label = accountFullName(account) || account.email;
 
-  if (variant === 'trigger' || !user.avatarUrl) {
+  if (variant === 'trigger' || !account.avatarUrl) {
     return (
       <span className={rootClass} aria-hidden="true" title={label}>
-        <span className={classNames.avatarFallback}>{accountUserInitials(user)}</span>
+        <span className={classNames.avatarFallback}>{accountInitials(account)}</span>
       </span>
     );
   }
@@ -33,7 +33,7 @@ export function AccountAvatar({
   return (
     <span className={rootClass} aria-hidden="true" title={label}>
       <img
-        src={user.avatarUrl}
+        src={account.avatarUrl}
         alt=""
         className={classNames.avatarImage}
         referrerPolicy="no-referrer"

@@ -3,21 +3,21 @@ import { AccountAvatar } from './AccountAvatar';
 import { AccountSignInIcon } from './AccountSignInIcon';
 import { mergeAccountClassNames } from './defaultClassNames';
 import { useAccountsConfig } from './context';
-import { accountUserFullName } from './names';
+import { accountFullName } from './names';
 import { AccountsSessionCtx } from './AccountsProvider';
-import type { AccountUser, AccountsClassNames, AccountsUILabels } from './types';
+import type { Account, AccountsClassNames, AccountsUILabels } from './types';
 
 function useOptionalAccountsSession() {
   return useContext(AccountsSessionCtx);
 }
 
 export type AccountMenuProps = {
-  user?: AccountUser | null;
-  isAuthenticated?: boolean;
+  account?: Account | null;
+  hasAccount?: boolean;
   onLogout?: () => void | Promise<void>;
   labels?: AccountsUILabels;
   classNames?: AccountsClassNames;
-  renderPanelExtra?: (user: AccountUser, close: () => void) => ReactNode;
+  renderPanelExtra?: (account: Account, close: () => void) => ReactNode;
   signInHref?: string;
   onSignInClick?: () => void;
   renderSignInTrigger?: (className?: string) => ReactNode;
@@ -27,8 +27,8 @@ export type AccountMenuProps = {
 };
 
 export function AccountMenu({
-  user: userProp,
-  isAuthenticated: isAuthenticatedProp,
+  account: accountProp,
+  hasAccount: hasAccountProp,
   onLogout: onLogoutProp,
   labels: labelsProp,
   classNames: classNamesProp,
@@ -42,8 +42,8 @@ export function AccountMenu({
 }: AccountMenuProps) {
   const sessionCtx = useOptionalAccountsSession();
   const ctx = useAccountsConfig();
-  const user = userProp ?? sessionCtx?.user ?? null;
-  const isAuthenticated = isAuthenticatedProp ?? sessionCtx?.isAuthenticated ?? !!user;
+  const account = accountProp ?? sessionCtx?.account ?? null;
+  const hasAccount = hasAccountProp ?? sessionCtx?.hasAccount ?? !!account;
   const logout = onLogoutProp ?? sessionCtx?.logout;
   const labels = { ...ctx.labels, ...labelsProp };
   const classNames = mergeAccountClassNames(ctx.classNames, classNamesProp);
@@ -54,8 +54,8 @@ export function AccountMenu({
   const menuId = useId();
 
   useEffect(() => {
-    if (!isAuthenticated) setOpen(false);
-  }, [isAuthenticated]);
+    if (!hasAccount) setOpen(false);
+  }, [hasAccount]);
 
   useEffect(() => {
     if (!open) return;
@@ -73,7 +73,7 @@ export function AccountMenu({
     };
   }, [open]);
 
-  if (!isAuthenticated || !user) {
+  if (!hasAccount || !account) {
     const signInClass = classNames.signInTrigger ?? classNames.trigger;
     if (renderSignInTrigger) {
       return <div className="appkit-account-menu">{renderSignInTrigger(signInClass)}</div>;
@@ -111,7 +111,7 @@ export function AccountMenu({
     return null;
   }
 
-  const name = accountUserFullName(user);
+  const name = accountFullName(account);
 
   return (
     <div className="appkit-account-menu" ref={rootRef}>
@@ -124,7 +124,7 @@ export function AccountMenu({
         title={labels.accountMenu}
         onClick={() => setOpen((v) => !v)}
       >
-        <AccountAvatar user={user} variant="trigger" classNames={classNames} />
+        <AccountAvatar account={account} variant="trigger" classNames={classNames} />
       </button>
       {open && (
         <div
@@ -135,10 +135,10 @@ export function AccountMenu({
         >
           {!hidePanelHeader && (
             <div className={classNames.panelHeader}>
-              <AccountAvatar user={user} classNames={classNames} />
+              <AccountAvatar account={account} classNames={classNames} />
               <div>
                 {name && <div>{name}</div>}
-                <div className={classNames.panelEmail}>{user.email}</div>
+                <div className={classNames.panelEmail}>{account.email}</div>
               </div>
             </div>
           )}
@@ -159,7 +159,7 @@ export function AccountMenu({
               Settings
             </button>
           )}
-          {renderPanelExtra?.(user, () => setOpen(false))}
+          {renderPanelExtra?.(account, () => setOpen(false))}
           <button
             type="button"
             className={classNames.menuItem}

@@ -14,7 +14,7 @@ type Config struct {
 	Session  SessionConfig  `yaml:"session"`
 	URLs     URLsConfig     `yaml:"urls"`
 	Tokens   TokensConfig   `yaml:"tokens"`
-	OAuth    OAuthConfig    `yaml:"oauth"`
+	OAuth    OAccountConfig    `yaml:"oauth"`
 	Features FeaturesConfig `yaml:"features"`
 }
 
@@ -37,7 +37,7 @@ type TokensConfig struct {
 	PasswordResetTTL  string `yaml:"password_reset_token_ttl"`
 }
 
-type OAuthConfig struct {
+type OAccountConfig struct {
 	StateCookieName string       `yaml:"state_cookie_name"`
 	Google          GoogleConfig `yaml:"google"`
 }

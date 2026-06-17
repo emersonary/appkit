@@ -1,0 +1,17 @@
+# Product config example: BaseConfig nodes plus a product-specific field.
+# Demonstrates mapstructure:",squash" on BaseConfig with an extra top-level node.
+
+server:
+  http:
+    enabled: true
+    # addr omitted — ApplyDefaults fills :8080 when enabled
+
+database:
+  host: localhost
+  port: 5432
+  user: app
+  password: app
+  name: app
+  sslmode: disable
+
+flag: true

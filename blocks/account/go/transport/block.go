@@ -10,6 +10,7 @@ import (
 	"github.com/emersonary/appkit/accounts/gen/account/v1/accountv1connect"
 	accounthttp "github.com/emersonary/appkit/accounts/http"
 	"github.com/emersonary/appkit/accounts"
+	googleoauth "github.com/emersonary/appkit/accounts/oauth/google"
 )
 
 // Block wires account transport (Connect, gRPC, default REST) around a Service.
@@ -24,8 +25,8 @@ type HTTPRoute struct {
 	Handler http.Handler
 }
 
-// Mount configures where account transport is registered. Fields are optional; pass nil to
-// NewBlock when only the service wrapper is needed (e.g. unit tests).
+// Mount configures where account transport is registered. Fields are optional; pass nil when
+// only the service wrapper is needed (e.g. unit tests).
 type Mount struct {
 	HTTPMux        *http.ServeMux
 	GRPCServer     *grpc.Server
@@ -33,14 +34,19 @@ type Mount struct {
 	ExtraRoutes    []HTTPRoute
 }
 
-// NewBlock builds the account transport block and, when mount is non-nil, registers all
-// account endpoints on the given HTTP mux and/or gRPC server.
-func NewBlock(svc *accounts.Service, mount *Mount) *Block {
+// New builds the account transport block and, when mount is non-nil, registers all account
+// endpoints on the given HTTP mux and/or gRPC server.
+func New(svc *accounts.Service, mount *Mount) *Block {
+	return newBlock(svc, mount)
+}
+
+func newBlock(svc *accounts.Service, mount *Mount) *Block {
 	b := &Block{
 		Service:       svc,
 		accountServer: NewAccountServer(svc),
 	}
 	if mount != nil {
+		googleoauth.Configure(svc)
 		b.mount(mount)
 	}
 	return b

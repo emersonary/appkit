@@ -3,10 +3,10 @@ export { fromConnectError } from './connectErrors';
 export { createLocalStorageSessionStorage, type AccountsSessionStorage } from './storage';
 export {
   accountsHttpUrl,
-  createAccountsAuthClient,
+  createAccountsClient,
   createAccountsConnectTransport,
   isAccountsApiConfigured,
   resolveAccountsApiBaseUrl,
 } from './transport';
-export { createConnectAuthClient, type CreateConnectAuthClientOptions } from './createConnectAuthClient';
+export { createConnectAccountClient, type CreateConnectAccountClientOptions } from './createConnectAccountClient';
 export { googleAccountsLoginUrl } from './oauth';

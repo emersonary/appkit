@@ -30,7 +30,7 @@ func (o Options) normalized() Options {
 	return o
 }
 
-func NewService(db *sql.DB, cfg Config, secrets Secrets, opts Options) (*Service, error) {
+func New(db *sql.DB, cfg Config, secrets Secrets, opts Options) (*Service, error) {
 	cfg.normalize()
 	if err := cfg.Validate(); err != nil {
 		return nil, err
@@ -62,7 +62,11 @@ func (s *Service) Config() Config {
 	return s.cfg
 }
 
-func (s *Service) OAuthProvider(name string) (oauth.Provider, bool) {
+func (s *Service) Secrets() Secrets {
+	return s.secrets
+}
+
+func (s *Service) OAccountProvider(name string) (oauth.Provider, bool) {
 	p, ok := s.oauth[name]
 	return p, ok
 }

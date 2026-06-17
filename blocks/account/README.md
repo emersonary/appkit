@@ -8,19 +8,23 @@ blocks/account/
 ├── go/     # module github.com/emersonary/appkit/accounts
 │   ├── service.go, store.go, schema.go
 │   ├── http/         # OAuth + verify-email REST routes
-│   └── transport/    # Connect + gRPC AccountService, Block mount API
+│   └── transport/    # Connect + gRPC, Mount, account interceptors
 └── web/    # npm @emersonary/appkit-accounts
 ```
+
+See also [`../BLOCK.md`](../BLOCK.md) for the block template used by future blocks.
 
 ## Wiring (Go)
 
 ```go
-svc, err := accounts.NewService(sqlDB, cfg, secrets, accounts.Options{Mailer: mailer})
+svc, err := accounts.New(sqlDB, cfg, secrets, accounts.Options{Mailer: mailer})
 
 mux := http.NewServeMux()
-grpcSrv := grpc.NewServer(/* app interceptors */)
+grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(
+    accounttransport.GRPCUnaryInterceptor(svc, "/member.v1.MembershipService/"),
+))
 
-	block := transport.NewBlock(svc, &transport.Mount{
+accounttransport.New(svc, &accounttransport.Mount{
     HTTPMux:    mux,
     GRPCServer: grpcSrv,
 })
@@ -29,9 +33,20 @@ grpcSrv := grpc.NewServer(/* app interceptors */)
 mux.HandleFunc("GET /healthz", handleHealth)
 ```
 
-`Service` methods (`Login`, `Register`, `SessionFromToken`, …) stay public for direct use in tests, jobs, and app-specific HTTP.
+`transport.New` configures Google OAuth when `Mount` is non-nil.
 
-Proto contract: [`proto/v1/account.proto`](proto/v1/account.proto).
+### Protecting other services (Connect)
+
+```go
+connect.WithInterceptors(
+    accounttransport.ConnectRequireSession(svc,
+        memberv1connect.MembershipServiceGetMembershipProcedure,
+        memberv1connect.MembershipServiceEnrollProcedure,
+    ),
+)
+```
+
+Account id in handlers: `accounttransport.AccountIDFromContext(ctx)`.
 
 ## Codegen
 
@@ -43,7 +58,7 @@ make proto
 
 ## Consumers
 
-**Go** — import paths unchanged:
+**Go**:
 
 ```go
 import (

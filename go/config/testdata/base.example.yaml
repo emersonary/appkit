@@ -1,0 +1,67 @@
+# Appkit BaseConfig reference — documents shared YAML nodes for every application.
+# Used by config package tests and as a template for product config files.
+#
+# Expected GET /config JSON (secrets redacted): testdata/base.example.json
+#
+# Products embed BaseConfig (mapstructure:",squash") and add their own nodes
+# (trip, posts, …). Env overrides use your product prefix, e.g. VIA_JERI_DATABASE_HOST.
+
+app:
+  name: example api
+
+log:
+  level: info
+  format: json
+
+server:
+  http:
+    enabled: true
+    addr: ":8080"
+  grpc:
+    enabled: true
+    addr: ":9090"
+  websocket:
+    enabled: false
+    addr: ""
+
+database:
+  host: localhost
+  port: 5432
+  user: app
+  password: secret
+  name: app
+  sslmode: disable
+
+nats:
+  url: nats://localhost:4222
+
+migrations:
+  path: db/migrations
+
+# Optional appkit blocks — wire in runtime when enabled: true
+accounts:
+  enabled: false
+  config_path: config/accounts.yaml
+  frontend_url: https://app.example.com
+  api_public_url: https://api.example.com
+
+currency:
+  enabled: false
+  config_path: config/currency.yaml
+  api_url: https://api.frankfurter.dev/v1/latest
+  update_interval: 1h
+
+email:
+  from: noreply@example.com
+  brand: Example
+  smtp:
+    host: ""
+    port: 0
+    username: ""
+    password: ""
+
+mail_provisioning:
+  enabled: false
+  jmap_url: ""
+  domain_id: ""
+  mail_domain: ""

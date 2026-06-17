@@ -1,0 +1,69 @@
+{
+  "app": {
+    "name": "example api"
+  },
+  "log": {
+    "level": "info",
+    "format": "json"
+  },
+  "server": {
+    "http": {
+      "enabled": true,
+      "addr": ":8080"
+    },
+    "grpc": {
+      "enabled": true,
+      "addr": ":9090"
+    },
+    "websocket": {
+      "enabled": false,
+      "addr": ""
+    }
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "app",
+    "name": "app",
+    "sslmode": "disable"
+  },
+  "nats": {
+    "url": "nats://localhost:4222"
+  },
+  "migrations": {
+    "path": "db/migrations"
+  },
+  "accounts": {
+    "enabled": false,
+    "config_path": "config/accounts.yaml",
+    "access_token_ttl": 0,
+    "frontend_url": "https://app.example.com",
+    "api_public_url": "https://api.example.com",
+    "verification_token_ttl": 0,
+    "password_reset_token_ttl": 0,
+    "google": {
+      "client_id": ""
+    }
+  },
+  "currency": {
+    "enabled": false,
+    "config_path": "config/currency.yaml",
+    "api_url": "https://api.frankfurter.dev/v1/latest",
+    "update_interval": 3600000000000
+  },
+  "email": {
+    "from": "noreply@example.com",
+    "brand": "Example",
+    "smtp": {
+      "host": "",
+      "port": 0,
+      "username": ""
+    }
+  },
+  "mail_provisioning": {
+    "enabled": false,
+    "jmap_url": "",
+    "domain_id": "",
+    "mail_domain": ""
+  }
+}

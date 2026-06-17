@@ -5,10 +5,10 @@ Config-driven identity layer: schema bootstrap, email/password auth, OAuth, JWT 
 ## Config (`accounts.yaml`)
 
 ```yaml
-schema: auth
+schema: account
 
 tenancy:
-  enabled: false          # true creates tenants + account_tenants tables
+  enabled: false
   default_tenant_id: sahar
 
 session:
@@ -28,6 +28,8 @@ features:
   admin_flag: true
 ```
 
+Secrets (`JWTSecret`, Google credentials) are passed at runtime via `accounts.Secrets`, not YAML.
+
 ## Apply schema (migration time)
 
 ```go
@@ -39,26 +41,41 @@ if err := accounts.ApplySchema(ctx, sqlDB, cfg); err != nil {
 }
 ```
 
-`ApplySchema` is idempotent. It also migrates legacy `public.users` → `auth.accounts` when present.
+`ApplySchema` is idempotent and creates **only** block-owned tables in the configured schema. Host-app legacy migrations stay in the consumer repo.
 
 ## Service
 
 ```go
-svc, err := accounts.NewService(sqlDB, cfg, accounts.Secrets{
+svc, err := accounts.New(sqlDB, cfg, accounts.Secrets{
     JWTSecret:          os.Getenv("JWT_SECRET"),
     GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
     GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 }, accounts.Options{
     Mailer: myMailer,
 })
-
-svc.RegisterProvider(googleoauth.New(googleoauth.Config{...}))
 ```
 
-## HTTP routes
+## Transport mount
 
 ```go
-accounthttp.New(svc).RegisterRoutes(mux)
+accounttransport.New(svc, &accounttransport.Mount{
+    HTTPMux:    mux,
+    GRPCServer: grpcSrv,
+})
 ```
 
-Registers: `GET /account/google`, `GET /account/google/callback`, `GET /account/verify-email`.
+Registers account REST (`/account/*`), Connect, and gRPC. OAuth is configured automatically when mount is non-nil.
+
+## Cross-service account session
+
+```go
+// gRPC: built-in account method rules + optional protected prefixes
+accounttransport.GRPCUnaryInterceptor(svc, "/member.v1.MembershipService/")
+
+// Connect: require session for listed procedures
+accounttransport.ConnectRequireSession(svc, procedureNames...)
+```
+
+## HTTP routes (also registered via Mount)
+
+`GET /account/verify-email`, `GET /account/google`, `GET /account/google/callback`

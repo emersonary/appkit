@@ -11,12 +11,12 @@
   justify-content: center;
   gap: 0.45rem;
   padding: 0.75rem;
-  border: 1px solid var(--appkit-auth-border, #e8dfd4);
-  background: var(--appkit-auth-surface, #fffdf9);
+  border: 1px solid var(--appkit-account-border, #e8dfd4);
+  background: var(--appkit-account-surface, #fffdf9);
   font-family: inherit;
   font-weight: 600;
   cursor: pointer;
-  border-radius: var(--appkit-auth-radius, 0.25rem);
+  border-radius: var(--appkit-account-radius, 0.25rem);
 }
 
 .appkit-login-workflow__tab-icon {
@@ -45,7 +45,7 @@
   flex-shrink: 0;
   width: 1.125rem;
   height: 1.125rem;
-  color: var(--appkit-auth-muted, #6b5d62);
+  color: var(--appkit-account-muted, #6b5d62);
 }
 
 .appkit-field-label__icon {
@@ -60,16 +60,16 @@
 }
 
 .appkit-login-workflow__tab.active {
-  background: var(--appkit-auth-primary, #5c2438);
-  color: var(--appkit-auth-on-primary, #f5f0e8);
-  border-color: var(--appkit-auth-primary, #5c2438);
+  background: var(--appkit-account-primary, #5c2438);
+  color: var(--appkit-account-on-primary, #f5f0e8);
+  border-color: var(--appkit-account-primary, #5c2438);
 }
 
 .appkit-login-workflow__divider {
   text-align: center;
   margin: 1.25rem 0 0.75rem;
   font-size: 0.85rem;
-  color: var(--appkit-auth-muted, #6b5d62);
+  color: var(--appkit-account-muted, #6b5d62);
 }
 
 .appkit-login-workflow__oauth-btn {

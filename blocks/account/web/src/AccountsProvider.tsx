@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AccountsConfigContext, defaultLabels } from './context';
-import type { AccountSession, AccountUser, AccountsProviderProps } from './types';
+import type { AccountSession, Account, AccountsProviderProps } from './types';
 
 export type AccountsSessionContextValue = {
-  user: AccountUser | null;
+  account: Account | null;
   session: AccountSession | null;
-  isAuthenticated: boolean;
+  hasAccount: boolean;
   isLoading: boolean;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -31,7 +31,7 @@ export { AccountsSessionCtx };
 export function AccountsProvider({
   children,
   tenancy,
-  authClient,
+  accountClient,
   googleOAuthUrl,
   labels,
   classNames,
@@ -55,15 +55,15 @@ export function AccountsProvider({
   );
 
   const refreshSession = useCallback(async () => {
-    const next = await authClient.getSession();
+    const next = await accountClient.getSession();
     setSession(next);
-  }, [authClient]);
+  }, [accountClient]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const existing = await authClient.getSession();
+        const existing = await accountClient.getSession();
         if (!cancelled) setSession(existing);
       } finally {
         if (!cancelled) setIsInitialized(true);
@@ -72,26 +72,26 @@ export function AccountsProvider({
     return () => {
       cancelled = true;
     };
-  }, [authClient]);
+  }, [accountClient]);
 
   const login = useCallback(
     async (email: string, password: string) => {
       setIsLoading(true);
       try {
-        const next = await authClient.login(email, password);
+        const next = await accountClient.login(email, password);
         setSession(next);
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient],
+    [accountClient],
   );
 
   const register = useCallback(
     async (email: string, password: string, firstName: string, lastName?: string) => {
       setIsLoading(true);
       try {
-        const result = await authClient.register(email, password, firstName, lastName);
+        const result = await accountClient.register(email, password, firstName, lastName);
         if (!result.verificationRequired) {
           await refreshSession();
         } else {
@@ -102,95 +102,95 @@ export function AccountsProvider({
         setIsLoading(false);
       }
     },
-    [authClient, refreshSession],
+    [accountClient, refreshSession],
   );
 
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authClient.logout();
+      await accountClient.logout();
       setSession(null);
     } finally {
       setIsLoading(false);
     }
-  }, [authClient]);
+  }, [accountClient]);
 
   const completeOAuthLogin = useCallback(
     async (accessToken: string) => {
-      if (!authClient.completeOAuthLogin) {
+      if (!accountClient.completeOAuthLogin) {
         throw new Error('completeOAuthLogin is not configured');
       }
       setIsLoading(true);
       try {
-        const next = await authClient.completeOAuthLogin(accessToken);
+        const next = await accountClient.completeOAuthLogin(accessToken);
         setSession(next);
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient],
+    [accountClient],
   );
 
   const requestPasswordReset = useCallback(
     async (email: string) => {
-      if (!authClient.requestPasswordReset) {
+      if (!accountClient.requestPasswordReset) {
         throw new Error('requestPasswordReset is not configured');
       }
       setIsLoading(true);
       try {
-        await authClient.requestPasswordReset(email);
+        await accountClient.requestPasswordReset(email);
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient],
+    [accountClient],
   );
 
   const resetPassword = useCallback(
     async (token: string, newPassword: string) => {
-      if (!authClient.resetPassword) {
+      if (!accountClient.resetPassword) {
         throw new Error('resetPassword is not configured');
       }
       setIsLoading(true);
       try {
-        await authClient.resetPassword(token, newPassword);
+        await accountClient.resetPassword(token, newPassword);
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient],
+    [accountClient],
   );
 
   const getVerificationStatus = useCallback(
     async (email: string) => {
-      if (!authClient.getVerificationStatus) {
+      if (!accountClient.getVerificationStatus) {
         throw new Error('getVerificationStatus is not configured');
       }
-      return authClient.getVerificationStatus(email);
+      return accountClient.getVerificationStatus(email);
     },
-    [authClient],
+    [accountClient],
   );
 
   const resendVerificationEmail = useCallback(
     async (email: string) => {
-      if (!authClient.resendVerificationEmail) {
+      if (!accountClient.resendVerificationEmail) {
         throw new Error('resendVerificationEmail is not configured');
       }
       setIsLoading(true);
       try {
-        await authClient.resendVerificationEmail(email);
+        await accountClient.resendVerificationEmail(email);
       } finally {
         setIsLoading(false);
       }
     },
-    [authClient],
+    [accountClient],
   );
 
   const sessionValue = useMemo<AccountsSessionContextValue>(
     () => ({
-      user: session?.user ?? null,
+      account: session?.account ?? null,
       session,
-      isAuthenticated: !!session,
+      hasAccount: !!session,
       isLoading,
       isInitialized,
       login,
@@ -234,6 +234,6 @@ export function useAccountsSession() {
   return ctx;
 }
 
-export function useAccountUser() {
-  return useAccountsSession().user;
+export function useSessionAccount() {
+  return useAccountsSession().account;
 }

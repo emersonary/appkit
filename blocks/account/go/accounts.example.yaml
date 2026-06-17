@@ -1,4 +1,4 @@
-schema: auth
+schema: account
 
 tenancy:
   enabled: false

@@ -1,6 +1,6 @@
 import './accounts.css';
 
-export { AccountsProvider, useAccountsSession, useAccountUser } from './AccountsProvider';
+export { AccountsProvider, useAccountsSession, useSessionAccount } from './AccountsProvider';
 export { useAccountsConfig } from './context';
 export { LoginPage } from './LoginPage';
 export type { LoginPageProps } from './LoginPage';
@@ -29,8 +29,8 @@ export { OAuthButtonGroup } from './OAuthButtonGroup';
 export { SessionGate, GuestGate } from './SessionGate';
 export type {
   AccountSession,
-  AccountUser,
-  AccountsAuthClient,
+  Account,
+  AccountsClient,
   AccountsClassNames,
   AccountsProviderProps,
   AccountsTenancyConfig,

@@ -1,4 +1,4 @@
-export type AccountUser = {
+export type Account = {
   id: string;
   email: string;
   firstName?: string;
@@ -9,7 +9,7 @@ export type AccountUser = {
 
 export type AccountSession = {
   accessToken: string;
-  user: AccountUser;
+  account: Account;
   tenantId?: string;
 };
 
@@ -104,7 +104,7 @@ export type RegisterResult = {
   email: string;
 };
 
-export type AccountsAuthClient = {
+export type AccountsClient = {
   login: (email: string, password: string) => Promise<AccountSession>;
   register: (
     email: string,
@@ -124,14 +124,14 @@ export type AccountsAuthClient = {
 export type AccountsProviderProps = {
   children: React.ReactNode;
   tenancy: AccountsTenancyConfig;
-  authClient: AccountsAuthClient;
+  accountClient: AccountsClient;
   googleOAuthUrl?: string;
   labels?: AccountsUILabels;
   classNames?: AccountsClassNames;
   settingsHref?: string;
   onSettingsClick?: () => void;
   renderSettings?: (close: () => void) => React.ReactNode;
-  renderPanelExtra?: (user: AccountUser, close: () => void) => React.ReactNode;
+  renderPanelExtra?: (account: Account, close: () => void) => React.ReactNode;
 };
 
 import type React from 'react';

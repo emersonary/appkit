@@ -1,11 +1,11 @@
 import { GetSessionRequest, LogoutRequest } from '../gen/v1/account_pb';
 import { AccountService } from '../gen/v1/account_connect';
-import type { AccountSession, AccountsAuthClient } from '../types';
+import type { AccountSession, AccountsClient } from '../types';
 import { fromConnectError } from './connectErrors';
-import { createAccountsAuthClient } from './transport';
+import { createAccountsClient } from './transport';
 import type { AccountsSessionStorage } from './storage';
 
-export type CreateConnectAuthClientOptions = {
+export type CreateConnectAccountClientOptions = {
   baseUrl?: string;
   storage: AccountsSessionStorage;
 };
@@ -23,7 +23,7 @@ function toSession(response: {
 }): AccountSession {
   return {
     accessToken: response.accessToken,
-    user: {
+    account: {
       id: response.account?.id ?? '',
       email: response.account?.email ?? '',
       firstName: response.account?.firstName || undefined,
@@ -38,11 +38,11 @@ function isLegacyMockToken(token: string): boolean {
   return token.startsWith('mock-');
 }
 
-export function createConnectAuthClient({
+export function createConnectAccountClient({
   baseUrl = '',
   storage,
-}: CreateConnectAuthClientOptions): AccountsAuthClient {
-  const client = createAccountsAuthClient(AccountService, { baseUrl, storage });
+}: CreateConnectAccountClientOptions): AccountsClient {
+  const client = createAccountsClient(AccountService, { baseUrl, storage });
 
   return {
     async login(email, password) {
@@ -78,7 +78,7 @@ export function createConnectAuthClient({
         storage.write(session);
         return {
           verificationRequired: false,
-          email: session.user.email,
+          email: session.account.email,
         };
       } catch (err) {
         throw fromConnectError(err);
@@ -119,7 +119,7 @@ export function createConnectAuthClient({
 
       storage.write({
         accessToken,
-        user: { id: '', email: '' },
+        account: { id: '', email: '' },
       });
 
       const session = await this.getSession();

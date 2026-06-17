@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Shared accounts UI, Connect client, and auth workflow for appkit consumer apps",
+  "description": "Shared accounts UI, Connect client, and account workflow for appkit consumer apps",
   "scripts": {
-    "generate:auth-proto": "node ./scripts/generate-auth-proto.mjs",
+    "generate:account-proto": "node ./scripts/generate-account-proto.mjs",
     "test": "tsc --noEmit -p tsconfig.json"
   },
   "exports": {
