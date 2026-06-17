@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package tenant.v1;
+
+option go_package = "github.com/emersonary/appkit/tenants/gen/tenant/v1;tenantv1";
+
+service TenantService {
+  rpc CreateTenant(CreateTenantRequest) returns (TenantResponse);
+  rpc ListMyTenants(ListMyTenantsRequest) returns (ListMyTenantsResponse);
+  rpc GetTenant(GetTenantRequest) returns (TenantResponse);
+  rpc InviteMember(InviteMemberRequest) returns (InviteMemberResponse);
+  rpc AcceptInvite(AcceptInviteRequest) returns (TenantMembershipResponse);
+}
+
+message Tenant {
+  string id = 1;
+  string slug = 2;
+  string name = 3;
+  string timezone = 4;
+  string status = 5;
+}
+
+message TenantMembership {
+  Tenant tenant = 1;
+  string role = 2;
+}
+
+message CreateTenantRequest {
+  string name = 1;
+  string slug = 2;
+  string timezone = 3;
+}
+
+message ListMyTenantsRequest {}
+
+message ListMyTenantsResponse {
+  repeated TenantMembership memberships = 1;
+}
+
+message GetTenantRequest {
+  string tenant_id = 1;
+}
+
+message TenantResponse {
+  Tenant tenant = 1;
+}
+
+message InviteMemberRequest {
+  string tenant_id = 1;
+  string email = 2;
+  string role = 3;
+}
+
+message InviteMemberResponse {
+  string invite_token = 1;
+}
+
+message AcceptInviteRequest {
+  string invite_token = 1;
+}
+
+message TenantMembershipResponse {
+  TenantMembership membership = 1;
+}

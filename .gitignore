@@ -1,8 +1,10 @@
 # Dependencies
-web/accounts/node_modules/
+node_modules/
+**/node_modules/
 
 # Build output
-web/accounts/dist/
+dist/
+**/dist/
 
 # IDE / OS
 .idea/

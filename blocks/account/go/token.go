@@ -28,12 +28,16 @@ func NewTokenService(secret string, ttl time.Duration, tenantID string) *TokenSe
 	}
 }
 
-func (s *TokenService) Issue(account Account) (Session, error) {
+func (s *TokenService) Issue(account Account, tenantID string) (Session, error) {
+	tid := tenantID
+	if tid == "" {
+		tid = s.tenant
+	}
 	now := time.Now()
 	claims := Claims{
 		AccountID: account.ID,
 		Email:     account.Email,
-		TenantID:  s.tenant,
+		TenantID:  tid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   account.ID,
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -50,7 +54,7 @@ func (s *TokenService) Issue(account Account) (Session, error) {
 	return Session{
 		AccessToken: signed,
 		Account:     account,
-		TenantID:    s.tenant,
+		TenantID:    tid,
 	}, nil
 }
 

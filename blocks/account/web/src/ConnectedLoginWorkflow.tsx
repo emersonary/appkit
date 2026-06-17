@@ -8,6 +8,8 @@ export type ConnectedLoginWorkflowProps = Omit<
   | 'onFetchVerificationStatus'
   | 'onResendVerificationEmail'
   | 'onGoogleClick'
+  | 'onLogin'
+  | 'onRegister'
   | 'showGoogle'
 > & {
   apiBaseUrl?: string;
@@ -39,7 +41,12 @@ export function ConnectedLoginWorkflow({
       isLoading={isLoadingOverride ?? handlers.isLoading}
       classifyResetError={classifyResetError ?? handlers.classifyResetError}
       onLogin={onLoginOverride ?? handlers.onLogin}
-      onRegister={onRegisterOverride ?? handlers.onRegister}
+      onRegister={
+        onRegisterOverride ??
+        (async (email, password, firstName, lastName) => {
+          await handlers.onRegister(email, password, firstName, lastName);
+        })
+      }
       onRequestReset={handlers.onRequestReset}
       onResetPassword={handlers.onResetPassword}
       onFetchVerificationStatus={handlers.onFetchVerificationStatus}

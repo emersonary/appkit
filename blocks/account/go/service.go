@@ -129,7 +129,19 @@ func (s *Service) Login(ctx context.Context, emailAddr, password string) (Sessio
 		return Session{}, ErrEmailNotVerified
 	}
 
-	return s.tokens.Issue(account)
+	return s.tokens.Issue(account, "")
+}
+
+// IssueSession mints a JWT for an account, optionally overriding the configured default tenant id.
+func (s *Service) IssueSession(ctx context.Context, accountID, tenantID string) (Session, error) {
+	account, err := s.store.GetByID(ctx, accountID)
+	if err != nil {
+		if err == ErrNotFound {
+			return Session{}, ErrUnauthenticated
+		}
+		return Session{}, err
+	}
+	return s.tokens.Issue(account, tenantID)
 }
 
 func (s *Service) SessionFromToken(ctx context.Context, accessToken string) (Session, error) {
@@ -174,7 +186,7 @@ func (s *Service) LoginOAuth(
 		}
 	}
 
-	return s.tokens.Issue(account)
+	return s.tokens.Issue(account, "")
 }
 
 func (s *Service) VerifyEmail(ctx context.Context, plainToken string) (VerifyEmailResult, error) {

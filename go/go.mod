@@ -4,6 +4,7 @@ go 1.26.3
 
 require (
 	github.com/emersonary/appkit/accounts v0.0.0
+	github.com/emersonary/appkit/tenants v0.0.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/nats-io/nats.go v1.52.0
 	github.com/pressly/goose/v3 v3.27.1
@@ -45,3 +46,5 @@ require (
 )
 
 replace github.com/emersonary/appkit/accounts => ../blocks/account/go
+
+replace github.com/emersonary/appkit/tenants => ../blocks/tenant/go

@@ -10,6 +10,7 @@ import (
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
+	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
@@ -26,6 +27,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	NATS          *nats.Conn
 	HealthHandler *health.Handler
 	Accounts      *accounts.Service
+	Tenants       *tenants.Service
 	Currency      *currency.Service
 	Email         *email.Handler
 

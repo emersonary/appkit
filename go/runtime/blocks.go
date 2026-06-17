@@ -6,6 +6,7 @@ import (
 	"github.com/emersonary/appkit/accounts"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
+	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 )
@@ -17,7 +18,7 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Currency.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled {
 		return nil
 	}
 
@@ -44,6 +45,17 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		a.Accounts = svc
 		if svc != nil {
 			a.Logger.Info("accounts block enabled")
+		}
+	}
+
+	if base.Tenants.Enabled {
+		svc, err := tenants.Wire(ctx, sqlDB, base.Tenants)
+		if err != nil {
+			return err
+		}
+		a.Tenants = svc
+		if svc != nil {
+			a.Logger.Info("tenants block enabled")
 		}
 	}
 

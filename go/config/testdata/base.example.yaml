@@ -60,6 +60,10 @@ email:
     username: ""
     password: ""
 
+tenants:
+  enabled: false
+  config_path: config/tenants.yaml
+
 mail_provisioning:
   enabled: false
   jmap_url: ""
