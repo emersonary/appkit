@@ -52,6 +52,26 @@ session, _ := accountsSvc.IssueSession(ctx, accountID, tenantID)
 - `tenant_accounts` — membership + role
 - `tenant_invites` — email invites
 
+## Fixed mode (`mode: fixed`)
+
+Declare a catalog of feeds in `tenants.yaml`; runtime upserts them on wire and rejects `CreateTenant`.
+
+```yaml
+schema: tenant
+mode: fixed
+feed:
+  - id: sahar
+    name: Sahar
+    timezone: America/New_York
+    metadata:
+      languages: [pt, en]
+      default_language: pt
+      public_url: https://example.com
+      callback_url: https://admin.example.com
+```
+
+Feed `id` values must be lowercase alphanumeric (no dashes). Product apps may read `metadata` for domain-specific fields.
+
 ## Web
 
 ```tsx

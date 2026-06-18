@@ -17,6 +17,20 @@ export type AccountsTenancyConfig = {
   enabled: boolean;
 };
 
+export type AccountsOAuthConfig = {
+  enabled?: boolean;
+  google?: boolean;
+  facebook?: boolean;
+  apple?: boolean;
+};
+
+export const defaultAccountsOAuthConfig: AccountsOAuthConfig = {
+  enabled: true,
+  google: true,
+  facebook: false,
+  apple: false,
+};
+
 export type AccountsUILabels = {
   signIn?: string;
   signOut?: string;
@@ -125,6 +139,8 @@ export type AccountsProviderProps = {
   children: React.ReactNode;
   tenancy: AccountsTenancyConfig;
   accountClient: AccountsClient;
+  registrationEnabled?: boolean;
+  oauth?: AccountsOAuthConfig;
   googleOAuthUrl?: string;
   labels?: AccountsUILabels;
   classNames?: AccountsClassNames;

@@ -24,6 +24,7 @@ func TestToProtoAccount(t *testing.T) {
 		LastName:        &lastName,
 		AvatarURL:       &avatarURL,
 		EmailVerifiedAt: &verifiedAt,
+		IsAdmin:         true,
 	}
 
 	pb := ToProtoAccount(account)
@@ -35,6 +36,9 @@ func TestToProtoAccount(t *testing.T) {
 	}
 	if !pb.GetEmailVerified() {
 		t.Fatal("expected email verified true")
+	}
+	if !pb.GetIsAdmin() {
+		t.Fatal("expected isAdmin true")
 	}
 }
 

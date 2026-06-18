@@ -42,12 +42,17 @@ func (s *AccountServer) Register(ctx context.Context, req *accountv1.RegisterReq
 		return nil, MapGRPCError(err)
 	}
 
-	return &accountv1.RegisterResponse{
+	resp := &accountv1.RegisterResponse{
 		VerificationRequired: result.VerificationRequired,
-		Session: &accountv1.SessionResponse{
+	}
+	if result.Session != nil {
+		resp.Session = ToProtoSession(*result.Session)
+	} else {
+		resp.Session = &accountv1.SessionResponse{
 			Account: ToProtoAccount(result.Account),
-		},
-	}, nil
+		}
+	}
+	return resp, nil
 }
 
 func (s *AccountServer) GetSession(ctx context.Context, _ *accountv1.GetSessionRequest) (*accountv1.SessionResponse, error) {

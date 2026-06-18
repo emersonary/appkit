@@ -69,6 +69,12 @@ var (
 		Message: "invalid or expired token",
 		Kind:    apperror.KindValidation,
 	}
+	ErrRegistrationDisabled = apperror.Error{
+		Code:    "ACCOUNTS_REGISTRATION_DISABLED",
+		Domain:  "accounts",
+		Message: "account registration is disabled",
+		Kind:    apperror.KindValidation,
+	}
 	ErrOAuthUnavailable = apperror.Error{
 		Code:    "ACCOUNTS_OAUTH_UNAVAILABLE",
 		Domain:  "accounts",

@@ -27,11 +27,13 @@ export { AccountAvatar } from './AccountAvatar';
 export { AccountSignInIcon } from './AccountSignInIcon';
 export { OAuthButtonGroup } from './OAuthButtonGroup';
 export { SessionGate, GuestGate } from './SessionGate';
+export { defaultAccountsOAuthConfig } from './types';
 export type {
   AccountSession,
   Account,
   AccountsClient,
   AccountsClassNames,
+  AccountsOAuthConfig,
   AccountsProviderProps,
   AccountsTenancyConfig,
   AccountsUILabels,

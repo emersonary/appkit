@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useAccountsSession } from './AccountsProvider';
+import { useAccountsConfig } from './context';
 import { AccountsError, AccountsErrorCode } from './connect/errors';
 import { googleAccountsLoginUrl, isAccountsApiConfigured } from './connect';
 
@@ -46,6 +47,7 @@ export function useLoginWorkflowHandlers({
     getVerificationStatus,
     resendVerificationEmail,
   } = useAccountsSession();
+  const { oauth, registrationEnabled } = useAccountsConfig();
 
   const wrap = useCallback(
     async <T,>(fn: () => Promise<T>): Promise<T> => {
@@ -90,9 +92,13 @@ export function useLoginWorkflowHandlers({
     [resendVerificationEmail, wrap],
   );
 
-  const googleEnabled = isAccountsApiConfigured(apiBaseUrl);
+  const googleConfigured = isAccountsApiConfigured(apiBaseUrl);
+  const oauthEnabled = oauth.enabled !== false;
+  const googleOAuthEnabled = oauth.google !== false;
+  const showGoogle =
+    registrationEnabled && oauthEnabled && googleOAuthEnabled && googleConfigured;
 
-  const onGoogleClick = googleEnabled
+  const onGoogleClick = showGoogle
     ? () => {
         window.location.href = googleAccountsLoginUrl(apiBaseUrl);
       }
@@ -112,7 +118,7 @@ export function useLoginWorkflowHandlers({
     onFetchVerificationStatus,
     onResendVerificationEmail,
     onGoogleClick,
-    showGoogle: googleEnabled,
+    showGoogle,
     classifyResetError,
   };
 }

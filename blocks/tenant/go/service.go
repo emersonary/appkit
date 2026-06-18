@@ -26,6 +26,10 @@ func New(db *sql.DB, cfg Config) (*Service, error) {
 }
 
 func (s *Service) CreateTenant(ctx context.Context, accountID, name, slug, timezone string) (Membership, error) {
+	if s.cfg.IsFixedMode() {
+		return Membership{}, ErrFixedMode
+	}
+
 	accountID = strings.TrimSpace(accountID)
 	name = strings.TrimSpace(name)
 	slug = normalizeSlug(slug)
@@ -108,6 +112,27 @@ func (s *Service) AcceptInvite(ctx context.Context, accountID, token string) (Me
 		return Membership{}, ErrInvalidArgument
 	}
 	return s.store.AcceptInvite(ctx, accountID, hashToken(token))
+}
+
+// Config returns the loaded tenants block configuration.
+func (s *Service) Config() Config {
+	return s.cfg
+}
+
+// SyncFixedCatalog upserts fixed-mode feed entries into tenant.tenants.
+func (s *Service) SyncFixedCatalog(ctx context.Context) (int, error) {
+	if !s.cfg.IsFixedMode() {
+		return 0, nil
+	}
+
+	var synced int
+	for _, entry := range s.cfg.Feed {
+		if _, err := s.store.UpsertCatalogTenant(ctx, entry.ID, entry.Name, entry.Timezone); err != nil {
+			return synced, err
+		}
+		synced++
+	}
+	return synced, nil
 }
 
 func isValidRole(role string) bool {

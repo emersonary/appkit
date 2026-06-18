@@ -1,3 +1,14 @@
 schema: tenant
+mode: fixed
 
 invite_token_ttl: 168h
+
+feed:
+  - id: example
+    name: Example Feed
+    timezone: UTC
+    metadata:
+      languages: [pt, en]
+      default_language: pt
+      public_url: https://example.com
+      callback_url: https://admin.example.com

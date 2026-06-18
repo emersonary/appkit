@@ -43,6 +43,14 @@ var (
 		Code: "TENANTS_INVALID_TOKEN", Domain: "tenants",
 		Message: "invalid or expired invite token", Kind: apperror.KindValidation,
 	}
+	ErrFixedMode = apperror.Error{
+		Code: "TENANTS_FIXED_MODE", Domain: "tenants",
+		Message: "tenant creation is disabled in fixed mode", Kind: apperror.KindValidation,
+	}
+	ErrFeedCatalogRequired = apperror.Error{
+		Code: "TENANTS_FEED_CATALOG_REQUIRED", Domain: "tenants",
+		Message: "feed catalog is required when mode is fixed", Kind: apperror.KindValidation,
+	}
 )
 
 func wrapErr(base apperror.Error, field string, err error) error {

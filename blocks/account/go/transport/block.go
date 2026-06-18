@@ -10,7 +10,6 @@ import (
 	"github.com/emersonary/appkit/accounts/gen/account/v1/accountv1connect"
 	accounthttp "github.com/emersonary/appkit/accounts/http"
 	"github.com/emersonary/appkit/accounts"
-	googleoauth "github.com/emersonary/appkit/accounts/oauth/google"
 )
 
 // Block wires account transport (Connect, gRPC, default REST) around a Service.
@@ -46,7 +45,7 @@ func newBlock(svc *accounts.Service, mount *Mount) *Block {
 		accountServer: NewAccountServer(svc),
 	}
 	if mount != nil {
-		googleoauth.Configure(svc)
+		configureOAuthProviders(svc)
 		b.mount(mount)
 	}
 	return b

@@ -2,41 +2,14 @@
 
 Config-driven identity layer: schema bootstrap, email/password auth, OAuth, JWT sessions.
 
-## Config (`accounts.yaml`)
+## Config (main `config.yaml` `accounts` node)
 
-```yaml
-schema: account
-
-tenancy:
-  enabled: false
-  default_tenant_id: sahar
-
-session:
-  access_token_ttl: 24h
-
-urls:
-  frontend_url: http://localhost:5174
-  api_public_url: http://localhost:8082
-
-oauth:
-  state_cookie_name: sahar_oauth_state
-  google:
-    enabled: true
-    redirect_url: http://localhost:8082/account/google/callback
-
-features:
-  admin_flag: true
-```
-
-Secrets (`JWTSecret`, Google credentials) are passed at runtime via `accounts.Secrets`, not YAML.
+See `accounts.example.yaml` for the full shape. Secrets (`jwt_secret`, Google `client_secret`) belong in env or local config overrides.
 
 ## Apply schema (migration time)
 
 ```go
-cfg, err := accounts.LoadConfig("config/accounts.yaml")
-if err != nil { return err }
-
-if err := accounts.ApplySchema(ctx, sqlDB, cfg); err != nil {
+if err := accounts.ApplySchemaFromAppConfig(ctx, sqlDB, appCfg.Accounts); err != nil {
     return err
 }
 ```

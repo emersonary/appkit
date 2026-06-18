@@ -1,10 +1,13 @@
 import { createContext, useContext } from 'react';
-import type { AccountsClassNames, AccountsUILabels, AccountsTenancyConfig } from './types';
+import type { AccountsClassNames, AccountsOAuthConfig, AccountsUILabels, AccountsTenancyConfig } from './types';
+import { defaultAccountsOAuthConfig } from './types';
 
 export type AccountsContextValue = {
   tenancy: AccountsTenancyConfig;
   labels: Required<AccountsUILabels>;
   classNames: AccountsClassNames;
+  registrationEnabled: boolean;
+  oauth: AccountsOAuthConfig;
   googleOAuthUrl?: string;
   settingsHref?: string;
   onSettingsClick?: () => void;
@@ -64,6 +67,8 @@ export const AccountsConfigContext = createContext<AccountsContextValue>({
   tenancy: { enabled: false },
   labels: defaultLabels,
   classNames: {},
+  registrationEnabled: true,
+  oauth: defaultAccountsOAuthConfig,
 });
 
 export function useAccountsConfig() {

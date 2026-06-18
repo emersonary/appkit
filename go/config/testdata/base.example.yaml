@@ -44,6 +44,17 @@ accounts:
   config_path: config/accounts.yaml
   frontend_url: https://app.example.com
   api_public_url: https://api.example.com
+  registration_enabled: true
+  register_as_admin: false
+  skip_email_verification: false
+  oauth:
+    enabled: false
+    google:
+      enabled: false
+    facebook:
+      enabled: false
+    apple:
+      enabled: false
 
 currency:
   enabled: false

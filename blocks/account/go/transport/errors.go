@@ -26,6 +26,8 @@ func MapGRPCError(err error) error {
 			return status.Error(codes.AlreadyExists, appErr.Error())
 		case accounts.ErrEmailNotVerified.Code:
 			return status.Error(codes.FailedPrecondition, appErr.Error())
+		case accounts.ErrRegistrationDisabled.Code:
+			return status.Error(codes.PermissionDenied, appErr.Error())
 		}
 	}
 	return status.Error(codes.Internal, "internal error")
@@ -56,6 +58,8 @@ func ToConnectError(err error) error {
 			return connect.NewError(connect.CodeAlreadyExists, appErr)
 		case accounts.ErrEmailNotVerified.Code:
 			return connect.NewError(connect.CodeFailedPrecondition, appErr)
+		case accounts.ErrRegistrationDisabled.Code:
+			return connect.NewError(connect.CodePermissionDenied, appErr)
 		}
 	}
 

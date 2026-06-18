@@ -45,13 +45,13 @@ func (s *Store) selectColumns() string {
 	return `id, email, password_hash, first_name, last_name, avatar_url, email_verified_at, is_admin, created_at, updated_at`
 }
 
-func (s *Store) Create(ctx context.Context, email, passwordHash string, firstName, lastName *string) (Account, error) {
+func (s *Store) Create(ctx context.Context, email, passwordHash string, firstName, lastName *string, emailVerified, isAdmin bool) (Account, error) {
 	email = strings.ToLower(strings.TrimSpace(email))
 	row := s.db.QueryRowContext(ctx, `
-		INSERT INTO `+s.accountsTable()+` (email, password_hash, first_name, last_name)
-		VALUES ($1, NULLIF($2, ''), $3, $4)
+		INSERT INTO `+s.accountsTable()+` (email, password_hash, first_name, last_name, email_verified_at, is_admin)
+		VALUES ($1, NULLIF($2, ''), $3, $4, CASE WHEN $5 THEN NOW() ELSE NULL END, $6)
 		RETURNING `+s.selectColumns()+`
-	`, email, passwordHash, firstName, lastName)
+	`, email, passwordHash, firstName, lastName, emailVerified, isAdmin)
 	return scanAccount(row)
 }
 

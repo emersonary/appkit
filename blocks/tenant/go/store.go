@@ -38,6 +38,26 @@ func (s *Store) CreateTenant(ctx context.Context, slug, name, timezone string) (
 	return tenant, err
 }
 
+func (s *Store) UpsertCatalogTenant(ctx context.Context, slug, name, timezone string) (Tenant, error) {
+	if timezone == "" {
+		timezone = "UTC"
+	}
+	var tenant Tenant
+	err := s.db.QueryRowContext(ctx, `
+		INSERT INTO `+s.tenantsTable()+` (slug, name, timezone, status)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (slug) DO UPDATE
+		SET name = EXCLUDED.name,
+		    timezone = EXCLUDED.timezone,
+		    status = EXCLUDED.status,
+		    updated_at = NOW()
+		RETURNING id, slug, name, timezone, status
+	`, slug, name, timezone, StatusActive).Scan(
+		&tenant.ID, &tenant.Slug, &tenant.Name, &tenant.Timezone, &tenant.Status,
+	)
+	return tenant, err
+}
+
 func (s *Store) AddMember(ctx context.Context, tenantID, accountID, role string) error {
 	_, err := s.db.ExecContext(ctx, `
 		INSERT INTO `+s.accountsTable()+` (tenant_id, account_id, role)

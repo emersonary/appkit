@@ -41,8 +41,21 @@
     "api_public_url": "https://api.example.com",
     "verification_token_ttl": 0,
     "password_reset_token_ttl": 0,
-    "google": {
-      "client_id": ""
+    "registration_enabled": true,
+    "register_as_admin": false,
+    "skip_email_verification": false,
+    "oauth": {
+      "enabled": false,
+      "google": {
+        "enabled": false,
+        "client_id": ""
+      },
+      "facebook": {
+        "enabled": false
+      },
+      "apple": {
+        "enabled": false
+      }
     }
   },
   "currency": {
@@ -65,5 +78,9 @@
     "jmap_url": "",
     "domain_id": "",
     "mail_domain": ""
+  },
+  "tenants": {
+    "enabled": false,
+    "config_path": "config/tenants.yaml"
   }
 }

@@ -9,18 +9,28 @@ import (
 )
 
 type Config struct {
+	Enabled  *bool          `yaml:"enabled"`
 	Schema   string         `yaml:"schema"`
 	Tenancy  TenancyConfig  `yaml:"tenancy"`
 	Session  SessionConfig  `yaml:"session"`
 	URLs     URLsConfig     `yaml:"urls"`
 	Tokens   TokensConfig   `yaml:"tokens"`
-	OAuth    OAccountConfig    `yaml:"oauth"`
+	OAuth    OAccountConfig `yaml:"oauth"`
 	Features FeaturesConfig `yaml:"features"`
 }
 
+// IsEnabled reports whether the accounts block is active.
+// When enabled is omitted from YAML, accounts default to enabled for backward compatibility.
+func (c Config) IsEnabled() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
+}
+
 type TenancyConfig struct {
-	Enabled         bool   `yaml:"enabled"`
-	DefaultTenantID string `yaml:"default_tenant_id"`
+	Enabled         bool   `yaml:"enabled" mapstructure:"enabled" json:"enabled"`
+	DefaultTenantID string `yaml:"default_tenant_id" mapstructure:"default_tenant_id" json:"default_tenant_id"`
 }
 
 type SessionConfig struct {
@@ -33,24 +43,84 @@ type URLsConfig struct {
 }
 
 type TokensConfig struct {
-	VerificationTTL   string `yaml:"verification_token_ttl"`
-	PasswordResetTTL  string `yaml:"password_reset_token_ttl"`
+	VerificationTTL  string `yaml:"verification_token_ttl"`
+	PasswordResetTTL string `yaml:"password_reset_token_ttl"`
 }
 
 type OAccountConfig struct {
-	StateCookieName string       `yaml:"state_cookie_name"`
-	Google          GoogleConfig `yaml:"google"`
+	Enabled         *bool          `yaml:"enabled"`
+	StateCookieName string         `yaml:"state_cookie_name"`
+	Google          GoogleConfig   `yaml:"google"`
+	Facebook        ProviderToggle `yaml:"facebook"`
+	Apple           ProviderToggle `yaml:"apple"`
+}
+
+type ProviderToggle struct {
+	Enabled bool `yaml:"enabled" mapstructure:"enabled" json:"enabled"`
 }
 
 type GoogleConfig struct {
-	Enabled     bool   `yaml:"enabled"`
-	ClientID    string `yaml:"client_id"`
+	Enabled      bool   `yaml:"enabled"`
+	ClientID     string `yaml:"client_id"`
 	ClientSecret string `yaml:"client_secret"`
-	RedirectURL string `yaml:"redirect_url"`
+	RedirectURL  string `yaml:"redirect_url"`
 }
 
 type FeaturesConfig struct {
-	AdminFlag bool `yaml:"admin_flag"`
+	RegistrationEnabled   *bool `yaml:"registration_enabled"`
+	RegisterAsAdmin       bool  `yaml:"register_as_admin"`
+	SkipEmailVerification bool  `yaml:"skip_email_verification"`
+}
+
+// RegistrationEnabled reports whether password registration is allowed (default true).
+func (c Config) RegistrationEnabled() bool {
+	if c.Features.RegistrationEnabled == nil {
+		return true
+	}
+	return *c.Features.RegistrationEnabled
+}
+
+// RegisterAsAdmin reports whether new password registrations are created with is_admin=true.
+func (c Config) RegisterAsAdmin() bool {
+	return c.Features.RegisterAsAdmin
+}
+
+// SkipEmailVerification reports whether new password registrations skip the email confirmation flow.
+func (c Config) SkipEmailVerification() bool {
+	return c.Features.SkipEmailVerification
+}
+
+// OAuthEnabled reports whether OAuth sign-in is allowed (default true when omitted).
+func (c Config) OAuthEnabled() bool {
+	if c.OAuth.Enabled == nil {
+		return true
+	}
+	return *c.OAuth.Enabled
+}
+
+// OAuthProviderEnabled reports whether a provider is enabled in config (parent oauth must be enabled).
+func (c Config) OAuthProviderEnabled(provider string) bool {
+	if !c.OAuthEnabled() {
+		return false
+	}
+	switch provider {
+	case "google":
+		return c.OAuth.Google.Enabled
+	case "facebook":
+		return c.OAuth.Facebook.Enabled
+	case "apple":
+		return c.OAuth.Apple.Enabled
+	default:
+		return false
+	}
+}
+
+// GoogleOAuthEnabled reports whether Google OAuth is fully configured and allowed.
+func (c Config) GoogleOAuthEnabled(secrets Secrets) bool {
+	if !c.OAuthProviderEnabled("google") {
+		return false
+	}
+	return c.OAuth.Google.EnabledWithSecrets(secrets)
 }
 
 // Secrets holds runtime credentials not stored in YAML files.
@@ -106,6 +176,13 @@ func (c *Config) normalize() {
 }
 
 func (c Config) Validate() error {
+	if !c.IsEnabled() {
+		if c.Tenancy.DefaultTenantID == "" {
+			return ErrDefaultTenantRequired
+		}
+		return nil
+	}
+
 	if c.Schema == "" {
 		return ErrSchemaRequired
 	}

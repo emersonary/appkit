@@ -11,6 +11,9 @@ import (
 func Configure(svc *accounts.Service) bool {
 	cfg := svc.Config()
 	secrets := svc.Secrets()
+	if !cfg.OAuthEnabled() || !cfg.OAuth.Google.Enabled {
+		return false
+	}
 	google := cfg.OAuth.Google
 	if !google.EnabledWithSecrets(secrets) {
 		return false

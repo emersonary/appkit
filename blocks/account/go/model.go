@@ -28,6 +28,7 @@ type Session struct {
 type RegisterResult struct {
 	VerificationRequired bool
 	Account              Account
+	Session              *Session
 }
 
 type VerifyEmailResult struct {

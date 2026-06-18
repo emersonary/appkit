@@ -79,12 +79,18 @@ func (s *Service) Register(ctx context.Context, emailAddr, password string, firs
 		return RegisterResult{}, ErrInvalidArgument
 	}
 
+	if !s.cfg.RegistrationEnabled() {
+		return RegisterResult{}, ErrRegistrationDisabled
+	}
+
 	hash, err := HashPassword(password)
 	if err != nil {
 		return RegisterResult{}, err
 	}
 
-	account, err := s.store.Create(ctx, emailAddr, hash, firstName, lastName)
+	skipVerify := s.cfg.SkipEmailVerification()
+	registerAsAdmin := s.cfg.RegisterAsAdmin()
+	account, err := s.store.Create(ctx, emailAddr, hash, firstName, lastName, skipVerify, registerAsAdmin)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return RegisterResult{}, ErrAlreadyExists
@@ -96,6 +102,18 @@ func (s *Service) Register(ctx context.Context, emailAddr, password string, firs
 		if err := s.store.JoinDefaultTenant(ctx, account.ID, s.cfg.Tenancy.DefaultTenantID); err != nil {
 			return RegisterResult{}, err
 		}
+	}
+
+	if skipVerify {
+		session, err := s.tokens.Issue(account, "")
+		if err != nil {
+			return RegisterResult{}, err
+		}
+		return RegisterResult{
+			VerificationRequired: false,
+			Account:              account,
+			Session:              &session,
+		}, nil
 	}
 
 	if err := s.sendVerificationEmail(ctx, account); err != nil {
@@ -171,6 +189,10 @@ func (s *Service) LoginOAuth(
 	firstName, lastName *string,
 	avatarURL *string,
 ) (Session, error) {
+	if !s.cfg.RegistrationEnabled() {
+		return Session{}, ErrRegistrationDisabled
+	}
+
 	if provider == "" || providerUserID == "" || !isValidEmail(emailAddr) {
 		return Session{}, ErrInvalidArgument
 	}

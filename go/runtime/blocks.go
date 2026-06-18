@@ -22,8 +22,8 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		return nil
 	}
 
+	// sqlDB wraps the application pool; do not Close here — Shutdown closes a.Pool.
 	sqlDB := stdlib.OpenDBFromPool(a.Pool)
-	defer sqlDB.Close()
 
 	if base.Accounts.Enabled {
 		accOpts := accounts.Options{}

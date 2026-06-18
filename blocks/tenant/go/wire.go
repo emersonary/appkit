@@ -42,5 +42,14 @@ func Wire(ctx context.Context, db *sql.DB, app AppConfig) (*Service, error) {
 		return nil, fmt.Errorf("apply tenants schema: %w", err)
 	}
 
-	return New(db, blockCfg)
+	svc, err := New(db, blockCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := svc.SyncFixedCatalog(ctx); err != nil {
+		return nil, fmt.Errorf("sync fixed tenant catalog: %w", err)
+	}
+
+	return svc, nil
 }

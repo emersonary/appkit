@@ -1,27 +1,29 @@
-schema: account
+# Example accounts node for the main application config.yaml (replaces legacy accounts.yaml).
 
-tenancy:
-  enabled: false
-  default_tenant_id: sahar
-
-session:
+accounts:
+  enabled: true
+  schema: account
+  tenancy:
+    enabled: false
+    default_tenant_id: sahar
+  jwt_secret: replace-with-a-long-random-string
   access_token_ttl: 24h
-
-urls:
-  frontend_url: http://localhost:5174
-  api_public_url: http://localhost:8082
-
-tokens:
   verification_token_ttl: 24h
   password_reset_token_ttl: 1h
-
-oauth:
-  state_cookie_name: sahar_oauth_state
-  google:
+  frontend_url: http://localhost:5174
+  api_public_url: http://localhost:8082
+  registration_enabled: true
+  register_as_admin: false
+  skip_email_verification: false
+  oauth:
     enabled: true
-    client_id: ""
-    client_secret: ""
-    redirect_url: http://localhost:8082/account/google/callback
-
-features:
-  admin_flag: true
+    state_cookie_name: sahar_oauth_state
+    google:
+      enabled: true
+      client_id: ""
+      client_secret: ""
+      redirect_url: http://localhost:8082/account/google/callback
+    facebook:
+      enabled: false
+    apple:
+      enabled: false

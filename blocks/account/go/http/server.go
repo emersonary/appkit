@@ -55,6 +55,10 @@ func (s *Server) handleVerifyEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	if !s.svc.Config().RegistrationEnabled() {
+		http.Error(w, "account registration is disabled", http.StatusForbidden)
+		return
+	}
 	if s.provider == nil {
 		http.Error(w, "google oauth not configured", http.StatusServiceUnavailable)
 		return
@@ -80,6 +84,10 @@ func (s *Server) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	if !s.svc.Config().RegistrationEnabled() {
+		s.redirectWithError(w, r, "registration_disabled")
+		return
+	}
 	if s.provider == nil {
 		http.Error(w, "google oauth not configured", http.StatusServiceUnavailable)
 		return

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AccountsConfigContext, defaultLabels } from './context';
 import type { AccountSession, Account, AccountsProviderProps } from './types';
+import { defaultAccountsOAuthConfig } from './types';
 
 export type AccountsSessionContextValue = {
   account: Account | null;
@@ -32,6 +33,8 @@ export function AccountsProvider({
   children,
   tenancy,
   accountClient,
+  oauth,
+  registrationEnabled = true,
   googleOAuthUrl,
   labels,
   classNames,
@@ -47,11 +50,13 @@ export function AccountsProvider({
       tenancy,
       labels: { ...defaultLabels, ...labels },
       classNames: classNames ?? {},
+      oauth: { ...defaultAccountsOAuthConfig, ...oauth },
+      registrationEnabled,
       googleOAuthUrl,
       settingsHref,
       onSettingsClick,
     }),
-    [tenancy, labels, classNames, googleOAuthUrl, settingsHref, onSettingsClick],
+    [tenancy, labels, classNames, oauth, registrationEnabled, googleOAuthUrl, settingsHref, onSettingsClick],
   );
 
   const refreshSession = useCallback(async () => {

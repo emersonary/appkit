@@ -19,7 +19,10 @@ export function OAuthButtonGroup({
   const googleOAuthUrl = googleOAuthUrlProp ?? ctx.googleOAuthUrl;
   const labels = { ...ctx.labels, ...labelsProp };
   const classNames = { ...ctx.classNames, ...classNamesProp };
-  const canUseGoogle = Boolean(googleOAuthUrl || onGoogleClick);
+  const oauthEnabled = ctx.oauth.enabled !== false;
+  const googleEnabled = ctx.oauth.google !== false;
+  const canUseGoogle =
+    ctx.registrationEnabled && oauthEnabled && googleEnabled && Boolean(googleOAuthUrl || onGoogleClick);
   if (!canUseGoogle) return null;
 
   function handleGoogle() {
