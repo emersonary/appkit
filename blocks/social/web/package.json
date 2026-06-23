@@ -1,0 +1,24 @@
+{
+  "name": "@emersonary/appkit-social",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Social publishing OAuth UI and API helpers for appkit consumer apps",
+  "scripts": {
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "typescript": "~5.8.3"
+  }
+}

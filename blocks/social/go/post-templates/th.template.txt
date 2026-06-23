@@ -1,0 +1,5 @@
+{{intro_text}}
+
+→ {{source_brand}}: {{article_url}}
+
+{{hashtags}}

@@ -1,0 +1,5 @@
+{{intro_text}}
+
+Link na bio · {{source_brand}} {{article_url}}
+
+{{hashtags}}

@@ -1,0 +1,58 @@
+# Social block — multi-platform publishing for blog posts.
+# Set enabled: true after filling account_id and access_token_env values.
+# Wire via main config social: node or social.config_path.
+
+enabled: false
+default_dispatch: server # server | client
+
+platforms:
+  ig:
+    enabled: true
+    dispatch: server
+    driver: instagram
+    account_id: "" # Instagram Business/Creator user id
+    access_token_env: META_ACCESS_TOKEN
+
+  fb:
+    enabled: true
+    dispatch: server
+    driver: facebook
+    account_id: "" # Facebook Page id
+    access_token_env: META_ACCESS_TOKEN
+
+  th:
+    enabled: true
+    dispatch: server
+    driver: threads
+    account_id: "" # Threads user id
+    access_token_env: META_ACCESS_TOKEN
+
+  pi:
+    enabled: true
+    dispatch: server
+    driver: pinterest
+    board_id: "" # Pinterest board id
+    board_name: Blog
+    access_token_env: PINTEREST_ACCESS_TOKEN
+
+  tt:
+    enabled: true
+    dispatch: client # TikTok often needs client upload; switch to server when video URL is ready
+    driver: tiktok
+    account_id: "" # TikTok open_id
+    access_token_env: TIKTOK_ACCESS_TOKEN
+
+  li:
+    enabled: true
+    dispatch: server
+    driver: linkedin
+    account_id: "" # urn:li:organization:ID or numeric org id
+    access_token_env: LINKEDIN_ACCESS_TOKEN
+
+  yt:
+    enabled: true
+    dispatch: client # Community posts default to client; set server + youtube_post_type: video for uploads
+    driver: youtube
+    account_id: "" # YouTube channel id
+    youtube_post_type: community # community | video
+    access_token_env: YOUTUBE_ACCESS_TOKEN
