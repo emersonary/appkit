@@ -47,4 +47,6 @@ require (
 
 replace github.com/emersonary/appkit/accounts => ../blocks/account/go
 
-replace github.com/emersonary/appkit/tenants => ../blocks/tenant/go
+replace github.com/emersonary/appkit/tenants => ../../via-jeri/appkit/blocks/tenant/go
+
+replace github.com/emersonary/appkit/social => ../blocks/social/go

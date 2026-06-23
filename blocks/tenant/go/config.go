@@ -15,17 +15,17 @@ const (
 
 // FeedEntry is a fixed-catalog tenant (feed) declared in tenants YAML.
 type FeedEntry struct {
-	ID       string         `yaml:"id"`
-	Name     string         `yaml:"name"`
-	Timezone string         `yaml:"timezone"`
-	Metadata map[string]any `yaml:"metadata"`
+	ID       string         `yaml:"id" mapstructure:"id"`
+	Name     string         `yaml:"name" mapstructure:"name"`
+	Timezone string         `yaml:"timezone" mapstructure:"timezone"`
+	Metadata map[string]any `yaml:"metadata" mapstructure:"metadata"`
 }
 
 type Config struct {
-	Schema         string      `yaml:"schema"`
-	Mode           string      `yaml:"mode"`
-	InviteTokenTTL string      `yaml:"invite_token_ttl"`
-	Feed           []FeedEntry `yaml:"feed"`
+	Schema         string      `yaml:"schema" mapstructure:"schema"`
+	Mode           string      `yaml:"mode" mapstructure:"mode"`
+	InviteTokenTTL string      `yaml:"invite_token_ttl" mapstructure:"invite_token_ttl"`
+	Feed           []FeedEntry `yaml:"feed" mapstructure:"feed"`
 }
 
 func LoadConfig(path string) (Config, error) {

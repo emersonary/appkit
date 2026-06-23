@@ -7,9 +7,12 @@ import (
 
 	"github.com/emersonary/appkit/accounts"
 	appkitconfig "github.com/emersonary/appkit/config"
+	"github.com/emersonary/appkit/ai"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
+	"github.com/emersonary/appkit/language"
+	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
@@ -29,6 +32,9 @@ type Application[T appkitconfig.AppConfig] struct {
 	Accounts      *accounts.Service
 	Tenants       *tenants.Service
 	Currency      *currency.Service
+	Language      *language.Service
+	AI            *ai.Service
+	Permissions   *permissions.Service
 	Email         *email.Handler
 
 	httpServer   *http.Server
@@ -36,8 +42,8 @@ type Application[T appkitconfig.AppConfig] struct {
 	grpcListener net.Listener
 	wsServer     *http.Server
 
-	workerCancel context.CancelFunc
-	wireShutdown WireShutdownFunc[T]
+	workerCancels []context.CancelFunc
+	wireShutdown  WireShutdownFunc[T]
 }
 
 // Base returns the embedded appkit infra config from the product config.
@@ -154,10 +160,7 @@ func (a *Application[T]) Shutdown(ctx context.Context) error {
 			shutdownErr = err
 		}
 	}
-	if a.workerCancel != nil {
-		a.workerCancel()
-		a.workerCancel = nil
-	}
+	a.stopWorkers()
 	if a.NATS != nil {
 		a.NATS.Close()
 		a.NATS = nil

@@ -1,0 +1,38 @@
+package language
+
+// LanguageCatalog is the static language registry used for validation and seed metadata.
+// Codes are ISO 639-1 (two letters, lowercase).
+var LanguageCatalog = map[string]CatalogEntry{
+	"af": {Name: "Afrikaans", NativeName: "Afrikaans", Direction: "ltr"},
+	"ar": {Name: "Arabic", NativeName: "العربية", Direction: "rtl"},
+	"bn": {Name: "Bengali", NativeName: "বাংলা", Direction: "ltr"},
+	"cs": {Name: "Czech", NativeName: "Čeština", Direction: "ltr"},
+	"da": {Name: "Danish", NativeName: "Dansk", Direction: "ltr"},
+	"de": {Name: "German", NativeName: "Deutsch", Direction: "ltr"},
+	"el": {Name: "Greek", NativeName: "Ελληνικά", Direction: "ltr"},
+	"en": {Name: "English", NativeName: "English", Direction: "ltr"},
+	"es": {Name: "Spanish", NativeName: "Español", Direction: "ltr"},
+	"fi": {Name: "Finnish", NativeName: "Suomi", Direction: "ltr"},
+	"fr": {Name: "French", NativeName: "Français", Direction: "ltr"},
+	"he": {Name: "Hebrew", NativeName: "עברית", Direction: "rtl"},
+	"hi": {Name: "Hindi", NativeName: "हिन्दी", Direction: "ltr"},
+	"hu": {Name: "Hungarian", NativeName: "Magyar", Direction: "ltr"},
+	"id": {Name: "Indonesian", NativeName: "Bahasa Indonesia", Direction: "ltr"},
+	"is": {Name: "Icelandic", NativeName: "Íslenska", Direction: "ltr"},
+	"it": {Name: "Italian", NativeName: "Italiano", Direction: "ltr"},
+	"ja": {Name: "Japanese", NativeName: "日本語", Direction: "ltr"},
+	"ko": {Name: "Korean", NativeName: "한국어", Direction: "ltr"},
+	"ms": {Name: "Malay", NativeName: "Bahasa Melayu", Direction: "ltr"},
+	"nl": {Name: "Dutch", NativeName: "Nederlands", Direction: "ltr"},
+	"no": {Name: "Norwegian", NativeName: "Norsk", Direction: "ltr"},
+	"pl": {Name: "Polish", NativeName: "Polski", Direction: "ltr"},
+	"pt": {Name: "Portuguese", NativeName: "Português", Direction: "ltr"},
+	"ro": {Name: "Romanian", NativeName: "Română", Direction: "ltr"},
+	"ru": {Name: "Russian", NativeName: "Русский", Direction: "ltr"},
+	"sv": {Name: "Swedish", NativeName: "Svenska", Direction: "ltr"},
+	"th": {Name: "Thai", NativeName: "ไทย", Direction: "ltr"},
+	"tr": {Name: "Turkish", NativeName: "Türkçe", Direction: "ltr"},
+	"uk": {Name: "Ukrainian", NativeName: "Українська", Direction: "ltr"},
+	"vi": {Name: "Vietnamese", NativeName: "Tiếng Việt", Direction: "ltr"},
+	"zh": {Name: "Chinese", NativeName: "中文", Direction: "ltr"},
+}

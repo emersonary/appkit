@@ -1,0 +1,14 @@
+# Example language node for the main application config.yaml.
+
+language:
+  enabled: true
+  schema: language
+  default_language: en
+  languages:
+    - en
+    - pt
+    - fr
+    - es
+    - de
+    - ar
+    - he

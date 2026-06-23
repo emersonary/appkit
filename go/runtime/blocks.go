@@ -4,8 +4,11 @@ import (
 	"context"
 
 	"github.com/emersonary/appkit/accounts"
+	"github.com/emersonary/appkit/ai"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
+	"github.com/emersonary/appkit/language"
+	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
@@ -18,12 +21,25 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.AI.Enabled {
 		return nil
 	}
 
 	// sqlDB wraps the application pool; do not Close here — Shutdown closes a.Pool.
 	sqlDB := stdlib.OpenDBFromPool(a.Pool)
+
+	if base.Permissions.Enabled {
+		svc, err := permissions.Wire(ctx, sqlDB, base.Permissions, permissions.WireOptions{})
+		if err != nil {
+			return err
+		}
+		a.Permissions = svc
+		if svc != nil {
+			a.Logger.Info("permissions block enabled",
+				zap.String("default_profile", base.Permissions.DefaultProfile),
+			)
+		}
+	}
 
 	if base.Accounts.Enabled {
 		accOpts := accounts.Options{}
@@ -36,6 +52,12 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		}
 		if accOpts.Mailer == nil && a.Email != nil {
 			accOpts.Mailer = a.Email.AccountMailer()
+		}
+		if accOpts.AfterCreate == nil && a.Permissions != nil {
+			perm := a.Permissions
+			accOpts.AfterCreate = func(ctx context.Context, account accounts.Account, registerAsAdmin bool) error {
+				return perm.AssignNewAccountProfile(ctx, account.ID, registerAsAdmin || account.IsAdmin)
+			}
 		}
 
 		svc, err := accounts.Wire(ctx, sqlDB, base.Accounts, accOpts)
@@ -60,28 +82,21 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 	}
 
 	if base.Currency.Enabled {
-		workerCtx, workerCancel := context.WithCancel(context.Background())
-		a.workerCancel = workerCancel
+		workerCtx, _ := a.RegisterWorker()
 
 		curOpts := currency.WireOptions{Logger: a.Logger.Named("currency"), WorkerCtx: workerCtx}
 		if opts.CurrencyWire != nil {
 			var err error
 			curOpts, err = opts.CurrencyWire(ctx, a, workerCtx)
 			if err != nil {
-				if a.workerCancel != nil {
-					a.workerCancel()
-					a.workerCancel = nil
-				}
+				a.stopWorkers()
 				return err
 			}
 		}
 
 		svc, err := currency.Wire(ctx, sqlDB, base.Currency, curOpts)
 		if err != nil {
-			if a.workerCancel != nil {
-				a.workerCancel()
-				a.workerCancel = nil
-			}
+			a.stopWorkers()
 			return err
 		}
 		a.Currency = svc
@@ -89,6 +104,32 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 			a.Logger.Info("currency block enabled",
 				zap.Duration("interval", base.Currency.UpdateInterval),
 				zap.String("api", base.Currency.APIURL),
+			)
+		}
+	}
+
+	if base.Language.Enabled {
+		svc, err := language.Wire(ctx, sqlDB, base.Language, language.WireOptions{})
+		if err != nil {
+			return err
+		}
+		a.Language = svc
+		if svc != nil {
+			a.Logger.Info("language block enabled",
+				zap.String("default", base.Language.DefaultLanguage),
+			)
+		}
+	}
+
+	if base.AI.Enabled {
+		svc, err := ai.Wire(ctx, base.AI, ai.WireOptions{})
+		if err != nil {
+			return err
+		}
+		a.AI = svc
+		if svc != nil {
+			a.Logger.Info("ai block enabled",
+				zap.Any("routes", svc.RouteSummary()),
 			)
 		}
 	}

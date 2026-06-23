@@ -75,6 +75,23 @@ func TestLoadConfig_FixedExample(t *testing.T) {
 	}
 }
 
+func TestResolveBlockConfigInline(t *testing.T) {
+	cfg, err := ResolveBlockConfig(AppConfig{
+		Enabled: true,
+		Schema:  "tenant",
+		Mode:    ModeFixed,
+		Feed: []FeedEntry{
+			{ID: "sahar", Name: "Sahar"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("ResolveBlockConfig: %v", err)
+	}
+	if !cfg.IsFixedMode() || len(cfg.Feed) != 1 || cfg.Feed[0].ID != "sahar" {
+		t.Fatalf("unexpected config: %+v", cfg)
+	}
+}
+
 func TestService_CreateTenantBlockedInFixedMode(t *testing.T) {
 	svc := &Service{cfg: Config{Schema: "tenant", Mode: ModeFixed, Feed: []FeedEntry{{ID: "sahar", Name: "Sahar"}}}}
 	_, err := svc.CreateTenant(t.Context(), "acct", "Acme", "acme", "UTC")

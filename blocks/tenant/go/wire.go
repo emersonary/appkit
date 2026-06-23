@@ -33,7 +33,7 @@ func Wire(ctx context.Context, db *sql.DB, app AppConfig) (*Service, error) {
 
 	app.ApplyDefaults()
 
-	blockCfg, err := LoadConfig(app.ConfigPath)
+	blockCfg, err := ResolveBlockConfig(app)
 	if err != nil {
 		return nil, fmt.Errorf("load tenants config: %w", err)
 	}
