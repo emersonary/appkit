@@ -1,0 +1,17 @@
+# AI block — provider routing for translation, chat, and Solidia workflows.
+# Wire via main config ai: node (see appkit/go/ai).
+
+enabled: true
+
+providers:
+  openai:
+    driver: openai
+    api_key_env: OPENAI_API_KEY
+    base_url: https://api.openai.com/v1
+    default_model: gpt-4o-mini
+    timeout: 30s
+
+routes:
+  translation: openai
+  chat: openai
+  chat_translation: openai

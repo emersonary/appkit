@@ -1,0 +1,57 @@
+# Permissions setup — profiles, groups, categories, and permission tree.
+# Wire via main config permissions: node (see appkit/go/permissions).
+
+schema: account
+accounts_schema: account
+default_profile: member
+
+groups:
+  - id: manage
+    name: Manage
+    sort_order: 1
+    route_prefix: /admin/manage
+  - id: settings
+    name: Settings
+    sort_order: 2
+    route_prefix: /admin/settings
+
+categories:
+  - id: content
+    name: Content
+    group: manage
+    sort_order: 1
+  - id: access
+    name: Access
+    group: settings
+    sort_order: 1
+
+permissions:
+  - id: blog_post
+    name: Posts
+    category: content
+    be_action: 15
+    route_name: /admin/posts
+    icon: file-text
+    sort_order: 1
+  - id: blog_post_drafts
+    name: Drafts
+    category: content
+    parent: blog_post
+    be_action: 1
+    route_name: /admin/posts/drafts
+    icon: file
+    sort_order: 2
+
+profiles:
+  - id: member
+    name: Member
+  - id: supervisor
+    name: Supervisor
+  - id: admin
+    name: Administrator
+    superuser: true
+
+profile_permissions:
+  - profile: supervisor
+    permission: blog_post
+    granted_actions: 5
