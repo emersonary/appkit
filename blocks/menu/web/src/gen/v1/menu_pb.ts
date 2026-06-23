@@ -126,6 +126,11 @@ export class MenuItem extends Message<MenuItem> {
    */
   children: MenuItem[] = [];
 
+  /**
+   * @generated from field: string group_name = 7;
+   */
+  groupName = "";
+
   constructor(data?: PartialMessage<MenuItem>) {
     super();
     proto3.util.initPartial(data, this);
@@ -140,6 +145,7 @@ export class MenuItem extends Message<MenuItem> {
     { no: 4, name: "route_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "children", kind: "message", T: MenuItem, repeated: true },
+    { no: 7, name: "group_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MenuItem {
@@ -178,6 +184,11 @@ export class Menu extends Message<Menu> {
    */
   items: MenuItem[] = [];
 
+  /**
+   * @generated from field: string icon = 4;
+   */
+  icon = "";
+
   constructor(data?: PartialMessage<Menu>) {
     super();
     proto3.util.initPartial(data, this);
@@ -189,6 +200,7 @@ export class Menu extends Message<Menu> {
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "items", kind: "message", T: MenuItem, repeated: true },
+    { no: 4, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Menu {

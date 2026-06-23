@@ -14,6 +14,7 @@ type ResolvedMenuItem struct {
 	Name         string
 	RouteName    string
 	Icon         string
+	GroupName    string
 	Children     []ResolvedMenuItem
 }
 
@@ -21,6 +22,7 @@ type ResolvedMenuItem struct {
 type ResolvedMenu struct {
 	ID    string
 	Name  string
+	Icon  string
 	Items []ResolvedMenuItem
 }
 
@@ -31,7 +33,9 @@ type Layout struct {
 	DefaultSelectedPermissionID  string
 }
 
-func ResolveLayout(setup Setup, tree *permissions.PermissionTree, grants []permissions.FlatPermission) (Layout, error) {
+type GroupNameResolver func(categoryID string) string
+
+func ResolveLayout(setup Setup, tree *permissions.PermissionTree, grants []permissions.FlatPermission, groupName GroupNameResolver) (Layout, error) {
 	grantMap := buildGrantMap(grants)
 	menus := make([]ResolvedMenu, 0, len(setup.Menus))
 	sortedMenus := append([]MenuConfig(nil), setup.Menus...)
@@ -46,13 +50,14 @@ func ResolveLayout(setup Setup, tree *permissions.PermissionTree, grants []permi
 		}
 		items := make([]ResolvedMenuItem, 0, len(roots))
 		for _, root := range roots {
-			if item := filterMenuNode(root, grantMap); item != nil {
+			if item := filterMenuNode(root, grantMap, groupName); item != nil {
 				items = append(items, *item)
 			}
 		}
 		menus = append(menus, ResolvedMenu{
 			ID:    menuCfg.ID,
 			Name:  menuCfg.Name,
+			Icon:  menuCfg.Icon,
 			Items: items,
 		})
 	}
@@ -110,14 +115,14 @@ func collectSubtree(node *permissions.PermissionNode, included map[string]*permi
 	}
 }
 
-func filterMenuNode(node *permissions.PermissionNode, grants map[string]int) *ResolvedMenuItem {
+func filterMenuNode(node *permissions.PermissionNode, grants map[string]int, groupName GroupNameResolver) *ResolvedMenuItem {
 	if node == nil || node.Permission == nil {
 		return nil
 	}
 
 	children := make([]ResolvedMenuItem, 0, len(node.Children))
 	for _, child := range node.Children {
-		if item := filterMenuNode(child, grants); item != nil {
+		if item := filterMenuNode(child, grants, groupName); item != nil {
 			children = append(children, *item)
 		}
 	}
@@ -128,12 +133,18 @@ func filterMenuNode(node *permissions.PermissionNode, grants map[string]int) *Re
 		return nil
 	}
 
+	group := ""
+	if groupName != nil && node.Permission != nil {
+		group = strings.TrimSpace(groupName(node.Permission.IDPermissionCategory))
+	}
+
 	return &ResolvedMenuItem{
 		FullID:       node.FullID,
 		PermissionID: permID,
 		Name:         node.Name,
 		RouteName:    node.Permission.RouteName,
 		Icon:         node.Permission.Icon,
+		GroupName:    group,
 		Children:     children,
 	}
 }

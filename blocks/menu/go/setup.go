@@ -19,6 +19,7 @@ type SidebarConfig struct {
 type MenuConfig struct {
 	ID          string   `yaml:"id" mapstructure:"id" json:"id"`
 	Name        string   `yaml:"name" mapstructure:"name" json:"name"`
+	Icon        string   `yaml:"icon" mapstructure:"icon" json:"icon"`
 	SortOrder   int      `yaml:"sort_order" mapstructure:"sort_order" json:"sort_order"`
 	Permissions []string `yaml:"permissions" mapstructure:"permissions" json:"permissions"`
 }
@@ -51,6 +52,7 @@ func (s *Setup) normalize() {
 	for i := range s.Menus {
 		s.Menus[i].ID = strings.TrimSpace(s.Menus[i].ID)
 		s.Menus[i].Name = strings.TrimSpace(s.Menus[i].Name)
+		s.Menus[i].Icon = strings.TrimSpace(s.Menus[i].Icon)
 		clean := make([]string, 0, len(s.Menus[i].Permissions))
 		for _, fullID := range s.Menus[i].Permissions {
 			if trimmed := strings.TrimSpace(fullID); trimmed != "" {

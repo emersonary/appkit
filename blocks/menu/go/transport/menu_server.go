@@ -38,6 +38,7 @@ func layoutToProto(layout menu.Layout) *menuv1.GetMenuResponse {
 		menus = append(menus, &menuv1.Menu{
 			Id:    m.ID,
 			Name:  m.Name,
+			Icon:  m.Icon,
 			Items: itemsToProto(m.Items),
 		})
 	}
@@ -63,6 +64,7 @@ func itemsToProto(items []menu.ResolvedMenuItem) []*menuv1.MenuItem {
 			Name:         item.Name,
 			RouteName:    item.RouteName,
 			Icon:         item.Icon,
+			GroupName:    item.GroupName,
 			Children:     itemsToProto(item.Children),
 		})
 	}

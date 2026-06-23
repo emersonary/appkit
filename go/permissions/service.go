@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -98,6 +99,23 @@ func isAccountProfileLookupSkippable(err error) bool {
 		}
 	}
 	return false
+}
+
+// GroupNameForCategory returns the display name of the permission group for a category id.
+func (s *Service) GroupNameForCategory(categoryID string) string {
+	categoryID = strings.TrimSpace(categoryID)
+	for _, category := range s.setup.Categories {
+		if strings.TrimSpace(category.ID) != categoryID {
+			continue
+		}
+		groupID := strings.TrimSpace(category.Group)
+		for _, group := range s.setup.Groups {
+			if strings.TrimSpace(group.ID) == groupID {
+				return strings.TrimSpace(group.Name)
+			}
+		}
+	}
+	return ""
 }
 
 func (s *Service) ListCatalog(ctx context.Context) (groups []Group, categories []Category, permissions []Permission, err error) {

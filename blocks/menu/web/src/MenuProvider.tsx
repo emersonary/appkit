@@ -132,12 +132,12 @@ export function useMenu() {
 }
 
 export function ConnectedSidebar(props: Omit<SidebarProps, "layout">) {
-  const { layout, loading, error } = useMenu();
+  const { layout, loading, error, sidebarProps } = useMenu();
   if (loading) {
     return <aside className="appkit-menu appkit-menu--loading">Loading menu…</aside>;
   }
   if (error || !layout) {
     return <aside className="appkit-menu appkit-menu--error">Menu unavailable</aside>;
   }
-  return <Sidebar layout={layout} {...props} />;
+  return <Sidebar layout={layout} {...sidebarProps} {...props} />;
 }

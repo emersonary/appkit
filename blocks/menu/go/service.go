@@ -47,5 +47,5 @@ func (s *Service) GetMenu(ctx context.Context, accountID string) (Layout, error)
 		return Layout{}, err
 	}
 
-	return ResolveLayout(s.setup, tree, grants)
+	return ResolveLayout(s.setup, tree, grants, s.permissions.GroupNameForCategory)
 }

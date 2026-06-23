@@ -133,6 +133,7 @@ type MenuItem struct {
 	RouteName     string                 `protobuf:"bytes,4,opt,name=route_name,json=routeName,proto3" json:"route_name,omitempty"`
 	Icon          string                 `protobuf:"bytes,5,opt,name=icon,proto3" json:"icon,omitempty"`
 	Children      []*MenuItem            `protobuf:"bytes,6,rep,name=children,proto3" json:"children,omitempty"`
+	GroupName     string                 `protobuf:"bytes,7,opt,name=group_name,json=groupName,proto3" json:"group_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -209,11 +210,19 @@ func (x *MenuItem) GetChildren() []*MenuItem {
 	return nil
 }
 
+func (x *MenuItem) GetGroupName() string {
+	if x != nil {
+		return x.GroupName
+	}
+	return ""
+}
+
 type Menu struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Items         []*MenuItem            `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
+	Icon          string                 `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -267,6 +276,13 @@ func (x *Menu) GetItems() []*MenuItem {
 		return x.Items
 	}
 	return nil
+}
+
+func (x *Menu) GetIcon() string {
+	if x != nil {
+		return x.Icon
+	}
+	return ""
 }
 
 type GetMenuResponse struct {
@@ -339,7 +355,7 @@ const file_v1_menu_proto_rawDesc = "" +
 	"\bfloating\x18\x01 \x01(\bR\bfloating\x12,\n" +
 	"\x12hide_when_selected\x18\x02 \x01(\bR\x10hideWhenSelected\x12\x16\n" +
 	"\x06locked\x18\x03 \x01(\bR\x06locked\x12!\n" +
-	"\fdefault_menu\x18\x04 \x01(\tR\vdefaultMenu\"\xbe\x01\n" +
+	"\fdefault_menu\x18\x04 \x01(\tR\vdefaultMenu\"\xdd\x01\n" +
 	"\bMenuItem\x12\x17\n" +
 	"\afull_id\x18\x01 \x01(\tR\x06fullId\x12#\n" +
 	"\rpermission_id\x18\x02 \x01(\tR\fpermissionId\x12\x12\n" +
@@ -347,11 +363,14 @@ const file_v1_menu_proto_rawDesc = "" +
 	"\n" +
 	"route_name\x18\x04 \x01(\tR\trouteName\x12\x12\n" +
 	"\x04icon\x18\x05 \x01(\tR\x04icon\x12-\n" +
-	"\bchildren\x18\x06 \x03(\v2\x11.menu.v1.MenuItemR\bchildren\"S\n" +
+	"\bchildren\x18\x06 \x03(\v2\x11.menu.v1.MenuItemR\bchildren\x12\x1d\n" +
+	"\n" +
+	"group_name\x18\a \x01(\tR\tgroupName\"g\n" +
 	"\x04Menu\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12'\n" +
-	"\x05items\x18\x03 \x03(\v2\x11.menu.v1.MenuItemR\x05items\"\xad\x01\n" +
+	"\x05items\x18\x03 \x03(\v2\x11.menu.v1.MenuItemR\x05items\x12\x12\n" +
+	"\x04icon\x18\x04 \x01(\tR\x04icon\"\xad\x01\n" +
 	"\x0fGetMenuResponse\x120\n" +
 	"\asidebar\x18\x01 \x01(\v2\x16.menu.v1.SidebarConfigR\asidebar\x12#\n" +
 	"\x05menus\x18\x02 \x03(\v2\r.menu.v1.MenuR\x05menus\x12C\n" +

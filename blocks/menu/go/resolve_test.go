@@ -51,7 +51,7 @@ func TestResolveLayoutExpandsDescendants(t *testing.T) {
 		{Permission: permissions.Permission{IDPermission: "posts_drafts", Name: "Drafts"}, GrantedActions: permissions.ActionList},
 	}
 
-	layout, err := ResolveLayout(testMenuSetup(), tree, grants)
+	layout, err := ResolveLayout(testMenuSetup(), tree, grants, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

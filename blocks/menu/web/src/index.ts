@@ -1,6 +1,11 @@
 export { Sidebar, type SidebarProps } from "./Sidebar";
 export { MenuProvider, ConnectedSidebar, useMenu } from "./MenuProvider";
 export { MenuService } from "./gen/v1/menu_connect";
+export {
+  resolveActiveMenuItem,
+  matchesMenuRoute,
+  firstMenuItemRoute,
+} from "./routes";
 export type {
   GetMenuResponse,
   Menu,
