@@ -42,7 +42,7 @@ func (s *Store) accountTenantsTable() string {
 }
 
 func (s *Store) selectColumns() string {
-	return `id, email, password_hash, first_name, last_name, avatar_url, email_verified_at, is_admin, created_at, updated_at`
+	return `id, email, password_hash, first_name, last_name, avatar_url, email_verified_at, is_admin, id_profile, created_at, updated_at`
 }
 
 func (s *Store) Create(ctx context.Context, email, passwordHash string, firstName, lastName *string, emailVerified, isAdmin bool) (Account, error) {
@@ -342,6 +342,7 @@ func scanAccount(row *sql.Row) (Account, error) {
 		&account.AvatarURL,
 		&account.EmailVerifiedAt,
 		&account.IsAdmin,
+		&account.IDProfile,
 		&account.CreatedAt,
 		&account.UpdatedAt,
 	)

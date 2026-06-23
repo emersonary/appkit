@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS ` + accounts + ` (
 	avatar_url TEXT,
 	email_verified_at TIMESTAMPTZ,
 	is_admin BOOLEAN NOT NULL DEFAULT false,
+	id_profile TEXT,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	CONSTRAINT accounts_email_unique UNIQUE (email)

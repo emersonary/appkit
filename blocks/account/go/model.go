@@ -11,6 +11,7 @@ type Account struct {
 	AvatarURL       *string
 	EmailVerifiedAt *time.Time
 	IsAdmin         bool
+	IDProfile       *string
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }

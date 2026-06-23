@@ -11,16 +11,19 @@ import (
 )
 
 type Service struct {
-	cfg    Config
-	secrets Secrets
-	store  *Store
-	tokens *TokenService
-	mailer Mailer
-	oauth  map[string]oauth.Provider
+	cfg         Config
+	secrets     Secrets
+	store       *Store
+	tokens      *TokenService
+	mailer      Mailer
+	oauth       map[string]oauth.Provider
+	afterCreate func(ctx context.Context, account Account, registerAsAdmin bool) error
 }
 
 type Options struct {
 	Mailer Mailer
+	// AfterCreate runs after a new account row is inserted (e.g. assign permissions profile).
+	AfterCreate func(ctx context.Context, account Account, registerAsAdmin bool) error
 }
 
 func (o Options) normalized() Options {
@@ -41,12 +44,13 @@ func New(db *sql.DB, cfg Config, secrets Secrets, opts Options) (*Service, error
 
 	opts = opts.normalized()
 	svc := &Service{
-		cfg:     cfg,
-		secrets: secrets,
-		store:   NewStore(db, cfg),
-		tokens:  NewTokenService(secrets.JWTSecret, cfg.AccessTokenTTL(), cfg.EffectiveTenantID()),
-		mailer:  opts.Mailer,
-		oauth:   map[string]oauth.Provider{},
+		cfg:         cfg,
+		secrets:     secrets,
+		store:       NewStore(db, cfg),
+		tokens:      NewTokenService(secrets.JWTSecret, cfg.AccessTokenTTL(), cfg.EffectiveTenantID()),
+		mailer:      opts.Mailer,
+		oauth:       map[string]oauth.Provider{},
+		afterCreate: opts.AfterCreate,
 	}
 	return svc, nil
 }
@@ -96,6 +100,12 @@ func (s *Service) Register(ctx context.Context, emailAddr, password string, firs
 			return RegisterResult{}, ErrAlreadyExists
 		}
 		return RegisterResult{}, err
+	}
+
+	if s.afterCreate != nil {
+		if err := s.afterCreate(ctx, account, registerAsAdmin); err != nil {
+			return RegisterResult{}, err
+		}
 	}
 
 	if s.cfg.Tenancy.Enabled {
