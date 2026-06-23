@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package menu.v1;
+
+option go_package = "github.com/emersonary/appkit/menu/gen/menu/v1;menuv1";
+
+service MenuService {
+  rpc GetMenu(GetMenuRequest) returns (GetMenuResponse);
+}
+
+message GetMenuRequest {}
+
+message SidebarConfig {
+  bool floating = 1;
+  bool hide_when_selected = 2;
+  bool locked = 3;
+  string default_menu = 4;
+}
+
+message MenuItem {
+  string full_id = 1;
+  string permission_id = 2;
+  string name = 3;
+  string route_name = 4;
+  string icon = 5;
+  repeated MenuItem children = 6;
+}
+
+message Menu {
+  string id = 1;
+  string name = 2;
+  repeated MenuItem items = 3;
+}
+
+message GetMenuResponse {
+  SidebarConfig sidebar = 1;
+  repeated Menu menus = 2;
+  string default_selected_permission_id = 3;
+}

@@ -4,6 +4,7 @@ go 1.26.3
 
 require (
 	github.com/emersonary/appkit/accounts v0.0.0
+	github.com/emersonary/appkit/menu v0.0.0
 	github.com/emersonary/appkit/tenants v0.0.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/nats-io/nats.go v1.52.0
@@ -18,6 +19,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
@@ -47,6 +49,8 @@ require (
 
 replace github.com/emersonary/appkit/accounts => ../blocks/account/go
 
-replace github.com/emersonary/appkit/tenants => ../../via-jeri/appkit/blocks/tenant/go
+replace github.com/emersonary/appkit/tenants => ../blocks/tenant/go
 
 replace github.com/emersonary/appkit/social => ../blocks/social/go
+
+replace github.com/emersonary/appkit/menu => ../blocks/menu/go

@@ -8,6 +8,7 @@ import (
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/language"
+	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -21,7 +22,7 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.AI.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled {
 		return nil
 	}
 
@@ -37,6 +38,19 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		if svc != nil {
 			a.Logger.Info("permissions block enabled",
 				zap.String("default_profile", base.Permissions.DefaultProfile),
+			)
+		}
+	}
+
+	if base.Menu.Enabled {
+		svc, err := menu.Wire(ctx, base.Menu, menu.WireOptions{Permissions: a.Permissions})
+		if err != nil {
+			return err
+		}
+		a.Menu = svc
+		if svc != nil {
+			a.Logger.Info("menu block enabled",
+				zap.Int("menus", len(svc.Setup().Menus)),
 			)
 		}
 	}

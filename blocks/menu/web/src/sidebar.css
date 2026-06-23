@@ -1,0 +1,87 @@
+.appkit-menu {
+  display: flex;
+  flex-direction: column;
+  width: 16rem;
+  min-height: 100%;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.appkit-menu--floating {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.appkit-menu--collapsed {
+  transform: translateX(-100%);
+}
+
+.appkit-menu__panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.appkit-menu__content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem 0.75rem;
+}
+
+.appkit-menu__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 0.75rem;
+}
+
+.appkit-menu__tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.appkit-menu__tree .appkit-menu__tree {
+  margin-left: 0.75rem;
+}
+
+.appkit-menu__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.appkit-menu__link.is-selected {
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+.appkit-menu__tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.appkit-menu__tab {
+  flex: 1;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.25rem;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.appkit-menu__tab.is-active {
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}

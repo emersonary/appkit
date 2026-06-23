@@ -3,6 +3,9 @@ package permissions
 import (
 	"context"
 	"database/sql"
+	"errors"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type Service struct {
@@ -75,13 +78,26 @@ func (s *Service) RequirePermission(ctx context.Context, accountID, idPermission
 func (s *Service) ListFlatForAccount(ctx context.Context, accountID string) ([]FlatPermission, error) {
 	idProfile, err := s.store.GetAccountProfileID(ctx, accountID)
 	if err != nil {
-		if IsNotFound(err) {
+		if IsNotFound(err) || isAccountProfileLookupSkippable(err) {
 			idProfile = s.setup.DefaultProfile
 		} else {
 			return nil, err
 		}
 	}
 	return s.store.ListFlatForProfile(ctx, idProfile)
+}
+
+// isAccountProfileLookupSkippable reports lookup errors that should fall back to default_profile
+// (e.g. launch JWT subjects that are not persisted account UUIDs).
+func isAccountProfileLookupSkippable(err error) bool {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		switch pgErr.Code {
+		case "22P02", "42P01": // invalid uuid / missing accounts table
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Service) ListCatalog(ctx context.Context) (groups []Group, categories []Category, permissions []Permission, err error) {

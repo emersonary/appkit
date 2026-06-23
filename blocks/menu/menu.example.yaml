@@ -1,0 +1,27 @@
+sidebar:
+  floating: false
+  hide_when_selected: true
+  locked: false
+  default_menu: posts_drafts
+
+menus:
+  - id: settings
+    name: Settings
+    sort_order: 10
+    permissions:
+      - Settings.General
+      - Settings.Integrations
+
+  - id: accounts
+    name: Accounts
+    sort_order: 20
+    permissions:
+      - Accounts.Users
+      - Accounts.Profiles
+
+  - id: manage
+    name: Manage
+    sort_order: 30
+    permissions:
+      - Posts
+      - Projects

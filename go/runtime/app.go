@@ -12,6 +12,7 @@ import (
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
 	"github.com/emersonary/appkit/language"
+	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -35,6 +36,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	Language      *language.Service
 	AI            *ai.Service
 	Permissions   *permissions.Service
+	Menu          *menu.Service
 	Email         *email.Handler
 
 	httpServer   *http.Server
