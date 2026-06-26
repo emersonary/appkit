@@ -1,0 +1,260 @@
+syntax = "proto3";
+
+package blog.v1;
+
+option go_package = "github.com/emersonary/appkit/blog/gen/blog/v1;blogv1";
+
+service BlogService {
+  rpc ListPublishedPosts(ListPublishedPostsRequest) returns (ListPublishedPostsResponse);
+  rpc GetPublishedPost(GetPublishedPostRequest) returns (PublishedPostResponse);
+  rpc GetPreviewPost(GetPreviewPostRequest) returns (PublishedPostResponse);
+
+  rpc ListAdminPosts(ListAdminPostsRequest) returns (ListAdminPostsResponse);
+  rpc GetAdminPost(GetAdminPostRequest) returns (AdminPostResponse);
+  rpc CreatePost(CreatePostRequest) returns (AdminPostResponse);
+  rpc UpdatePost(UpdatePostRequest) returns (AdminPostResponse);
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+  rpc SetPostPublished(SetPostPublishedRequest) returns (PostSummary);
+  rpc TriggerTranslation(TriggerTranslationRequest) returns (AdminPostResponse);
+  rpc ListSocialPublications(ListSocialPublicationsRequest) returns (ListSocialPublicationsResponse);
+  // Dev-only: bypasses publish schedule and dispatches immediately (POSTS_DEV_TOOLS=true).
+  rpc PublishSocialPublicationNow(PublishSocialPublicationNowRequest) returns (SocialPublication);
+  rpc ListSocialPublicationJobs(ListSocialPublicationJobsRequest) returns (ListSocialPublicationJobsResponse);
+  rpc ListPostTypes(ListPostTypesRequest) returns (ListPostTypesResponse);
+  rpc ListProjectLanguages(ListProjectLanguagesRequest) returns (ListProjectLanguagesResponse);
+  rpc ListSocialPlatforms(ListSocialPlatformsRequest) returns (ListSocialPlatformsResponse);
+}
+
+message PostTypeItem {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  bool is_default = 4;
+  int32 sort_order = 5;
+}
+
+message ListPostTypesRequest {}
+
+message ListPostTypesResponse {
+  repeated PostTypeItem types = 1;
+}
+
+message ListProjectLanguagesRequest {}
+
+message ListProjectLanguagesResponse {
+  repeated string languages = 1;
+  string default_language = 2;
+  bool language_filter_enabled = 3;
+  bool dev_tools_enabled = 4;
+}
+
+message SocialPlatformItem {
+  string id = 1;
+  string description = 2;
+}
+
+message ListSocialPlatformsRequest {}
+
+message ListSocialPlatformsResponse {
+  repeated SocialPlatformItem platforms = 1;
+}
+
+message PostSummary {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string summary = 4;
+  string post_type = 5;
+  string content_kind = 6;
+  string layout_type = 7;
+  string publish_at = 8;
+  string status = 9;
+  bool published = 10;
+  string video_url = 11;
+  string video_provider = 12;
+  string video_thumbnail_url = 13;
+  bool social_platform_filter_enabled = 14;
+  repeated string social_platform_ids = 15;
+  bool language_filter_enabled = 16;
+  repeated string language_filter_ids = 17;
+}
+
+message PostTranslation {
+  string language = 1;
+  string title = 2;
+  string summary = 3;
+  string body_html = 4;
+  string video_url = 5;
+  string status = 6;
+  string error_message = 7;
+  string publish_status = 8;
+  string hashtags = 9;
+}
+
+message PostHashtagPhrase {
+  string id = 1;
+  string phrase = 2;
+  string hashtag = 3;
+}
+
+message SocialPublication {
+  string id = 1;
+  string platform_code = 2;
+  string platform_name = 3;
+  string language = 4;
+  string status = 5;
+  string caption = 6;
+  string tracking_code = 7;
+  string tracking_url = 8;
+  string published_url = 9;
+  string dispatch_mode = 10;
+  string scheduled_at = 11;
+  string created_at = 12;
+  string updated_at = 13;
+  string published_at = 14;
+  string error_message = 15;
+  string client_payload_json = 16;
+}
+
+enum PageDirection {
+  PAGE_DIRECTION_UNSPECIFIED = 0;
+  PAGE_DIRECTION_NEXT = 1;
+  PAGE_DIRECTION_PREV = 2;
+}
+
+message ListPublishedPostsRequest {
+  string project_id = 1;
+  string language = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+  int32 page = 5;
+  PageDirection page_direction = 6;
+}
+
+message ListPublishedPostsResponse {
+  repeated PostSummary posts = 1;
+  string next_page_token = 2;
+  string prev_page_token = 3;
+  int32 total_count = 4;
+  int32 page = 5;
+}
+
+message GetPublishedPostRequest {
+  string project_id = 1;
+  string slug = 2;
+  string language = 3;
+}
+
+message GetPreviewPostRequest {
+  string project_id = 1;
+  string id = 2;
+  string language = 3;
+}
+
+message PublishedPostResponse {
+  PostSummary post = 1;
+  PostTranslation translation = 2;
+  string body_html = 3;
+}
+
+message ListAdminPostsRequest {}
+
+message ListAdminPostsResponse {
+  repeated PostSummary posts = 1;
+}
+
+message GetAdminPostRequest {
+  string id = 1;
+}
+
+message AdminPostResponse {
+  PostSummary post = 1;
+  repeated PostTranslation translations = 2;
+  repeated SocialPublication social_publications = 3;
+  repeated PostHashtagPhrase hashtag_phrases = 4;
+}
+
+message CreatePostRequest {
+  string title = 1;
+  string summary = 2;
+  string body_html = 3;
+  string slug = 4;
+  string post_type = 5;
+  string content_kind = 6;
+  string layout_type = 7;
+  string publish_at = 8;
+  string video_url = 9;
+  bool social_platform_filter_enabled = 10;
+  repeated string social_platform_ids = 11;
+  bool language_filter_enabled = 12;
+  repeated string language_filter_ids = 13;
+  repeated string hashtag_phrases = 14;
+}
+
+message UpdatePostRequest {
+  string id = 1;
+  string title = 2;
+  string summary = 3;
+  string body_html = 4;
+  string slug = 5;
+  string post_type = 6;
+  string content_kind = 7;
+  string layout_type = 8;
+  string publish_at = 9;
+  string video_url = 10;
+  bool published = 11;
+  bool social_platform_filter_enabled = 12;
+  repeated string social_platform_ids = 13;
+  bool language_filter_enabled = 14;
+  repeated string language_filter_ids = 15;
+  repeated string hashtag_phrases = 16;
+}
+
+message DeletePostRequest {
+  string id = 1;
+}
+
+message DeletePostResponse {}
+
+message SetPostPublishedRequest {
+  string id = 1;
+  bool published = 2;
+}
+
+message TriggerTranslationRequest {
+  string id = 1;
+}
+
+message ListSocialPublicationsRequest {
+  string post_id = 1;
+}
+
+message ListSocialPublicationsResponse {
+  repeated SocialPublication publications = 1;
+}
+
+message PublishSocialPublicationNowRequest {
+  string post_id = 1;
+  string publication_id = 2;
+}
+
+message SocialPublicationJob {
+  string id = 1;
+  string publication_id = 2;
+  string operation = 3;
+  string status = 4;
+  string created_at = 5;
+  string updated_at = 6;
+  string error_message = 7;
+  string request_payload_json = 8;
+  string response_payload_json = 9;
+}
+
+message ListSocialPublicationJobsRequest {
+  string post_id = 1;
+  string publication_id = 2;
+}
+
+message ListSocialPublicationJobsResponse {
+  repeated SocialPublicationJob jobs = 1;
+}
