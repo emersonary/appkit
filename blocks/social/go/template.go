@@ -113,7 +113,11 @@ func BuildFields(input PostInput, cfg PlatformConfig) TemplateFields {
 	brand := strings.TrimSpace(input.SourceBrand)
 	sourceURL := strings.TrimSpace(input.SourceURL)
 	hashtags := strings.TrimSpace(input.Hashtags)
-	hero := strings.TrimSpace(input.HeroImageURL)
+	hero := resolveHeroMediaURL(input)
+	cover := strings.TrimSpace(input.CoverImageURL)
+	if cover == "" {
+		cover = hero
+	}
 	video := strings.TrimSpace(input.VideoURL)
 
 	excerpt := intro
@@ -137,7 +141,7 @@ func BuildFields(input PostInput, cfg PlatformConfig) TemplateFields {
 		"link_preview_title":       title,
 		"link_preview_description": excerpt,
 		"article_excerpt":          excerpt,
-		"cover_image_url":          hero,
+		"cover_image_url":          cover,
 		"board_name":               strings.TrimSpace(cfg.BoardName),
 		"thread_reply_2":           fmt.Sprintf("Leia completo no %s: %s", brand, articleURL),
 		"first_comment":            fmt.Sprintf("%s", articleURL),

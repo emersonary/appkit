@@ -9,19 +9,19 @@ menus:
     name: Settings
     sort_order: 10
     permissions:
-      - Settings.General
-      - Settings.Integrations
+      - settings_general
+      - settings_integrations
 
   - id: accounts
     name: Accounts
     sort_order: 20
     permissions:
-      - Accounts.Users
-      - Accounts.Profiles
+      - accounts_users
+      - accounts_profiles
 
   - id: manage
     name: Manage
     sort_order: 30
     permissions:
-      - Posts
-      - Projects
+      - posts
+      - projects

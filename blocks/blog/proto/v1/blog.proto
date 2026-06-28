@@ -77,6 +77,11 @@ message PostSummary {
   repeated string social_platform_ids = 15;
   bool language_filter_enabled = 16;
   repeated string language_filter_ids = 17;
+  string cover_image_id = 18;
+  string cover_image_url = 19;
+  string created_at = 20;
+  // link | native for default-language LinkedIn publication; empty when N/A
+  string linkedin_mode = 21;
 }
 
 message PostTranslation {
@@ -114,6 +119,8 @@ message SocialPublication {
   string published_at = 14;
   string error_message = 15;
   string client_payload_json = 16;
+  // link | native (LinkedIn only)
+  string linkedin_mode = 17;
 }
 
 enum PageDirection {
@@ -167,11 +174,19 @@ message GetAdminPostRequest {
   string id = 1;
 }
 
+message PostImageItem {
+  string id = 1;
+  string url = 2;
+  string content_type = 3;
+  string original_filename = 4;
+}
+
 message AdminPostResponse {
   PostSummary post = 1;
   repeated PostTranslation translations = 2;
   repeated SocialPublication social_publications = 3;
   repeated PostHashtagPhrase hashtag_phrases = 4;
+  repeated PostImageItem images = 5;
 }
 
 message CreatePostRequest {
@@ -189,6 +204,7 @@ message CreatePostRequest {
   bool language_filter_enabled = 12;
   repeated string language_filter_ids = 13;
   repeated string hashtag_phrases = 14;
+  string cover_image_id = 15;
 }
 
 message UpdatePostRequest {
@@ -208,6 +224,7 @@ message UpdatePostRequest {
   bool language_filter_enabled = 14;
   repeated string language_filter_ids = 15;
   repeated string hashtag_phrases = 16;
+  string cover_image_id = 17;
 }
 
 message DeletePostRequest {

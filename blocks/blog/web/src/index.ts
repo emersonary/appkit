@@ -1,4 +1,5 @@
 export { BlogPostView, type BlogPostViewProps } from "./BlogPostView";
+export { BlogPostHashtags, type BlogPostHashtagsProps } from "./BlogPostHashtags";
 export { normalizeBlogContentKind, type BlogContentKind } from "./contentKind";
 export {
   isTwoColumnLayout,

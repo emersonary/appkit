@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS ` + accounts + ` (
 	CONSTRAINT accounts_email_unique UNIQUE (email)
 );
 
+ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS id_profile TEXT;
+
 CREATE TABLE IF NOT EXISTS ` + oauth + ` (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	account_id UUID NOT NULL REFERENCES ` + accounts + ` (id) ON DELETE CASCADE,

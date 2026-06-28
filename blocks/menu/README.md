@@ -4,7 +4,7 @@ Backend-defined navigation menus filtered by account permissions, with a React s
 
 ## Backend
 
-- `menu.Setup` — multiple named menus, each listing permission **FullID** roots
+- `menu.Setup` — multiple named menus, each listing permission **id** roots
 - `menu.Service.GetMenu` — resolves trees, expands descendants, filters by grants
 - `MenuService.GetMenu` — Connect + gRPC transport
 

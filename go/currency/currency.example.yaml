@@ -1,11 +1,12 @@
-# Example currency configuration for appkit/currency.
-# Copy to currency.yaml in your project and list only the currencies you support.
+# Example currency node for the main application config.yaml.
 
-schema: public
-
-base_currency: USD
-
-currencies:
-  - USD
-  - EUR
-  - BRL
+currency:
+  enabled: true
+  schema: currency
+  base_currency: USD
+  currencies:
+    - USD
+    - BRL
+    - EUR
+  api_url: https://open.er-api.com/v6/latest/USD
+  update_interval: 1h

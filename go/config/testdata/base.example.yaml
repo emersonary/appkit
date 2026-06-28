@@ -58,9 +58,29 @@ accounts:
 
 currency:
   enabled: false
-  config_path: config/currency.yaml
+  schema: currency
+  base_currency: USD
+  currencies:
+    - USD
+    - EUR
   api_url: https://api.frankfurter.dev/v1/latest
   update_interval: 1h
+
+language:
+  enabled: false
+  schema: language
+  default_language: en
+  languages:
+    - en
+    - pt
+
+ai:
+  enabled: false
+
+permissions:
+  enabled: false
+  schema: account
+  default_profile: member
 
 email:
   from: noreply@example.com

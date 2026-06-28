@@ -447,6 +447,28 @@ export class PostSummary extends Message<PostSummary> {
    */
   languageFilterIds: string[] = [];
 
+  /**
+   * @generated from field: string cover_image_id = 18;
+   */
+  coverImageId = "";
+
+  /**
+   * @generated from field: string cover_image_url = 19;
+   */
+  coverImageUrl = "";
+
+  /**
+   * @generated from field: string created_at = 20;
+   */
+  createdAt = "";
+
+  /**
+   * link | native for default-language LinkedIn publication; empty when N/A
+   *
+   * @generated from field: string linkedin_mode = 21;
+   */
+  linkedinMode = "";
+
   constructor(data?: PartialMessage<PostSummary>) {
     super();
     proto3.util.initPartial(data, this);
@@ -472,6 +494,10 @@ export class PostSummary extends Message<PostSummary> {
     { no: 15, name: "social_platform_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 16, name: "language_filter_enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 17, name: "language_filter_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 18, name: "cover_image_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "cover_image_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 21, name: "linkedin_mode", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PostSummary {
@@ -709,6 +735,13 @@ export class SocialPublication extends Message<SocialPublication> {
    */
   clientPayloadJson = "";
 
+  /**
+   * link | native (LinkedIn only)
+   *
+   * @generated from field: string linkedin_mode = 17;
+   */
+  linkedinMode = "";
+
   constructor(data?: PartialMessage<SocialPublication>) {
     super();
     proto3.util.initPartial(data, this);
@@ -733,6 +766,7 @@ export class SocialPublication extends Message<SocialPublication> {
     { no: 14, name: "published_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 15, name: "error_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 16, name: "client_payload_json", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "linkedin_mode", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SocialPublication {
@@ -1133,6 +1167,61 @@ export class GetAdminPostRequest extends Message<GetAdminPostRequest> {
 }
 
 /**
+ * @generated from message blog.v1.PostImageItem
+ */
+export class PostImageItem extends Message<PostImageItem> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string url = 2;
+   */
+  url = "";
+
+  /**
+   * @generated from field: string content_type = 3;
+   */
+  contentType = "";
+
+  /**
+   * @generated from field: string original_filename = 4;
+   */
+  originalFilename = "";
+
+  constructor(data?: PartialMessage<PostImageItem>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "blog.v1.PostImageItem";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "original_filename", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PostImageItem {
+    return new PostImageItem().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PostImageItem {
+    return new PostImageItem().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PostImageItem {
+    return new PostImageItem().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PostImageItem | PlainMessage<PostImageItem> | undefined, b: PostImageItem | PlainMessage<PostImageItem> | undefined): boolean {
+    return proto3.util.equals(PostImageItem, a, b);
+  }
+}
+
+/**
  * @generated from message blog.v1.AdminPostResponse
  */
 export class AdminPostResponse extends Message<AdminPostResponse> {
@@ -1156,6 +1245,11 @@ export class AdminPostResponse extends Message<AdminPostResponse> {
    */
   hashtagPhrases: PostHashtagPhrase[] = [];
 
+  /**
+   * @generated from field: repeated blog.v1.PostImageItem images = 5;
+   */
+  images: PostImageItem[] = [];
+
   constructor(data?: PartialMessage<AdminPostResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1168,6 +1262,7 @@ export class AdminPostResponse extends Message<AdminPostResponse> {
     { no: 2, name: "translations", kind: "message", T: PostTranslation, repeated: true },
     { no: 3, name: "social_publications", kind: "message", T: SocialPublication, repeated: true },
     { no: 4, name: "hashtag_phrases", kind: "message", T: PostHashtagPhrase, repeated: true },
+    { no: 5, name: "images", kind: "message", T: PostImageItem, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdminPostResponse {
@@ -1261,6 +1356,11 @@ export class CreatePostRequest extends Message<CreatePostRequest> {
    */
   hashtagPhrases: string[] = [];
 
+  /**
+   * @generated from field: string cover_image_id = 15;
+   */
+  coverImageId = "";
+
   constructor(data?: PartialMessage<CreatePostRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1283,6 +1383,7 @@ export class CreatePostRequest extends Message<CreatePostRequest> {
     { no: 12, name: "language_filter_enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 13, name: "language_filter_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "hashtag_phrases", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 15, name: "cover_image_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreatePostRequest {
@@ -1386,6 +1487,11 @@ export class UpdatePostRequest extends Message<UpdatePostRequest> {
    */
   hashtagPhrases: string[] = [];
 
+  /**
+   * @generated from field: string cover_image_id = 17;
+   */
+  coverImageId = "";
+
   constructor(data?: PartialMessage<UpdatePostRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1410,6 +1516,7 @@ export class UpdatePostRequest extends Message<UpdatePostRequest> {
     { no: 14, name: "language_filter_enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "language_filter_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 16, name: "hashtag_phrases", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 17, name: "cover_image_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdatePostRequest {

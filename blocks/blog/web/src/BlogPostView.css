@@ -1,0 +1,180 @@
+.blog-post-view--preview {
+  margin-top: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.blog-post-view__badge {
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-border) 35%, var(--color-surface));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.blog-post-view__content {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.blog-post-view__public-hero {
+  text-align: left;
+}
+
+.blog-post-view__title {
+  margin: 0.5rem 0 0;
+}
+
+.blog-post-view__hero {
+  position: relative;
+  padding: 1.25rem 1.25rem 0.75rem;
+  color: var(--color-hero-text);
+  background: linear-gradient(180deg, var(--color-hero-from) 0%, var(--color-hero-to) 100%);
+}
+
+.blog-post-view__hero--cover {
+  min-height: 160px;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  background-size: cover;
+  background-position: center;
+}
+
+.blog-post-view__hero--cover .blog-post-view__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 1rem 1.25rem 0.85rem;
+}
+
+.blog-post-view__hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 15, 20, 0.25) 0%, rgba(15, 15, 20, 0.88) 100%);
+}
+
+.blog-post-view__hero .blog-post-view__title {
+  font-size: 1.75rem;
+  color: inherit;
+}
+
+.blog-post-view__hero time {
+  display: block;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-hero-text) 72%, transparent);
+  margin-top: 0.25rem;
+}
+
+.blog-post-view__body {
+  padding: 0 1.25rem 1.25rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.blog-post-view__inner {
+  padding-top: 0.5rem;
+}
+
+.blog-post-view .blog-body,
+.blog-post-view--preview .blog-body,
+.blog-post-view--preview .blog-body--two-columns {
+  width: 100%;
+  margin: 0;
+  color: inherit;
+  line-height: 1.65;
+}
+
+.blog-post-view .blog-body :is(h1, h2, h3, h4),
+.blog-post-view--preview .blog-body :is(h1, h2, h3, h4) {
+  color: inherit;
+}
+
+.blog-post-view .blog-body a,
+.blog-post-view--preview .blog-body a {
+  color: var(--color-primary);
+}
+
+.blog-post-view .blog-body--two-columns,
+.blog-post-view--preview .blog-body--two-columns {
+  column-count: 2;
+  column-gap: 2rem;
+}
+
+.blog-post-view__empty {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.blog-post-view .blog-video-embed,
+.blog-post-view--preview .blog-video-embed {
+  aspect-ratio: 16 / 9;
+  max-height: 280px;
+  margin-bottom: 1rem;
+}
+
+.blog-post-view .blog-video-embed iframe,
+.blog-post-view--preview .blog-video-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.blog-video-fallback {
+  margin-bottom: 1.5rem;
+}
+
+.blog-body :is(pre.blog-code-block, pre),
+.blog-post-view--preview .blog-body :is(pre.blog-code-block, pre) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-border) 28%, var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 4;
+}
+
+.blog-body :is(pre.blog-code-block, pre) code,
+.blog-post-view--preview .blog-body :is(pre.blog-code-block, pre) code {
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  padding: 0;
+  border: 0;
+}
+
+.blog-post-view__hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.25rem;
+}
+
+.blog-post-view__hashtags .blog-post-hashtag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.4;
+  word-break: break-word;
+  background: rgba(255, 193, 7, 0.15);
+  color: #b8860b;
+}

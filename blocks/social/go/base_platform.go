@@ -30,7 +30,7 @@ func (b *basePlatform) FormatPost(_ context.Context, input PostInput) (Formatted
 		return FormattedPost{}, err
 	}
 	media := []string{}
-	if hero := strings.TrimSpace(input.HeroImageURL); hero != "" {
+	if hero := resolveHeroMediaURL(input); hero != "" {
 		media = append(media, hero)
 	}
 	return FormattedPost{

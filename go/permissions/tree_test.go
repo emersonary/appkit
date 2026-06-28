@@ -35,6 +35,13 @@ func TestPermissionConfigListTree(t *testing.T) {
 	if drafts.FullID != "Posts.Drafts" {
 		t.Fatalf("full id: got %q", drafts.FullID)
 	}
+
+	if byID := tree.FindByID("blog_post_drafts"); byID != drafts {
+		t.Fatalf("FindByID: expected drafts node, got %+v", byID)
+	}
+	if tree.FindByID("missing") != nil {
+		t.Fatal("expected nil for unknown permission id")
+	}
 }
 
 func TestPermissionTreeFindByFullIDMissing(t *testing.T) {

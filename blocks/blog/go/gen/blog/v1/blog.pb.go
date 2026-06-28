@@ -481,8 +481,13 @@ type PostSummary struct {
 	SocialPlatformIds           []string               `protobuf:"bytes,15,rep,name=social_platform_ids,json=socialPlatformIds,proto3" json:"social_platform_ids,omitempty"`
 	LanguageFilterEnabled       bool                   `protobuf:"varint,16,opt,name=language_filter_enabled,json=languageFilterEnabled,proto3" json:"language_filter_enabled,omitempty"`
 	LanguageFilterIds           []string               `protobuf:"bytes,17,rep,name=language_filter_ids,json=languageFilterIds,proto3" json:"language_filter_ids,omitempty"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	CoverImageId                string                 `protobuf:"bytes,18,opt,name=cover_image_id,json=coverImageId,proto3" json:"cover_image_id,omitempty"`
+	CoverImageUrl               string                 `protobuf:"bytes,19,opt,name=cover_image_url,json=coverImageUrl,proto3" json:"cover_image_url,omitempty"`
+	CreatedAt                   string                 `protobuf:"bytes,20,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// link | native for default-language LinkedIn publication; empty when N/A
+	LinkedinMode  string `protobuf:"bytes,21,opt,name=linkedin_mode,json=linkedinMode,proto3" json:"linkedin_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PostSummary) Reset() {
@@ -632,6 +637,34 @@ func (x *PostSummary) GetLanguageFilterIds() []string {
 		return x.LanguageFilterIds
 	}
 	return nil
+}
+
+func (x *PostSummary) GetCoverImageId() string {
+	if x != nil {
+		return x.CoverImageId
+	}
+	return ""
+}
+
+func (x *PostSummary) GetCoverImageUrl() string {
+	if x != nil {
+		return x.CoverImageUrl
+	}
+	return ""
+}
+
+func (x *PostSummary) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *PostSummary) GetLinkedinMode() string {
+	if x != nil {
+		return x.LinkedinMode
+	}
+	return ""
 }
 
 type PostTranslation struct {
@@ -820,8 +853,10 @@ type SocialPublication struct {
 	PublishedAt       string                 `protobuf:"bytes,14,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
 	ErrorMessage      string                 `protobuf:"bytes,15,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 	ClientPayloadJson string                 `protobuf:"bytes,16,opt,name=client_payload_json,json=clientPayloadJson,proto3" json:"client_payload_json,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// link | native (LinkedIn only)
+	LinkedinMode  string `protobuf:"bytes,17,opt,name=linkedin_mode,json=linkedinMode,proto3" json:"linkedin_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SocialPublication) Reset() {
@@ -962,6 +997,13 @@ func (x *SocialPublication) GetErrorMessage() string {
 func (x *SocialPublication) GetClientPayloadJson() string {
 	if x != nil {
 		return x.ClientPayloadJson
+	}
+	return ""
+}
+
+func (x *SocialPublication) GetLinkedinMode() string {
+	if x != nil {
+		return x.LinkedinMode
 	}
 	return ""
 }
@@ -1430,19 +1472,88 @@ func (x *GetAdminPostRequest) GetId() string {
 	return ""
 }
 
+type PostImageItem struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Url              string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	ContentType      string                 `protobuf:"bytes,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	OriginalFilename string                 `protobuf:"bytes,4,opt,name=original_filename,json=originalFilename,proto3" json:"original_filename,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *PostImageItem) Reset() {
+	*x = PostImageItem{}
+	mi := &file_v1_blog_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PostImageItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PostImageItem) ProtoMessage() {}
+
+func (x *PostImageItem) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_blog_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PostImageItem.ProtoReflect.Descriptor instead.
+func (*PostImageItem) Descriptor() ([]byte, []int) {
+	return file_v1_blog_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *PostImageItem) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *PostImageItem) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *PostImageItem) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *PostImageItem) GetOriginalFilename() string {
+	if x != nil {
+		return x.OriginalFilename
+	}
+	return ""
+}
+
 type AdminPostResponse struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Post               *PostSummary           `protobuf:"bytes,1,opt,name=post,proto3" json:"post,omitempty"`
 	Translations       []*PostTranslation     `protobuf:"bytes,2,rep,name=translations,proto3" json:"translations,omitempty"`
 	SocialPublications []*SocialPublication   `protobuf:"bytes,3,rep,name=social_publications,json=socialPublications,proto3" json:"social_publications,omitempty"`
 	HashtagPhrases     []*PostHashtagPhrase   `protobuf:"bytes,4,rep,name=hashtag_phrases,json=hashtagPhrases,proto3" json:"hashtag_phrases,omitempty"`
+	Images             []*PostImageItem       `protobuf:"bytes,5,rep,name=images,proto3" json:"images,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
 func (x *AdminPostResponse) Reset() {
 	*x = AdminPostResponse{}
-	mi := &file_v1_blog_proto_msgTypes[20]
+	mi := &file_v1_blog_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1454,7 +1565,7 @@ func (x *AdminPostResponse) String() string {
 func (*AdminPostResponse) ProtoMessage() {}
 
 func (x *AdminPostResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[20]
+	mi := &file_v1_blog_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1467,7 +1578,7 @@ func (x *AdminPostResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminPostResponse.ProtoReflect.Descriptor instead.
 func (*AdminPostResponse) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{20}
+	return file_v1_blog_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *AdminPostResponse) GetPost() *PostSummary {
@@ -1498,6 +1609,13 @@ func (x *AdminPostResponse) GetHashtagPhrases() []*PostHashtagPhrase {
 	return nil
 }
 
+func (x *AdminPostResponse) GetImages() []*PostImageItem {
+	if x != nil {
+		return x.Images
+	}
+	return nil
+}
+
 type CreatePostRequest struct {
 	state                       protoimpl.MessageState `protogen:"open.v1"`
 	Title                       string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
@@ -1514,13 +1632,14 @@ type CreatePostRequest struct {
 	LanguageFilterEnabled       bool                   `protobuf:"varint,12,opt,name=language_filter_enabled,json=languageFilterEnabled,proto3" json:"language_filter_enabled,omitempty"`
 	LanguageFilterIds           []string               `protobuf:"bytes,13,rep,name=language_filter_ids,json=languageFilterIds,proto3" json:"language_filter_ids,omitempty"`
 	HashtagPhrases              []string               `protobuf:"bytes,14,rep,name=hashtag_phrases,json=hashtagPhrases,proto3" json:"hashtag_phrases,omitempty"`
+	CoverImageId                string                 `protobuf:"bytes,15,opt,name=cover_image_id,json=coverImageId,proto3" json:"cover_image_id,omitempty"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *CreatePostRequest) Reset() {
 	*x = CreatePostRequest{}
-	mi := &file_v1_blog_proto_msgTypes[21]
+	mi := &file_v1_blog_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1532,7 +1651,7 @@ func (x *CreatePostRequest) String() string {
 func (*CreatePostRequest) ProtoMessage() {}
 
 func (x *CreatePostRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[21]
+	mi := &file_v1_blog_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1545,7 +1664,7 @@ func (x *CreatePostRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePostRequest.ProtoReflect.Descriptor instead.
 func (*CreatePostRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{21}
+	return file_v1_blog_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreatePostRequest) GetTitle() string {
@@ -1646,6 +1765,13 @@ func (x *CreatePostRequest) GetHashtagPhrases() []string {
 	return nil
 }
 
+func (x *CreatePostRequest) GetCoverImageId() string {
+	if x != nil {
+		return x.CoverImageId
+	}
+	return ""
+}
+
 type UpdatePostRequest struct {
 	state                       protoimpl.MessageState `protogen:"open.v1"`
 	Id                          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1664,13 +1790,14 @@ type UpdatePostRequest struct {
 	LanguageFilterEnabled       bool                   `protobuf:"varint,14,opt,name=language_filter_enabled,json=languageFilterEnabled,proto3" json:"language_filter_enabled,omitempty"`
 	LanguageFilterIds           []string               `protobuf:"bytes,15,rep,name=language_filter_ids,json=languageFilterIds,proto3" json:"language_filter_ids,omitempty"`
 	HashtagPhrases              []string               `protobuf:"bytes,16,rep,name=hashtag_phrases,json=hashtagPhrases,proto3" json:"hashtag_phrases,omitempty"`
+	CoverImageId                string                 `protobuf:"bytes,17,opt,name=cover_image_id,json=coverImageId,proto3" json:"cover_image_id,omitempty"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *UpdatePostRequest) Reset() {
 	*x = UpdatePostRequest{}
-	mi := &file_v1_blog_proto_msgTypes[22]
+	mi := &file_v1_blog_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1682,7 +1809,7 @@ func (x *UpdatePostRequest) String() string {
 func (*UpdatePostRequest) ProtoMessage() {}
 
 func (x *UpdatePostRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[22]
+	mi := &file_v1_blog_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1695,7 +1822,7 @@ func (x *UpdatePostRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePostRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePostRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{22}
+	return file_v1_blog_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UpdatePostRequest) GetId() string {
@@ -1810,6 +1937,13 @@ func (x *UpdatePostRequest) GetHashtagPhrases() []string {
 	return nil
 }
 
+func (x *UpdatePostRequest) GetCoverImageId() string {
+	if x != nil {
+		return x.CoverImageId
+	}
+	return ""
+}
+
 type DeletePostRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1819,7 +1953,7 @@ type DeletePostRequest struct {
 
 func (x *DeletePostRequest) Reset() {
 	*x = DeletePostRequest{}
-	mi := &file_v1_blog_proto_msgTypes[23]
+	mi := &file_v1_blog_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1831,7 +1965,7 @@ func (x *DeletePostRequest) String() string {
 func (*DeletePostRequest) ProtoMessage() {}
 
 func (x *DeletePostRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[23]
+	mi := &file_v1_blog_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1844,7 +1978,7 @@ func (x *DeletePostRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePostRequest.ProtoReflect.Descriptor instead.
 func (*DeletePostRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{23}
+	return file_v1_blog_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeletePostRequest) GetId() string {
@@ -1862,7 +1996,7 @@ type DeletePostResponse struct {
 
 func (x *DeletePostResponse) Reset() {
 	*x = DeletePostResponse{}
-	mi := &file_v1_blog_proto_msgTypes[24]
+	mi := &file_v1_blog_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1874,7 +2008,7 @@ func (x *DeletePostResponse) String() string {
 func (*DeletePostResponse) ProtoMessage() {}
 
 func (x *DeletePostResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[24]
+	mi := &file_v1_blog_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1887,7 +2021,7 @@ func (x *DeletePostResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePostResponse.ProtoReflect.Descriptor instead.
 func (*DeletePostResponse) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{24}
+	return file_v1_blog_proto_rawDescGZIP(), []int{25}
 }
 
 type SetPostPublishedRequest struct {
@@ -1900,7 +2034,7 @@ type SetPostPublishedRequest struct {
 
 func (x *SetPostPublishedRequest) Reset() {
 	*x = SetPostPublishedRequest{}
-	mi := &file_v1_blog_proto_msgTypes[25]
+	mi := &file_v1_blog_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1912,7 +2046,7 @@ func (x *SetPostPublishedRequest) String() string {
 func (*SetPostPublishedRequest) ProtoMessage() {}
 
 func (x *SetPostPublishedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[25]
+	mi := &file_v1_blog_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1925,7 +2059,7 @@ func (x *SetPostPublishedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetPostPublishedRequest.ProtoReflect.Descriptor instead.
 func (*SetPostPublishedRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{25}
+	return file_v1_blog_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SetPostPublishedRequest) GetId() string {
@@ -1951,7 +2085,7 @@ type TriggerTranslationRequest struct {
 
 func (x *TriggerTranslationRequest) Reset() {
 	*x = TriggerTranslationRequest{}
-	mi := &file_v1_blog_proto_msgTypes[26]
+	mi := &file_v1_blog_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1963,7 +2097,7 @@ func (x *TriggerTranslationRequest) String() string {
 func (*TriggerTranslationRequest) ProtoMessage() {}
 
 func (x *TriggerTranslationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[26]
+	mi := &file_v1_blog_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1976,7 +2110,7 @@ func (x *TriggerTranslationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TriggerTranslationRequest.ProtoReflect.Descriptor instead.
 func (*TriggerTranslationRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{26}
+	return file_v1_blog_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *TriggerTranslationRequest) GetId() string {
@@ -1995,7 +2129,7 @@ type ListSocialPublicationsRequest struct {
 
 func (x *ListSocialPublicationsRequest) Reset() {
 	*x = ListSocialPublicationsRequest{}
-	mi := &file_v1_blog_proto_msgTypes[27]
+	mi := &file_v1_blog_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2007,7 +2141,7 @@ func (x *ListSocialPublicationsRequest) String() string {
 func (*ListSocialPublicationsRequest) ProtoMessage() {}
 
 func (x *ListSocialPublicationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[27]
+	mi := &file_v1_blog_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2020,7 +2154,7 @@ func (x *ListSocialPublicationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSocialPublicationsRequest.ProtoReflect.Descriptor instead.
 func (*ListSocialPublicationsRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{27}
+	return file_v1_blog_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListSocialPublicationsRequest) GetPostId() string {
@@ -2039,7 +2173,7 @@ type ListSocialPublicationsResponse struct {
 
 func (x *ListSocialPublicationsResponse) Reset() {
 	*x = ListSocialPublicationsResponse{}
-	mi := &file_v1_blog_proto_msgTypes[28]
+	mi := &file_v1_blog_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2051,7 +2185,7 @@ func (x *ListSocialPublicationsResponse) String() string {
 func (*ListSocialPublicationsResponse) ProtoMessage() {}
 
 func (x *ListSocialPublicationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[28]
+	mi := &file_v1_blog_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2064,7 +2198,7 @@ func (x *ListSocialPublicationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSocialPublicationsResponse.ProtoReflect.Descriptor instead.
 func (*ListSocialPublicationsResponse) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{28}
+	return file_v1_blog_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ListSocialPublicationsResponse) GetPublications() []*SocialPublication {
@@ -2084,7 +2218,7 @@ type PublishSocialPublicationNowRequest struct {
 
 func (x *PublishSocialPublicationNowRequest) Reset() {
 	*x = PublishSocialPublicationNowRequest{}
-	mi := &file_v1_blog_proto_msgTypes[29]
+	mi := &file_v1_blog_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2096,7 +2230,7 @@ func (x *PublishSocialPublicationNowRequest) String() string {
 func (*PublishSocialPublicationNowRequest) ProtoMessage() {}
 
 func (x *PublishSocialPublicationNowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[29]
+	mi := &file_v1_blog_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2109,7 +2243,7 @@ func (x *PublishSocialPublicationNowRequest) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use PublishSocialPublicationNowRequest.ProtoReflect.Descriptor instead.
 func (*PublishSocialPublicationNowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{29}
+	return file_v1_blog_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *PublishSocialPublicationNowRequest) GetPostId() string {
@@ -2143,7 +2277,7 @@ type SocialPublicationJob struct {
 
 func (x *SocialPublicationJob) Reset() {
 	*x = SocialPublicationJob{}
-	mi := &file_v1_blog_proto_msgTypes[30]
+	mi := &file_v1_blog_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2155,7 +2289,7 @@ func (x *SocialPublicationJob) String() string {
 func (*SocialPublicationJob) ProtoMessage() {}
 
 func (x *SocialPublicationJob) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[30]
+	mi := &file_v1_blog_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2168,7 +2302,7 @@ func (x *SocialPublicationJob) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SocialPublicationJob.ProtoReflect.Descriptor instead.
 func (*SocialPublicationJob) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{30}
+	return file_v1_blog_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *SocialPublicationJob) GetId() string {
@@ -2244,7 +2378,7 @@ type ListSocialPublicationJobsRequest struct {
 
 func (x *ListSocialPublicationJobsRequest) Reset() {
 	*x = ListSocialPublicationJobsRequest{}
-	mi := &file_v1_blog_proto_msgTypes[31]
+	mi := &file_v1_blog_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2256,7 +2390,7 @@ func (x *ListSocialPublicationJobsRequest) String() string {
 func (*ListSocialPublicationJobsRequest) ProtoMessage() {}
 
 func (x *ListSocialPublicationJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[31]
+	mi := &file_v1_blog_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2269,7 +2403,7 @@ func (x *ListSocialPublicationJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSocialPublicationJobsRequest.ProtoReflect.Descriptor instead.
 func (*ListSocialPublicationJobsRequest) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{31}
+	return file_v1_blog_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ListSocialPublicationJobsRequest) GetPostId() string {
@@ -2295,7 +2429,7 @@ type ListSocialPublicationJobsResponse struct {
 
 func (x *ListSocialPublicationJobsResponse) Reset() {
 	*x = ListSocialPublicationJobsResponse{}
-	mi := &file_v1_blog_proto_msgTypes[32]
+	mi := &file_v1_blog_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2307,7 +2441,7 @@ func (x *ListSocialPublicationJobsResponse) String() string {
 func (*ListSocialPublicationJobsResponse) ProtoMessage() {}
 
 func (x *ListSocialPublicationJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_blog_proto_msgTypes[32]
+	mi := &file_v1_blog_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2320,7 +2454,7 @@ func (x *ListSocialPublicationJobsResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ListSocialPublicationJobsResponse.ProtoReflect.Descriptor instead.
 func (*ListSocialPublicationJobsResponse) Descriptor() ([]byte, []int) {
-	return file_v1_blog_proto_rawDescGZIP(), []int{32}
+	return file_v1_blog_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ListSocialPublicationJobsResponse) GetJobs() []*SocialPublicationJob {
@@ -2357,7 +2491,7 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"\x1c\n" +
 	"\x1aListSocialPlatformsRequest\"X\n" +
 	"\x1bListSocialPlatformsResponse\x129\n" +
-	"\tplatforms\x18\x01 \x03(\v2\x1b.blog.v1.SocialPlatformItemR\tplatforms\"\xe8\x04\n" +
+	"\tplatforms\x18\x01 \x03(\v2\x1b.blog.v1.SocialPlatformItemR\tplatforms\"\xfa\x05\n" +
 	"\vPostSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x14\n" +
@@ -2378,7 +2512,12 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\x1esocial_platform_filter_enabled\x18\x0e \x01(\bR\x1bsocialPlatformFilterEnabled\x12.\n" +
 	"\x13social_platform_ids\x18\x0f \x03(\tR\x11socialPlatformIds\x126\n" +
 	"\x17language_filter_enabled\x18\x10 \x01(\bR\x15languageFilterEnabled\x12.\n" +
-	"\x13language_filter_ids\x18\x11 \x03(\tR\x11languageFilterIds\"\x97\x02\n" +
+	"\x13language_filter_ids\x18\x11 \x03(\tR\x11languageFilterIds\x12$\n" +
+	"\x0ecover_image_id\x18\x12 \x01(\tR\fcoverImageId\x12&\n" +
+	"\x0fcover_image_url\x18\x13 \x01(\tR\rcoverImageUrl\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x14 \x01(\tR\tcreatedAt\x12#\n" +
+	"\rlinkedin_mode\x18\x15 \x01(\tR\flinkedinMode\"\x97\x02\n" +
 	"\x0fPostTranslation\x12\x1a\n" +
 	"\blanguage\x18\x01 \x01(\tR\blanguage\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
@@ -2392,7 +2531,7 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\x11PostHashtagPhrase\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06phrase\x18\x02 \x01(\tR\x06phrase\x12\x18\n" +
-	"\ahashtag\x18\x03 \x01(\tR\ahashtag\"\xa6\x04\n" +
+	"\ahashtag\x18\x03 \x01(\tR\ahashtag\"\xcb\x04\n" +
 	"\x11SocialPublication\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\rplatform_code\x18\x02 \x01(\tR\fplatformCode\x12#\n" +
@@ -2412,7 +2551,8 @@ const file_v1_blog_proto_rawDesc = "" +
 	"updated_at\x18\r \x01(\tR\tupdatedAt\x12!\n" +
 	"\fpublished_at\x18\x0e \x01(\tR\vpublishedAt\x12#\n" +
 	"\rerror_message\x18\x0f \x01(\tR\ferrorMessage\x12.\n" +
-	"\x13client_payload_json\x18\x10 \x01(\tR\x11clientPayloadJson\"\xe5\x01\n" +
+	"\x13client_payload_json\x18\x10 \x01(\tR\x11clientPayloadJson\x12#\n" +
+	"\rlinkedin_mode\x18\x11 \x01(\tR\flinkedinMode\"\xe5\x01\n" +
 	"\x19ListPublishedPostsRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1a\n" +
@@ -2447,12 +2587,18 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\x16ListAdminPostsResponse\x12*\n" +
 	"\x05posts\x18\x01 \x03(\v2\x14.blog.v1.PostSummaryR\x05posts\"%\n" +
 	"\x13GetAdminPostRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x8d\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x81\x01\n" +
+	"\rPostImageItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\x12!\n" +
+	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\x12+\n" +
+	"\x11original_filename\x18\x04 \x01(\tR\x10originalFilename\"\xbd\x02\n" +
 	"\x11AdminPostResponse\x12(\n" +
 	"\x04post\x18\x01 \x01(\v2\x14.blog.v1.PostSummaryR\x04post\x12<\n" +
 	"\ftranslations\x18\x02 \x03(\v2\x18.blog.v1.PostTranslationR\ftranslations\x12K\n" +
 	"\x13social_publications\x18\x03 \x03(\v2\x1a.blog.v1.SocialPublicationR\x12socialPublications\x12C\n" +
-	"\x0fhashtag_phrases\x18\x04 \x03(\v2\x1a.blog.v1.PostHashtagPhraseR\x0ehashtagPhrases\"\x97\x04\n" +
+	"\x0fhashtag_phrases\x18\x04 \x03(\v2\x1a.blog.v1.PostHashtagPhraseR\x0ehashtagPhrases\x12.\n" +
+	"\x06images\x18\x05 \x03(\v2\x16.blog.v1.PostImageItemR\x06images\"\xbd\x04\n" +
 	"\x11CreatePostRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
 	"\asummary\x18\x02 \x01(\tR\asummary\x12\x1b\n" +
@@ -2470,7 +2616,8 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\x13social_platform_ids\x18\v \x03(\tR\x11socialPlatformIds\x126\n" +
 	"\x17language_filter_enabled\x18\f \x01(\bR\x15languageFilterEnabled\x12.\n" +
 	"\x13language_filter_ids\x18\r \x03(\tR\x11languageFilterIds\x12'\n" +
-	"\x0fhashtag_phrases\x18\x0e \x03(\tR\x0ehashtagPhrases\"\xc5\x04\n" +
+	"\x0fhashtag_phrases\x18\x0e \x03(\tR\x0ehashtagPhrases\x12$\n" +
+	"\x0ecover_image_id\x18\x0f \x01(\tR\fcoverImageId\"\xeb\x04\n" +
 	"\x11UpdatePostRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
@@ -2490,7 +2637,8 @@ const file_v1_blog_proto_rawDesc = "" +
 	"\x13social_platform_ids\x18\r \x03(\tR\x11socialPlatformIds\x126\n" +
 	"\x17language_filter_enabled\x18\x0e \x01(\bR\x15languageFilterEnabled\x12.\n" +
 	"\x13language_filter_ids\x18\x0f \x03(\tR\x11languageFilterIds\x12'\n" +
-	"\x0fhashtag_phrases\x18\x10 \x03(\tR\x0ehashtagPhrases\"#\n" +
+	"\x0fhashtag_phrases\x18\x10 \x03(\tR\x0ehashtagPhrases\x12$\n" +
+	"\x0ecover_image_id\x18\x11 \x01(\tR\fcoverImageId\"#\n" +
 	"\x11DeletePostRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
 	"\x12DeletePostResponse\"G\n" +
@@ -2561,7 +2709,7 @@ func file_v1_blog_proto_rawDescGZIP() []byte {
 }
 
 var file_v1_blog_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_v1_blog_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
+var file_v1_blog_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_v1_blog_proto_goTypes = []any{
 	(PageDirection)(0),                         // 0: blog.v1.PageDirection
 	(*PostTypeItem)(nil),                       // 1: blog.v1.PostTypeItem
@@ -2584,19 +2732,20 @@ var file_v1_blog_proto_goTypes = []any{
 	(*ListAdminPostsRequest)(nil),              // 18: blog.v1.ListAdminPostsRequest
 	(*ListAdminPostsResponse)(nil),             // 19: blog.v1.ListAdminPostsResponse
 	(*GetAdminPostRequest)(nil),                // 20: blog.v1.GetAdminPostRequest
-	(*AdminPostResponse)(nil),                  // 21: blog.v1.AdminPostResponse
-	(*CreatePostRequest)(nil),                  // 22: blog.v1.CreatePostRequest
-	(*UpdatePostRequest)(nil),                  // 23: blog.v1.UpdatePostRequest
-	(*DeletePostRequest)(nil),                  // 24: blog.v1.DeletePostRequest
-	(*DeletePostResponse)(nil),                 // 25: blog.v1.DeletePostResponse
-	(*SetPostPublishedRequest)(nil),            // 26: blog.v1.SetPostPublishedRequest
-	(*TriggerTranslationRequest)(nil),          // 27: blog.v1.TriggerTranslationRequest
-	(*ListSocialPublicationsRequest)(nil),      // 28: blog.v1.ListSocialPublicationsRequest
-	(*ListSocialPublicationsResponse)(nil),     // 29: blog.v1.ListSocialPublicationsResponse
-	(*PublishSocialPublicationNowRequest)(nil), // 30: blog.v1.PublishSocialPublicationNowRequest
-	(*SocialPublicationJob)(nil),               // 31: blog.v1.SocialPublicationJob
-	(*ListSocialPublicationJobsRequest)(nil),   // 32: blog.v1.ListSocialPublicationJobsRequest
-	(*ListSocialPublicationJobsResponse)(nil),  // 33: blog.v1.ListSocialPublicationJobsResponse
+	(*PostImageItem)(nil),                      // 21: blog.v1.PostImageItem
+	(*AdminPostResponse)(nil),                  // 22: blog.v1.AdminPostResponse
+	(*CreatePostRequest)(nil),                  // 23: blog.v1.CreatePostRequest
+	(*UpdatePostRequest)(nil),                  // 24: blog.v1.UpdatePostRequest
+	(*DeletePostRequest)(nil),                  // 25: blog.v1.DeletePostRequest
+	(*DeletePostResponse)(nil),                 // 26: blog.v1.DeletePostResponse
+	(*SetPostPublishedRequest)(nil),            // 27: blog.v1.SetPostPublishedRequest
+	(*TriggerTranslationRequest)(nil),          // 28: blog.v1.TriggerTranslationRequest
+	(*ListSocialPublicationsRequest)(nil),      // 29: blog.v1.ListSocialPublicationsRequest
+	(*ListSocialPublicationsResponse)(nil),     // 30: blog.v1.ListSocialPublicationsResponse
+	(*PublishSocialPublicationNowRequest)(nil), // 31: blog.v1.PublishSocialPublicationNowRequest
+	(*SocialPublicationJob)(nil),               // 32: blog.v1.SocialPublicationJob
+	(*ListSocialPublicationJobsRequest)(nil),   // 33: blog.v1.ListSocialPublicationJobsRequest
+	(*ListSocialPublicationJobsResponse)(nil),  // 34: blog.v1.ListSocialPublicationJobsResponse
 }
 var file_v1_blog_proto_depIdxs = []int32{
 	1,  // 0: blog.v1.ListPostTypesResponse.types:type_name -> blog.v1.PostTypeItem
@@ -2610,45 +2759,46 @@ var file_v1_blog_proto_depIdxs = []int32{
 	10, // 8: blog.v1.AdminPostResponse.translations:type_name -> blog.v1.PostTranslation
 	12, // 9: blog.v1.AdminPostResponse.social_publications:type_name -> blog.v1.SocialPublication
 	11, // 10: blog.v1.AdminPostResponse.hashtag_phrases:type_name -> blog.v1.PostHashtagPhrase
-	12, // 11: blog.v1.ListSocialPublicationsResponse.publications:type_name -> blog.v1.SocialPublication
-	31, // 12: blog.v1.ListSocialPublicationJobsResponse.jobs:type_name -> blog.v1.SocialPublicationJob
-	13, // 13: blog.v1.BlogService.ListPublishedPosts:input_type -> blog.v1.ListPublishedPostsRequest
-	15, // 14: blog.v1.BlogService.GetPublishedPost:input_type -> blog.v1.GetPublishedPostRequest
-	16, // 15: blog.v1.BlogService.GetPreviewPost:input_type -> blog.v1.GetPreviewPostRequest
-	18, // 16: blog.v1.BlogService.ListAdminPosts:input_type -> blog.v1.ListAdminPostsRequest
-	20, // 17: blog.v1.BlogService.GetAdminPost:input_type -> blog.v1.GetAdminPostRequest
-	22, // 18: blog.v1.BlogService.CreatePost:input_type -> blog.v1.CreatePostRequest
-	23, // 19: blog.v1.BlogService.UpdatePost:input_type -> blog.v1.UpdatePostRequest
-	24, // 20: blog.v1.BlogService.DeletePost:input_type -> blog.v1.DeletePostRequest
-	26, // 21: blog.v1.BlogService.SetPostPublished:input_type -> blog.v1.SetPostPublishedRequest
-	27, // 22: blog.v1.BlogService.TriggerTranslation:input_type -> blog.v1.TriggerTranslationRequest
-	28, // 23: blog.v1.BlogService.ListSocialPublications:input_type -> blog.v1.ListSocialPublicationsRequest
-	30, // 24: blog.v1.BlogService.PublishSocialPublicationNow:input_type -> blog.v1.PublishSocialPublicationNowRequest
-	32, // 25: blog.v1.BlogService.ListSocialPublicationJobs:input_type -> blog.v1.ListSocialPublicationJobsRequest
-	2,  // 26: blog.v1.BlogService.ListPostTypes:input_type -> blog.v1.ListPostTypesRequest
-	4,  // 27: blog.v1.BlogService.ListProjectLanguages:input_type -> blog.v1.ListProjectLanguagesRequest
-	7,  // 28: blog.v1.BlogService.ListSocialPlatforms:input_type -> blog.v1.ListSocialPlatformsRequest
-	14, // 29: blog.v1.BlogService.ListPublishedPosts:output_type -> blog.v1.ListPublishedPostsResponse
-	17, // 30: blog.v1.BlogService.GetPublishedPost:output_type -> blog.v1.PublishedPostResponse
-	17, // 31: blog.v1.BlogService.GetPreviewPost:output_type -> blog.v1.PublishedPostResponse
-	19, // 32: blog.v1.BlogService.ListAdminPosts:output_type -> blog.v1.ListAdminPostsResponse
-	21, // 33: blog.v1.BlogService.GetAdminPost:output_type -> blog.v1.AdminPostResponse
-	21, // 34: blog.v1.BlogService.CreatePost:output_type -> blog.v1.AdminPostResponse
-	21, // 35: blog.v1.BlogService.UpdatePost:output_type -> blog.v1.AdminPostResponse
-	25, // 36: blog.v1.BlogService.DeletePost:output_type -> blog.v1.DeletePostResponse
-	9,  // 37: blog.v1.BlogService.SetPostPublished:output_type -> blog.v1.PostSummary
-	21, // 38: blog.v1.BlogService.TriggerTranslation:output_type -> blog.v1.AdminPostResponse
-	29, // 39: blog.v1.BlogService.ListSocialPublications:output_type -> blog.v1.ListSocialPublicationsResponse
-	12, // 40: blog.v1.BlogService.PublishSocialPublicationNow:output_type -> blog.v1.SocialPublication
-	33, // 41: blog.v1.BlogService.ListSocialPublicationJobs:output_type -> blog.v1.ListSocialPublicationJobsResponse
-	3,  // 42: blog.v1.BlogService.ListPostTypes:output_type -> blog.v1.ListPostTypesResponse
-	5,  // 43: blog.v1.BlogService.ListProjectLanguages:output_type -> blog.v1.ListProjectLanguagesResponse
-	8,  // 44: blog.v1.BlogService.ListSocialPlatforms:output_type -> blog.v1.ListSocialPlatformsResponse
-	29, // [29:45] is the sub-list for method output_type
-	13, // [13:29] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	21, // 11: blog.v1.AdminPostResponse.images:type_name -> blog.v1.PostImageItem
+	12, // 12: blog.v1.ListSocialPublicationsResponse.publications:type_name -> blog.v1.SocialPublication
+	32, // 13: blog.v1.ListSocialPublicationJobsResponse.jobs:type_name -> blog.v1.SocialPublicationJob
+	13, // 14: blog.v1.BlogService.ListPublishedPosts:input_type -> blog.v1.ListPublishedPostsRequest
+	15, // 15: blog.v1.BlogService.GetPublishedPost:input_type -> blog.v1.GetPublishedPostRequest
+	16, // 16: blog.v1.BlogService.GetPreviewPost:input_type -> blog.v1.GetPreviewPostRequest
+	18, // 17: blog.v1.BlogService.ListAdminPosts:input_type -> blog.v1.ListAdminPostsRequest
+	20, // 18: blog.v1.BlogService.GetAdminPost:input_type -> blog.v1.GetAdminPostRequest
+	23, // 19: blog.v1.BlogService.CreatePost:input_type -> blog.v1.CreatePostRequest
+	24, // 20: blog.v1.BlogService.UpdatePost:input_type -> blog.v1.UpdatePostRequest
+	25, // 21: blog.v1.BlogService.DeletePost:input_type -> blog.v1.DeletePostRequest
+	27, // 22: blog.v1.BlogService.SetPostPublished:input_type -> blog.v1.SetPostPublishedRequest
+	28, // 23: blog.v1.BlogService.TriggerTranslation:input_type -> blog.v1.TriggerTranslationRequest
+	29, // 24: blog.v1.BlogService.ListSocialPublications:input_type -> blog.v1.ListSocialPublicationsRequest
+	31, // 25: blog.v1.BlogService.PublishSocialPublicationNow:input_type -> blog.v1.PublishSocialPublicationNowRequest
+	33, // 26: blog.v1.BlogService.ListSocialPublicationJobs:input_type -> blog.v1.ListSocialPublicationJobsRequest
+	2,  // 27: blog.v1.BlogService.ListPostTypes:input_type -> blog.v1.ListPostTypesRequest
+	4,  // 28: blog.v1.BlogService.ListProjectLanguages:input_type -> blog.v1.ListProjectLanguagesRequest
+	7,  // 29: blog.v1.BlogService.ListSocialPlatforms:input_type -> blog.v1.ListSocialPlatformsRequest
+	14, // 30: blog.v1.BlogService.ListPublishedPosts:output_type -> blog.v1.ListPublishedPostsResponse
+	17, // 31: blog.v1.BlogService.GetPublishedPost:output_type -> blog.v1.PublishedPostResponse
+	17, // 32: blog.v1.BlogService.GetPreviewPost:output_type -> blog.v1.PublishedPostResponse
+	19, // 33: blog.v1.BlogService.ListAdminPosts:output_type -> blog.v1.ListAdminPostsResponse
+	22, // 34: blog.v1.BlogService.GetAdminPost:output_type -> blog.v1.AdminPostResponse
+	22, // 35: blog.v1.BlogService.CreatePost:output_type -> blog.v1.AdminPostResponse
+	22, // 36: blog.v1.BlogService.UpdatePost:output_type -> blog.v1.AdminPostResponse
+	26, // 37: blog.v1.BlogService.DeletePost:output_type -> blog.v1.DeletePostResponse
+	9,  // 38: blog.v1.BlogService.SetPostPublished:output_type -> blog.v1.PostSummary
+	22, // 39: blog.v1.BlogService.TriggerTranslation:output_type -> blog.v1.AdminPostResponse
+	30, // 40: blog.v1.BlogService.ListSocialPublications:output_type -> blog.v1.ListSocialPublicationsResponse
+	12, // 41: blog.v1.BlogService.PublishSocialPublicationNow:output_type -> blog.v1.SocialPublication
+	34, // 42: blog.v1.BlogService.ListSocialPublicationJobs:output_type -> blog.v1.ListSocialPublicationJobsResponse
+	3,  // 43: blog.v1.BlogService.ListPostTypes:output_type -> blog.v1.ListPostTypesResponse
+	5,  // 44: blog.v1.BlogService.ListProjectLanguages:output_type -> blog.v1.ListProjectLanguagesResponse
+	8,  // 45: blog.v1.BlogService.ListSocialPlatforms:output_type -> blog.v1.ListSocialPlatformsResponse
+	30, // [30:46] is the sub-list for method output_type
+	14, // [14:30] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_v1_blog_proto_init() }
@@ -2662,7 +2812,7 @@ func file_v1_blog_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_blog_proto_rawDesc), len(file_v1_blog_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   33,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

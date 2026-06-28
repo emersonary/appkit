@@ -54,6 +54,57 @@ func (c *linkedInClient) GetAccountInfo(ctx context.Context) (AccountInfo, error
 	}, nil
 }
 
+func (c *linkedInClient) FormatPost(ctx context.Context, input PostInput) (FormattedPost, error) {
+	if err := validateLinkedInPostInput(input); err != nil {
+		return FormattedPost{}, err
+	}
+	mode := resolveLinkedInMode(input)
+	fields := BuildFields(input, c.cfg)
+	fields = applyLinkedInMode(fields, input, mode)
+	caption, err := c.templates.Render(c.id, fields)
+	if err != nil {
+		return FormattedPost{}, err
+	}
+	media := []string{}
+	if hero := resolveHeroMediaURL(input); hero != "" {
+		media = append(media, hero)
+	}
+	return FormattedPost{
+		PlatformID:         c.id,
+		Caption:            caption,
+		Title:              strings.TrimSpace(input.Title),
+		LinkURL:            strings.TrimSpace(input.ArticleURL),
+		MediaURLs:          media,
+		VideoURL:           strings.TrimSpace(input.VideoURL),
+		IncludeArticleLink: mode == linkedInModeLink,
+		Fields:             fields,
+	}, nil
+}
+
+func validateLinkedInPostInput(input PostInput) error {
+	if strings.TrimSpace(input.IntroText) == "" && strings.TrimSpace(input.BodyHTML) == "" {
+		return ErrInvalidRequest.With("intro_text", "required")
+	}
+	if strings.TrimSpace(input.ArticleURL) == "" {
+		return ErrInvalidRequest.With("article_url", "required")
+	}
+	if strings.TrimSpace(input.SourceBrand) == "" {
+		return ErrInvalidRequest.With("source_brand", "required")
+	}
+	return nil
+}
+
+func linkedInIncludeArticleLink(formatted FormattedPost) bool {
+	if formatted.IncludeArticleLink {
+		return strings.TrimSpace(formatted.LinkURL) != ""
+	}
+	// Legacy formatted payloads saved before IncludeArticleLink existed.
+	if strings.TrimSpace(formatted.LinkURL) == "" {
+		return false
+	}
+	return strings.Contains(formatted.Caption, formatted.LinkURL)
+}
+
 func (c *linkedInClient) CreatePost(ctx context.Context, req CreatePostRequest) (CreatePostResult, error) {
 	formatted := req.Formatted
 	if formatted.PlatformID == "" {
@@ -87,7 +138,7 @@ func (c *linkedInClient) CreatePost(ctx context.Context, req CreatePostRequest) 
 			"thirdPartyDistributionChannels": []any{},
 		},
 	}
-	if formatted.LinkURL != "" {
+	if linkedInIncludeArticleLink(formatted) {
 		body["content"] = map[string]any{
 			"article": map[string]any{
 				"source": formatted.LinkURL,

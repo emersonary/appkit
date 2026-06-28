@@ -16,10 +16,11 @@ type PermissionNode struct {
 	Children   []*PermissionNode
 }
 
-// PermissionTree is a forest of permission nodes indexed by FullID.
+// PermissionTree is a forest of permission nodes indexed by FullID and config id.
 type PermissionTree struct {
 	Roots    []*PermissionNode
 	byFullID map[string]*PermissionNode
+	byID     map[string]*PermissionNode
 }
 
 // FindByFullID returns the node for a dotted full id path, or nil when not found.
@@ -28,6 +29,14 @@ func (t *PermissionTree) FindByFullID(fullID string) *PermissionNode {
 		return nil
 	}
 	return t.byFullID[strings.TrimSpace(fullID)]
+}
+
+// FindByID returns the node for a permission config id, or nil when not found.
+func (t *PermissionTree) FindByID(id string) *PermissionNode {
+	if t == nil {
+		return nil
+	}
+	return t.byID[strings.TrimSpace(id)]
 }
 
 // PermissionConfigList is a []PermissionConfig with tree-building helpers.
@@ -50,7 +59,10 @@ func NewPermissionTreeFromConfigs(configs []PermissionConfig) (*PermissionTree, 
 // NewPermissionTree builds a tree from persisted permission rows.
 func NewPermissionTree(perms []Permission) (*PermissionTree, error) {
 	if len(perms) == 0 {
-		return &PermissionTree{byFullID: make(map[string]*PermissionNode)}, nil
+		return &PermissionTree{
+			byFullID: make(map[string]*PermissionNode),
+			byID:     make(map[string]*PermissionNode),
+		}, nil
 	}
 
 	byID := make(map[string]*PermissionNode, len(perms))
@@ -112,6 +124,7 @@ func NewPermissionTree(perms []Permission) (*PermissionTree, error) {
 	tree := &PermissionTree{
 		Roots:    roots,
 		byFullID: make(map[string]*PermissionNode, len(perms)),
+		byID:     byID,
 	}
 	for _, root := range roots {
 		if err := assignPermissionFullIDs(root, tree.byFullID); err != nil {

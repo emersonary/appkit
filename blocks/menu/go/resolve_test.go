@@ -32,7 +32,7 @@ func testMenuSetup() Setup {
 				ID:   "manage",
 				Name: "Manage",
 				Permissions: []string{
-					"Posts",
+					"posts",
 				},
 			},
 		},
@@ -69,11 +69,11 @@ func TestResolveLayoutExpandsDescendants(t *testing.T) {
 	}
 }
 
-func TestValidateAgainstPermissionsRejectsUnknownFullID(t *testing.T) {
+func TestValidateAgainstPermissionsRejectsUnknownID(t *testing.T) {
 	setup := testMenuSetup()
-	setup.Menus[0].Permissions = []string{"Missing.Node"}
+	setup.Menus[0].Permissions = []string{"missing_permission"}
 
 	if err := setup.ValidateAgainstPermissions(testPermissionSetup()); err == nil {
-		t.Fatal("expected validation error for unknown full_id")
+		t.Fatal("expected validation error for unknown permission id")
 	}
 }

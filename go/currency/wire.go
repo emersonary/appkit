@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
 	"go.uber.org/zap"
 )
@@ -15,19 +14,15 @@ type WireOptions struct {
 	WorkerCtx context.Context
 }
 
-// ApplySchemaFromFile loads block YAML and applies the currency schema.
-func ApplySchemaFromFile(ctx context.Context, db *sql.DB, configPath string) error {
-	path := configPath
-	if path == "" {
-		path = defaultAppConfigPath
-	}
-	if override := os.Getenv("CURRENCY_CONFIG"); override != "" {
-		path = override
+// ApplySchemaFromAppConfig resolves currency config and applies the schema when enabled.
+func ApplySchemaFromAppConfig(ctx context.Context, db *sql.DB, app AppConfig) error {
+	if !app.Enabled {
+		return nil
 	}
 
-	cfg, err := LoadConfig(path)
+	cfg, err := ResolveBlockConfig(app)
 	if err != nil {
-		return fmt.Errorf("load currency config: %w", err)
+		return fmt.Errorf("resolve currency config: %w", err)
 	}
 
 	if err := ApplySchema(ctx, db, cfg); err != nil {
@@ -37,6 +32,12 @@ func ApplySchemaFromFile(ctx context.Context, db *sql.DB, configPath string) err
 	return nil
 }
 
+// ApplySchemaFromFile loads legacy block YAML and applies the currency schema.
+// Deprecated: prefer ApplySchemaFromAppConfig with the main config currency node.
+func ApplySchemaFromFile(ctx context.Context, db *sql.DB, configPath string) error {
+	return ApplySchemaFromAppConfig(ctx, db, AppConfig{Enabled: true, ConfigPath: configPath})
+}
+
 // Wire applies the currency schema and builds the service when app.Enabled is true.
 // Returns nil, nil when disabled. Starts the exchange-rate updater when WorkerCtx is set.
 func Wire(ctx context.Context, db *sql.DB, app AppConfig, opts WireOptions) (*Service, error) {
@@ -44,11 +45,9 @@ func Wire(ctx context.Context, db *sql.DB, app AppConfig, opts WireOptions) (*Se
 		return nil, nil
 	}
 
-	app.ApplyDefaults()
-
-	blockCfg, err := LoadConfig(app.blockConfigPath())
+	blockCfg, err := ResolveBlockConfig(app)
 	if err != nil {
-		return nil, fmt.Errorf("load currency config: %w", err)
+		return nil, fmt.Errorf("resolve currency config: %w", err)
 	}
 
 	if err := ApplySchema(ctx, db, blockCfg); err != nil {

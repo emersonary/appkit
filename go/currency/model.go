@@ -4,8 +4,11 @@ import "time"
 
 const BaseCurrencyCode = "USD"
 
+// IDCurrencyColumn is the reference column name used in foreign keys.
+const IDCurrencyColumn = "id_currency"
+
 type Currency struct {
-	Code             string
+	IDCurrency       string
 	Name             string
 	Symbol           string
 	IsBase           bool
@@ -15,18 +18,18 @@ type Currency struct {
 }
 
 type ExchangeRate struct {
-	CurrencyCode string
-	Rate         float64
-	Source       string
-	FetchedAt    time.Time
+	IDCurrency string
+	Rate       float64
+	Source     string
+	FetchedAt  time.Time
 }
 
 type ExchangeRateHistory struct {
-	ID           string
-	CurrencyCode string
-	Rate         float64
-	Source       string
-	RecordedAt   time.Time
+	ID         string
+	IDCurrency string
+	Rate       float64
+	Source     string
+	RecordedAt time.Time
 }
 
 type Snapshot struct {

@@ -82,7 +82,7 @@ func (s Setup) Validate() error {
 			return invalidSetupf("menus.%s.name", menu.ID, "name is required")
 		}
 		if len(menu.Permissions) == 0 {
-			return invalidSetupf("menus.%s.permissions", menu.ID, "at least one permission full_id is required")
+			return invalidSetupf("menus.%s.permissions", menu.ID, "at least one permission id is required")
 		}
 	}
 
@@ -93,7 +93,7 @@ func (s Setup) Validate() error {
 	return nil
 }
 
-// ValidateAgainstPermissions checks menu full_ids and default_menu against the permissions catalog.
+// ValidateAgainstPermissions checks menu permission ids and default_menu against the permissions catalog.
 func (s Setup) ValidateAgainstPermissions(permSetup permissions.Setup) error {
 	tree, err := permissions.PermissionConfigList(permSetup.Permissions).Tree()
 	if err != nil {
@@ -106,9 +106,9 @@ func (s Setup) ValidateAgainstPermissions(permSetup permissions.Setup) error {
 	}
 
 	for _, menu := range s.Menus {
-		for _, fullID := range menu.Permissions {
-			if tree.FindByFullID(fullID) == nil {
-				return invalidSetupf("menus.%s.permissions", menu.ID, "unknown permission full_id %q", fullID)
+		for _, permID := range menu.Permissions {
+			if tree.FindByID(permID) == nil {
+				return invalidSetupf("menus.%s.permissions", menu.ID, "unknown permission id %q", permID)
 			}
 		}
 	}

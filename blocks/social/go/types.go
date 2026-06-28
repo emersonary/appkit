@@ -8,6 +8,8 @@ type PostInput struct {
 	SourceBrand  string
 	SourceURL    string
 	HeroImageURL string
+	CoverImageURL string
+	BodyHTML     string
 	VideoURL     string
 	Hashtags     string
 	Language     string
@@ -24,9 +26,10 @@ type FormattedPost struct {
 	Caption    string
 	Title      string
 	LinkURL    string
-	MediaURLs  []string
-	VideoURL   string
-	Fields     TemplateFields
+	MediaURLs          []string
+	VideoURL           string
+	IncludeArticleLink bool
+	Fields             TemplateFields
 }
 
 // CreatePostRequest is the publish payload after formatting.

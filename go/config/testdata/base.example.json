@@ -36,6 +36,11 @@
   "accounts": {
     "enabled": false,
     "config_path": "config/accounts.yaml",
+    "schema": "",
+    "tenancy": {
+      "enabled": false,
+      "default_tenant_id": ""
+    },
     "access_token_ttl": 0,
     "frontend_url": "https://app.example.com",
     "api_public_url": "https://api.example.com",
@@ -46,9 +51,11 @@
     "skip_email_verification": false,
     "oauth": {
       "enabled": false,
+      "state_cookie_name": "",
       "google": {
         "enabled": false,
-        "client_id": ""
+        "client_id": "",
+        "redirect_url": ""
       },
       "facebook": {
         "enabled": false
@@ -58,11 +65,58 @@
       }
     }
   },
+  "tenants": {
+    "enabled": false,
+    "config_path": "config/tenants.yaml"
+  },
   "currency": {
     "enabled": false,
-    "config_path": "config/currency.yaml",
+    "schema": "currency",
+    "base_currency": "USD",
+    "currencies": [
+      "USD",
+      "EUR"
+    ],
+    "skip_seed": false,
     "api_url": "https://api.frankfurter.dev/v1/latest",
     "update_interval": 3600000000000
+  },
+  "language": {
+    "enabled": false,
+    "schema": "language",
+    "default_language": "en",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "skip_seed": false
+  },
+  "permissions": {
+    "enabled": false,
+    "schema": "account",
+    "accounts_schema": "",
+    "default_profile": "member",
+    "skip_seed": false,
+    "groups": null,
+    "categories": null,
+    "permissions": null,
+    "profiles": null,
+    "profile_permissions": null
+  },
+  "menu": {
+    "enabled": false,
+    "sidebar": {
+      "floating": false,
+      "hide_when_selected": false,
+      "locked": false,
+      "default_menu": ""
+    },
+    "menus": null
+  },
+  "ai": {
+    "enabled": false,
+    "providers": null,
+    "routes": null
   },
   "email": {
     "from": "noreply@example.com",
@@ -78,9 +132,5 @@
     "jmap_url": "",
     "domain_id": "",
     "mail_domain": ""
-  },
-  "tenants": {
-    "enabled": false,
-    "config_path": "config/tenants.yaml"
   }
 }

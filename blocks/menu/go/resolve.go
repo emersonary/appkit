@@ -79,10 +79,10 @@ func buildGrantMap(grants []permissions.FlatPermission) map[string]int {
 
 func menuRoots(menu MenuConfig, tree *permissions.PermissionTree) ([]*permissions.PermissionNode, error) {
 	included := make(map[string]*permissions.PermissionNode)
-	for _, fullID := range menu.Permissions {
-		node := tree.FindByFullID(fullID)
+	for _, permID := range menu.Permissions {
+		node := tree.FindByID(permID)
 		if node == nil {
-			return nil, invalidSetupf("menus.%s.permissions", menu.ID, "unknown permission full_id %q", fullID)
+			return nil, invalidSetupf("menus.%s.permissions", menu.ID, "unknown permission id %q", permID)
 		}
 		collectSubtree(node, included)
 	}

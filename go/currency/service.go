@@ -221,7 +221,7 @@ func (s *Service) ListCurrencies(ctx context.Context) ([]Currency, error) {
 
 	filtered := make([]Currency, 0, len(items))
 	for _, item := range items {
-		if err := s.ValidateCode(item.Code); err != nil {
+		if err := s.ValidateCode(item.IDCurrency); err != nil {
 			continue
 		}
 
@@ -239,7 +239,7 @@ func (s *Service) ListExchangeRates(ctx context.Context) ([]ExchangeRate, error)
 
 	filtered := make([]ExchangeRate, 0, len(items))
 	for _, item := range items {
-		if err := s.ValidateCode(item.CurrencyCode); err != nil {
+		if err := s.ValidateCode(item.IDCurrency); err != nil {
 			continue
 		}
 

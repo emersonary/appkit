@@ -25,9 +25,9 @@ func (s *Store) table(name string) string {
 
 func (s *Store) ListCurrencies(ctx context.Context) ([]Currency, error) {
 	query := fmt.Sprintf(`
-		SELECT code, name, symbol, is_base, website_languages, created_at, updated_at
+		SELECT id_currency, name, symbol, is_base, website_languages, created_at, updated_at
 		FROM %s
-		ORDER BY is_base DESC, code
+		ORDER BY is_base DESC, id_currency
 	`, s.table("currencies"))
 
 	rows, err := s.db.QueryContext(ctx, query)
@@ -42,7 +42,7 @@ func (s *Store) ListCurrencies(ctx context.Context) ([]Currency, error) {
 		var languages pgtype.FlatArray[string]
 
 		if err := rows.Scan(
-			&item.Code,
+			&item.IDCurrency,
 			&item.Name,
 			&item.Symbol,
 			&item.IsBase,
@@ -62,7 +62,7 @@ func (s *Store) ListCurrencies(ctx context.Context) ([]Currency, error) {
 
 func (s *Store) ListTrackedCurrencyCodes(ctx context.Context) ([]string, error) {
 	query := fmt.Sprintf(`
-		SELECT code FROM %s WHERE NOT is_base ORDER BY code
+		SELECT id_currency FROM %s WHERE NOT is_base ORDER BY id_currency
 	`, s.table("currencies"))
 
 	rows, err := s.db.QueryContext(ctx, query)
@@ -85,7 +85,7 @@ func (s *Store) ListTrackedCurrencyCodes(ctx context.Context) ([]string, error) 
 }
 
 func (s *Store) CurrencyExists(ctx context.Context, code string) (bool, error) {
-	query := fmt.Sprintf(`SELECT EXISTS (SELECT 1 FROM %s WHERE code = $1)`, s.table("currencies"))
+	query := fmt.Sprintf(`SELECT EXISTS (SELECT 1 FROM %s WHERE id_currency = $1)`, s.table("currencies"))
 
 	var exists bool
 	if err := s.db.QueryRowContext(ctx, query, strings.ToUpper(strings.TrimSpace(code))).Scan(&exists); err != nil {
@@ -97,9 +97,9 @@ func (s *Store) CurrencyExists(ctx context.Context, code string) (bool, error) {
 
 func (s *Store) UpsertExchangeRate(ctx context.Context, currencyCode string, rate float64, source string, fetchedAt time.Time) error {
 	query := fmt.Sprintf(`
-		INSERT INTO %s (currency_code, rate, source, fetched_at)
+		INSERT INTO %s (id_currency, rate, source, fetched_at)
 		VALUES ($1, $2, $3, $4)
-		ON CONFLICT (currency_code) DO UPDATE SET
+		ON CONFLICT (id_currency) DO UPDATE SET
 			rate = EXCLUDED.rate,
 			source = EXCLUDED.source,
 			fetched_at = EXCLUDED.fetched_at
@@ -115,7 +115,7 @@ func (s *Store) UpsertExchangeRate(ctx context.Context, currencyCode string, rat
 
 func (s *Store) InsertExchangeRateHistory(ctx context.Context, currencyCode string, rate float64, source string, recordedAt time.Time) error {
 	query := fmt.Sprintf(`
-		INSERT INTO %s (currency_code, rate, source, recorded_at)
+		INSERT INTO %s (id_currency, rate, source, recorded_at)
 		VALUES ($1, $2, $3, $4)
 	`, s.table("currency_exchange_rate_history"))
 
@@ -129,14 +129,14 @@ func (s *Store) InsertExchangeRateHistory(ctx context.Context, currencyCode stri
 
 func (s *Store) GetExchangeRate(ctx context.Context, currencyCode string) (ExchangeRate, error) {
 	query := fmt.Sprintf(`
-		SELECT currency_code, rate, source, fetched_at
+		SELECT id_currency, rate, source, fetched_at
 		FROM %s
-		WHERE currency_code = $1
+		WHERE id_currency = $1
 	`, s.table("currency_exchange_rates"))
 
 	var item ExchangeRate
 	err := s.db.QueryRowContext(ctx, query, currencyCode).Scan(
-		&item.CurrencyCode,
+		&item.IDCurrency,
 		&item.Rate,
 		&item.Source,
 		&item.FetchedAt,
@@ -150,9 +150,9 @@ func (s *Store) GetExchangeRate(ctx context.Context, currencyCode string) (Excha
 
 func (s *Store) ListExchangeRates(ctx context.Context) ([]ExchangeRate, error) {
 	query := fmt.Sprintf(`
-		SELECT currency_code, rate, source, fetched_at
+		SELECT id_currency, rate, source, fetched_at
 		FROM %s
-		ORDER BY currency_code
+		ORDER BY id_currency
 	`, s.table("currency_exchange_rates"))
 
 	rows, err := s.db.QueryContext(ctx, query)
@@ -164,7 +164,7 @@ func (s *Store) ListExchangeRates(ctx context.Context) ([]ExchangeRate, error) {
 	var out []ExchangeRate
 	for rows.Next() {
 		var item ExchangeRate
-		if err := rows.Scan(&item.CurrencyCode, &item.Rate, &item.Source, &item.FetchedAt); err != nil {
+		if err := rows.Scan(&item.IDCurrency, &item.Rate, &item.Source, &item.FetchedAt); err != nil {
 			return nil, err
 		}
 
@@ -172,4 +172,8 @@ func (s *Store) ListExchangeRates(ctx context.Context) ([]ExchangeRate, error) {
 	}
 
 	return out, rows.Err()
+}
+
+func (s *Store) QualifiedCurrenciesTable() string {
+	return s.table("currencies")
 }

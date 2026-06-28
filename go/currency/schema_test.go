@@ -18,11 +18,11 @@ func TestBuildSchemaSQLIncludesConfiguredSeed(t *testing.T) {
 	for _, fragment := range []string{
 		`CREATE TABLE IF NOT EXISTS "public"."currencies"`,
 		`CREATE TABLE IF NOT EXISTS "public"."currency_exchange_rates"`,
-		`DELETE FROM "public"."currency_exchange_rates" WHERE currency_code = 'USD'`,
+		`DELETE FROM "public"."currency_exchange_rates" WHERE id_currency = 'USD'`,
 		`'EUR'`,
 		`'BRL'`,
 		`ARRAY['pt']`,
-		`ON CONFLICT (code) DO UPDATE SET`,
+		`ON CONFLICT (id_currency) DO UPDATE SET`,
 	} {
 		if !strings.Contains(sqlText, fragment) {
 			t.Fatalf("expected schema SQL to contain %q", fragment)

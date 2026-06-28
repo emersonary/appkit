@@ -76,6 +76,20 @@ currencies:
 	}
 }
 
+func TestAppConfig_BlockConfig(t *testing.T) {
+	cfg, err := (AppConfig{
+		Schema:       "public",
+		BaseCurrency: BaseCurrencyCode,
+		Currencies:   []string{BaseCurrencyCode, "EUR"},
+	}).BlockConfig()
+	if err != nil {
+		t.Fatalf("BlockConfig: %v", err)
+	}
+	if cfg.Schema != "public" {
+		t.Fatalf("schema: got %q", cfg.Schema)
+	}
+}
+
 func TestValidateCodeUsesEnabledConfig(t *testing.T) {
 	svc, err := NewService(nil, Config{
 		Schema:       "public",
