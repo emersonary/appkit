@@ -44,7 +44,7 @@ func TestResolveLinkedInModeLongPlainUsesNative(t *testing.T) {
 	}
 }
 
-func TestLinkedInNativeCaptionOmitsLinkLine(t *testing.T) {
+func TestLinkedInNativeCaptionUsesNativeSession(t *testing.T) {
 	renderer, err := NewTemplateRenderer()
 	if err != nil {
 		t.Fatal(err)
@@ -59,12 +59,15 @@ func TestLinkedInNativeCaptionOmitsLinkLine(t *testing.T) {
 		Language:    "en",
 		Hashtags:    "#go",
 	}
-	fields := applyLinkedInMode(BuildFields(input, PlatformConfig{}), input, linkedInModeNative)
-	out, err := renderer.Render(PlatformLinkedIn, fields)
+	fields := BuildFields(input, PlatformConfig{})
+	out, err := renderer.RenderWithContext(PlatformLinkedIn, fields, TemplateContext{
+		Platform: PlatformLinkedIn,
+		Filters:  map[string]string{"type": "native"},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "Full native body text.\n\n#go"
+	want := "Title\n\nFull native body text.\n\n#go\n\nRead on Brand: https://example.com/r/abc123"
 	if out != want {
 		t.Fatalf("got %q want %q", out, want)
 	}

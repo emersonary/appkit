@@ -118,7 +118,10 @@ func TestTemplateRendererLinkedIn(t *testing.T) {
 	input := samplePostInput()
 	input.Language = "en"
 	fields := BuildFields(input, PlatformConfig{})
-	out, err := renderer.Render(PlatformLinkedIn, fields)
+	out, err := renderer.RenderWithContext(PlatformLinkedIn, fields, TemplateContext{
+		Platform: PlatformLinkedIn,
+		Filters:  map[string]string{"type": "link"},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,11 +151,14 @@ func TestTemplateRendererLinkedInEmptyHashtags(t *testing.T) {
 		SourceURL:   "https://example.com",
 		Language:    "en",
 	}, PlatformConfig{})
-	out, err := renderer.Render(PlatformLinkedIn, fields)
+	out, err := renderer.RenderWithContext(PlatformLinkedIn, fields, TemplateContext{
+		Platform: PlatformLinkedIn,
+		Filters:  map[string]string{"type": "link"},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "Hook line.\n\nRead on Brand: https://example.com/r/abc123"
+	want := "Title\n\nHook line.\n\nRead on Brand: https://example.com/r/abc123"
 	if out != want {
 		t.Fatalf("got %q want %q", out, want)
 	}

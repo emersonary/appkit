@@ -75,19 +75,6 @@ func htmlToPlainText(raw string) string {
 	return strings.TrimSpace(strings.Join(lines, "\n"))
 }
 
-func applyLinkedInMode(fields TemplateFields, input PostInput, mode linkedInMode) TemplateFields {
-	if mode == linkedInModeLink {
-		return fields
-	}
-	plain := htmlToPlainText(input.BodyHTML)
-	if plain == "" {
-		plain = strings.TrimSpace(fields["intro_text"])
-	}
-	fields["intro_text"] = plain
-	fields["link_line"] = ""
-	return fields
-}
-
 func resolveHeroMediaURL(input PostInput) string {
 	if cover := strings.TrimSpace(input.CoverImageURL); cover != "" {
 		return cover

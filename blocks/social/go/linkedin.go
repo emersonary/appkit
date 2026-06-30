@@ -60,8 +60,10 @@ func (c *linkedInClient) FormatPost(ctx context.Context, input PostInput) (Forma
 	}
 	mode := resolveLinkedInMode(input)
 	fields := BuildFields(input, c.cfg)
-	fields = applyLinkedInMode(fields, input, mode)
-	caption, err := c.templates.Render(c.id, fields)
+	caption, err := c.templates.RenderWithContext(c.id, fields, TemplateContext{
+		Platform: c.id,
+		Filters:  map[string]string{"type": linkedInModeFilter(mode)},
+	})
 	if err != nil {
 		return FormattedPost{}, err
 	}

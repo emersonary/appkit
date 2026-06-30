@@ -11,56 +11,43 @@ var templateFS embed.FS
 
 // TemplateRenderer loads and renders per-platform caption templates.
 type TemplateRenderer struct {
-	bodies map[PlatformID]string
+	templates map[PlatformID]ParsedTemplate
 }
 
 // NewTemplateRenderer loads embedded templates for all platforms.
 func NewTemplateRenderer() (*TemplateRenderer, error) {
-	bodies := make(map[PlatformID]string, len(DefaultPlatforms))
+	templates := make(map[PlatformID]ParsedTemplate, len(DefaultPlatforms))
 	for _, id := range DefaultPlatforms {
 		path := fmt.Sprintf("post-templates/%s.template.txt", id)
 		data, err := templateFS.ReadFile(path)
 		if err != nil {
 			return nil, wrapErr(ErrLoadConfig, "templates", fmt.Errorf("%s: %w", path, err))
 		}
-		bodies[id] = extractTemplateBody(string(data))
+		parsed, err := parseTemplate(string(data))
+		if err != nil {
+			return nil, wrapErr(ErrLoadConfig, "templates", fmt.Errorf("%s: %w", path, err))
+		}
+		templates[id] = parsed
 	}
-	return &TemplateRenderer{bodies: bodies}, nil
+	return &TemplateRenderer{templates: templates}, nil
 }
 
-func extractTemplateBody(raw string) string {
-	var lines []string
-	for _, line := range strings.Split(raw, "\n") {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" {
-			lines = append(lines, "")
-			continue
-		}
-		// Comment lines are documentation only — never part of the published caption.
-		if strings.HasPrefix(trimmed, "#") {
-			continue
-		}
-		lines = append(lines, line)
-	}
-
-	body := strings.TrimSpace(strings.Join(lines, "\n"))
-	for strings.Contains(body, "\n\n\n") {
-		body = strings.ReplaceAll(body, "\n\n\n", "\n\n")
-	}
-	return body
-}
-
-// Render applies template fields for a platform.
+// Render applies template fields for a platform using an empty context (global content only).
 func (r *TemplateRenderer) Render(id PlatformID, fields TemplateFields) (string, error) {
-	body, ok := r.bodies[id]
+	return r.RenderWithContext(id, fields, TemplateContext{Platform: id})
+}
+
+// RenderWithContext applies fields and renders global content plus matching session blocks.
+func (r *TemplateRenderer) RenderWithContext(id PlatformID, fields TemplateFields, ctx TemplateContext) (string, error) {
+	parsed, ok := r.templates[id]
 	if !ok {
 		return "", ErrPlatformNotFound.With("platform", string(id))
 	}
+	body := composeTemplateBody(parsed, ctx)
 	out := body
 	for key, value := range fields {
 		out = strings.ReplaceAll(out, "{{"+key+"}}", value)
 	}
-	// Remove leftover optional placeholders.
 	for {
 		start := strings.Index(out, "{{")
 		if start < 0 {
@@ -119,6 +106,12 @@ func BuildFields(input PostInput, cfg PlatformConfig) TemplateFields {
 		cover = hero
 	}
 	video := strings.TrimSpace(input.VideoURL)
+	linkLine := brandLinkLine(input.Language, brand, articleURL)
+
+	fullText := htmlToPlainText(input.BodyHTML)
+	if fullText == "" {
+		fullText = intro
+	}
 
 	excerpt := intro
 	if idx := strings.Index(excerpt, "\n"); idx >= 0 {
@@ -131,10 +124,12 @@ func BuildFields(input PostInput, cfg PlatformConfig) TemplateFields {
 	fields := TemplateFields{
 		"title":                    title,
 		"intro_text":               intro,
+		"full_text":                fullText,
 		"article_url":              articleURL,
 		"source_brand":             brand,
 		"source_url":               sourceURL,
-		"link_line":                brandLinkLine(input.Language, brand, articleURL),
+		"link_line":                linkLine,
+		"read_on_line":             linkLine,
 		"hero_image_url":           hero,
 		"video_url":                video,
 		"hashtags":                 hashtags,

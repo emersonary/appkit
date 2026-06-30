@@ -1,5 +1,17 @@
+{{title}}
+
+@session type=link
 {{intro_text}}
 
 {{link_line}}
 
 {{hashtags}}
+@end
+
+@session type=native
+{{full_text}}
+
+{{hashtags}}
+
+{{read_on_line}}
+@end
