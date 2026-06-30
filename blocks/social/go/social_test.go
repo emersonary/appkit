@@ -158,7 +158,7 @@ func TestTemplateRendererLinkedInEmptyHashtags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "Title\n\nHook line.\n\nRead on Brand: https://example.com/r/abc123"
+	want := ToSansSerifBold("Title") + "\n\nHook line.\n\nRead on Brand: https://example.com/r/abc123"
 	if out != want {
 		t.Fatalf("got %q want %q", out, want)
 	}

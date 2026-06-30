@@ -1,4 +1,4 @@
-{{title}}
+{{title_bold}}
 
 @session type=link
 {{intro_text}}

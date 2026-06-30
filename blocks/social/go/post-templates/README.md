@@ -6,7 +6,8 @@ Each `*.template.txt` file is **caption body only**. Lines starting with `#` are
 
 | Field | Source |
 |-------|--------|
-| `{{title}}` | Post title |
+| `{{title}}` | Post title (plain text) |
+| `{{title_bold}}` | Post title in Unicode sans-serif bold (LinkedIn caption; ASCII a–z, A–Z, 0–9 only) |
 | `{{intro_text}}` | Summary / hook (translation) |
 | `{{full_text}}` | Full post body as plain text (HTML stripped) |
 | `{{article_url}}` | Tracking redirect URL (`/r/{code}`) |
@@ -22,7 +23,7 @@ Each `*.template.txt` file is **caption body only**. Lines starting with `#` are
 Templates may define **sessions**: conditional blocks rendered only when a filter matches.
 
 ```text
-{{title}}
+{{title_bold}}
 
 @session type=link
 {{intro_text}}
@@ -51,13 +52,13 @@ Mode is resolved in Go (`resolveLinkedInMode`); the template selects layout via 
 
 **Link mode** (long post with inline images, code blocks, or similar):
 
-- Global: `{{title}}`
+- Global: `{{title_bold}}` (Unicode bold; link preview card still uses plain title via API)
 - Session `type=link`: intro + link line + hashtags
 - LinkedIn API attaches the article link preview
 
 **Native mode** (short posts, or long plain text without rich media):
 
-- Global: `{{title}}`
+- Global: `{{title_bold}}` (Unicode bold; link preview card still uses plain title via API)
 - Session `type=native`: full body + hashtags + read-on line
 - No article link attachment on LinkedIn
 

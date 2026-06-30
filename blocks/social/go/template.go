@@ -123,6 +123,7 @@ func BuildFields(input PostInput, cfg PlatformConfig) TemplateFields {
 
 	fields := TemplateFields{
 		"title":                    title,
+		"title_bold":               ToSansSerifBold(title),
 		"intro_text":               intro,
 		"full_text":                fullText,
 		"article_url":              articleURL,
