@@ -186,6 +186,11 @@ export function SocialConnectionCard({
       )}
       {expired && <p className="text-danger">{text.expired}</p>}
       {!connected && !expired && <p className="text-muted">{text.connectHint}</p>}
+      {oauthConfigured && status?.redirect_uri && (
+        <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+          LinkedIn redirect URI: <code>{status.redirect_uri}</code>
+        </p>
+      )}
       {expiringSoon && (
         <p className="alert alert-warning" style={{ marginBottom: '0.75rem' }}>
           {text.expiringSoon}

@@ -1,5 +1,6 @@
 export type SocialConnectionStatus = {
   oauth_configured: boolean;
+  redirect_uri?: string;
   connected: boolean;
   expired: boolean;
   account_id?: string;

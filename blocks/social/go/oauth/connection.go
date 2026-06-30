@@ -23,6 +23,7 @@ func (c Connection) ValidAt(now time.Time) bool {
 // ConnectionStatus is returned by the OAuth manager status endpoint.
 type ConnectionStatus struct {
 	OAuthConfigured bool       `json:"oauth_configured"`
+	RedirectURI     string     `json:"redirect_uri,omitempty"`
 	Connected       bool       `json:"connected"`
 	Expired         bool       `json:"expired"`
 	AccountID       string     `json:"account_id,omitempty"`

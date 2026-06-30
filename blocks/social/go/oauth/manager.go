@@ -96,6 +96,7 @@ func (m *Manager) OAuthConfigured(tenantID, platformID string) bool {
 
 func (m *Manager) Status(ctx context.Context, tenantID, platformID, language string) (ConnectionStatus, error) {
 	oauthConfigured := m.OAuthConfigured(tenantID, platformID)
+	redirectURI := m.resolvedRedirectURI(tenantID, platformID)
 	conn, valid, err := m.store.ValidAt(ctx, tenantID, platformID, language, time.Now())
 	if err != nil {
 		return ConnectionStatus{}, err
@@ -103,17 +104,27 @@ func (m *Manager) Status(ctx context.Context, tenantID, platformID, language str
 	if valid {
 		st := connectionStatus(conn, true)
 		st.OAuthConfigured = oauthConfigured
+		st.RedirectURI = redirectURI
 		return st, nil
 	}
 	conn, err = m.store.Get(ctx, tenantID, platformID, language)
 	if err != nil {
-		return ConnectionStatus{Connected: false, OAuthConfigured: oauthConfigured}, nil
+		return ConnectionStatus{Connected: false, OAuthConfigured: oauthConfigured, RedirectURI: redirectURI}, nil
 	}
 	st := connectionStatus(conn, false)
 	st.Expired = true
 	st.DaysLeft = 0
 	st.OAuthConfigured = oauthConfigured
+	st.RedirectURI = redirectURI
 	return st, nil
+}
+
+func (m *Manager) resolvedRedirectURI(tenantID, platformID string) string {
+	_, _, uri, err := m.resolveOAuth(tenantID, platformID)
+	if err != nil {
+		return ""
+	}
+	return uri
 }
 
 func (m *Manager) Disconnect(ctx context.Context, tenantID, platformID, language string) error {
