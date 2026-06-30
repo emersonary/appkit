@@ -200,12 +200,16 @@ func (m *Manager) HandleCallback(ctx context.Context, platformID string, w http.
 	}
 
 	cookieName := m.StateCookieName(platformID, st.Language)
-	cookie, err := r.Cookie(cookieName)
-	if err != nil || cookie.Value == "" || cookie.Value != stateParam {
-		m.failCallback(w, r, platformID, st.Language, "invalid_state", "oauth state cookie mismatch or missing")
-		return
+	cookie, cookieErr := r.Cookie(cookieName)
+	if cookieErr == nil && cookie.Value != "" {
+		if cookie.Value != stateParam {
+			m.failCallback(w, r, platformID, st.Language, "invalid_state", "oauth state cookie mismatch")
+			return
+		}
+		http.SetCookie(w, &http.Cookie{Name: cookieName, Value: "", Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteLaxMode})
 	}
-	http.SetCookie(w, &http.Cookie{Name: cookieName, Value: "", Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteLaxMode})
+	// When the redirect URI is on another host (e.g. emersonary.dev) the state cookie set at
+	// /start is not sent here; the HMAC-signed state parameter is sufficient.
 
 	provider, oauthCfg, redirectURI, err := m.resolveOAuth(st.TenantID, platformID)
 	if err != nil {

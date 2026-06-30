@@ -17,6 +17,7 @@ export type SocialConnectionLabels = {
   expired?: string;
   expiringSoon?: string;
   connectButton?: string;
+  connectingButton?: string;
   reconnectButton?: string;
   disconnectButton?: string;
   loadError?: string;

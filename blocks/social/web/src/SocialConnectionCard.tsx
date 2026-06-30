@@ -96,6 +96,7 @@ const defaultLabels = (platformLabel: string): Required<SocialConnectionLabels> 
   expired: `${platformLabel} token expired. Reconnect to publish again.`,
   expiringSoon: 'Token expires soon. Reconnect to avoid publish failures.',
   connectButton: `Connect ${platformLabel}`,
+  connectingButton: 'Connecting…',
   reconnectButton: `Reconnect ${platformLabel}`,
   disconnectButton: 'Disconnect',
   loadError: `Could not load ${platformLabel} status.`,
@@ -152,7 +153,7 @@ export function SocialConnectionCard({
         <div className="social-connection-inline__actions">
           {(!connected || expired || expiringSoon) && oauthConfigured && (
             <button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={() => void connect()}>
-              {connected ? text.reconnectButton : text.connectButton}
+              {busy ? text.connectingButton : connected ? text.reconnectButton : text.connectButton}
             </button>
           )}
           {allowDisconnect && connected && (
@@ -193,7 +194,7 @@ export function SocialConnectionCard({
       <div className="form-actions" style={{ marginTop: '0.75rem' }}>
         {(!connected || expired || expiringSoon) && oauthConfigured && (
           <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void connect()}>
-            {connected ? text.reconnectButton : text.connectButton}
+            {busy ? text.connectingButton : connected ? text.reconnectButton : text.connectButton}
           </button>
         )}
         {allowDisconnect && connected && (
