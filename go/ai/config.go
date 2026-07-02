@@ -10,12 +10,23 @@ import (
 )
 
 const (
-	defaultOpenAIBaseURL      = "https://api.openai.com/v1"
-	defaultOpenAIModel        = "gpt-4o-mini"
-	defaultOpenAIAPIKeyEnv    = "OPENAI_API_KEY"
-	defaultProviderTimeout    = 30 * time.Second
-	defaultOpenAIDriver       = "openai"
+	defaultOpenAIBaseURL   = "https://api.openai.com/v1"
+	defaultOpenAIModel     = "gpt-4o-mini"
+	defaultOpenAIAPIKeyEnv = "OPENAI_API_KEY"
+	defaultProviderTimeout = 30 * time.Second
+	defaultOpenAIDriver    = "openai"
+	defaultChatGPTDriver   = "chatgpt" // alias for openai
+	defaultLocalDriver     = "local"
 )
+
+func normalizeDriver(driver string) string {
+	switch strings.ToLower(strings.TrimSpace(driver)) {
+	case defaultOpenAIDriver, defaultChatGPTDriver, "gpt":
+		return defaultOpenAIDriver
+	default:
+		return strings.TrimSpace(driver)
+	}
+}
 
 // ProviderConfig configures a single AI provider instance.
 type ProviderConfig struct {
@@ -43,7 +54,7 @@ func (p ProviderConfig) driver(providerID string) string {
 }
 
 func (p *ProviderConfig) normalize(providerID string) {
-	p.Driver = p.driver(providerID)
+	p.Driver = normalizeDriver(p.driver(providerID))
 	if strings.TrimSpace(p.BaseURL) == "" && p.Driver == defaultOpenAIDriver {
 		p.BaseURL = defaultOpenAIBaseURL
 	}
@@ -73,7 +84,8 @@ type AIConfig struct {
 	Enabled    bool                      `mapstructure:"enabled" yaml:"enabled" json:"enabled"`
 	ConfigPath string                    `mapstructure:"config_path" yaml:"config_path,omitempty" json:"config_path,omitempty"`
 	Providers  map[string]ProviderConfig `mapstructure:"providers" yaml:"providers" json:"providers"`
-	Routes     map[string]string         `mapstructure:"routes" yaml:"routes" json:"routes"`
+	Routes     map[string]any            `mapstructure:"routes" yaml:"routes" json:"routes"`
+	routeTable RouteTable                `yaml:"-" mapstructure:"-" json:"-"`
 }
 
 // Resolved returns a normalized, validated copy.
@@ -114,7 +126,7 @@ func mergeAIConfig(base *AIConfig, overlay AIConfig) {
 		base.Providers = copyProviders(overlay.Providers)
 	}
 	if len(overlay.Routes) > 0 {
-		base.Routes = copyRoutes(overlay.Routes)
+		base.Routes = copyRouteMap(overlay.Routes)
 	}
 }
 
@@ -141,12 +153,18 @@ func (c *AIConfig) normalize() {
 		c.Providers = map[string]ProviderConfig{}
 	}
 	if c.Routes == nil {
-		c.Routes = map[string]string{}
+		c.Routes = map[string]any{}
 	}
 	for id := range c.Providers {
 		p := c.Providers[id]
 		p.normalize(id)
 		c.Providers[id] = p
+	}
+	if len(c.Routes) > 0 {
+		table, err := ParseRouteMap(c.Routes)
+		if err == nil {
+			c.routeTable = table
+		}
 	}
 }
 
@@ -166,19 +184,8 @@ func (c AIConfig) Validate() error {
 		if !provider.isEnabled() {
 			continue
 		}
-		switch provider.driver(id) {
-		case defaultOpenAIDriver:
-			if provider.resolvedAPIKey() == "" {
-				return invalidConfigf("providers.%s.api_key", id, "api_key or %s env var is required", provider.APIKeyEnv)
-			}
-			if strings.TrimSpace(provider.BaseURL) == "" {
-				return invalidConfigf("providers.%s.base_url", id, "base_url is required")
-			}
-			if strings.TrimSpace(provider.DefaultModel) == "" {
-				return invalidConfigf("providers.%s.default_model", id, "default_model is required")
-			}
-		default:
-			return invalidConfigf("providers.%s.driver", id, "unsupported driver %q", provider.driver(id))
+		if err := validateProviderConfig(id, provider); err != nil {
+			return err
 		}
 	}
 
@@ -186,41 +193,106 @@ func (c AIConfig) Validate() error {
 		return invalidConfig("routes", "at least one route is required when ai is enabled")
 	}
 
-	for rawType, providerID := range c.Routes {
-		serviceType, err := ParseServiceType(rawType)
-		if err != nil {
-			return invalidConfig("routes", err.Error())
-		}
-		providerID = strings.TrimSpace(providerID)
-		if providerID == "" {
-			return invalidConfigf("routes.%s", string(serviceType), "provider id is required")
-		}
-		provider, ok := c.Providers[providerID]
-		if !ok {
-			return invalidConfigf("routes.%s", string(serviceType), "unknown provider %q", providerID)
-		}
-		if !provider.isEnabled() {
-			return invalidConfigf("routes.%s", string(serviceType), "provider %q is disabled", providerID)
-		}
+	table, err := ParseRouteMap(c.Routes)
+	if err != nil {
+		return err
+	}
+	if table.IsEmpty() {
+		return invalidConfig("routes", "at least one route is required when ai is enabled")
 	}
 
-	if _, ok := c.route(ServiceTypeTranslation); !ok {
-		return invalidConfig("routes.translation", "translation route is required when ai is enabled")
+	if err := validateRouteTable(table, c.Providers); err != nil {
+		return err
+	}
+
+	if _, ok := table.resolve(CapabilityTranslation, OpTranslate); !ok {
+		return invalidConfig("routes.translation", "translation.translate route is required when ai is enabled")
 	}
 
 	return nil
 }
 
-func (c AIConfig) route(serviceType ServiceType) (string, bool) {
-	providerID, ok := c.Routes[string(serviceType)]
-	if !ok {
-		return "", false
+func validateProviderConfig(id string, provider ProviderConfig) error {
+	switch normalizeDriver(provider.driver(id)) {
+	case defaultOpenAIDriver:
+		if provider.resolvedAPIKey() == "" {
+			return invalidConfigf("providers.%s.api_key", id, "api_key or %s env var is required", provider.APIKeyEnv)
+		}
+		if strings.TrimSpace(provider.BaseURL) == "" {
+			return invalidConfigf("providers.%s.base_url", id, "base_url is required")
+		}
+		if strings.TrimSpace(provider.DefaultModel) == "" {
+			return invalidConfigf("providers.%s.default_model", id, "default_model is required")
+		}
+	case defaultLocalDriver:
+		return nil
+	default:
+		return invalidConfigf("providers.%s.driver", id, "unsupported driver %q", provider.driver(id))
 	}
+	return nil
+}
+
+func (p ProviderConfig) normalizedDriver(providerID string) string {
+	return normalizeDriver(p.driver(providerID))
+}
+
+func validateRouteTable(table RouteTable, providers map[string]ProviderConfig) error {
+	for capability, route := range table.Capabilities {
+		if err := validateCapabilityRoute(string(capability), route, providers); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateCapabilityRoute(capabilityName string, route CapabilityRoute, providers map[string]ProviderConfig) error {
+	capability, err := parseCapability(capabilityName)
+	if err != nil {
+		return err
+	}
+
+	if defaultID := strings.TrimSpace(route.Default); defaultID != "" {
+		if err := validateRouteTarget(capability, "", defaultID, providers); err != nil {
+			return invalidConfigf("routes.%s.default", capabilityName, "%s", err.Error())
+		}
+	}
+
+	for op, providerID := range route.Operations {
+		operation, err := parseOperation(capability, op)
+		if err != nil {
+			return invalidConfigf("routes.%s.operations.%s", capabilityName, op, "%s", err.Error())
+		}
+		if err := validateRouteTarget(capability, operation, providerID, providers); err != nil {
+			return invalidConfigf("routes.%s.operations.%s", capabilityName, op, "%s", err.Error())
+		}
+	}
+
+	if strings.TrimSpace(route.Default) == "" && len(route.Operations) == 0 {
+		return invalidConfigf("routes.%s", capabilityName, "default or operations is required")
+	}
+	return nil
+}
+
+func validateRouteTarget(capability Capability, operation Operation, providerID string, providers map[string]ProviderConfig) error {
 	providerID = strings.TrimSpace(providerID)
 	if providerID == "" {
-		return "", false
+		return fmt.Errorf("provider id is required")
 	}
-	return providerID, true
+	provider, ok := providers[providerID]
+	if !ok {
+		return fmt.Errorf("unknown provider %q", providerID)
+	}
+	if !provider.isEnabled() {
+		return fmt.Errorf("provider %q is disabled", providerID)
+	}
+	driver := provider.normalizedDriver(providerID)
+	if operation == "" {
+		return nil
+	}
+	if !providerSupportsOperation(driver, capability, operation) {
+		return fmt.Errorf("provider %q (driver %q) does not support %s.%s", providerID, driver, capability, operation)
+	}
+	return nil
 }
 
 func copyProviders(in map[string]ProviderConfig) map[string]ProviderConfig {
@@ -231,8 +303,8 @@ func copyProviders(in map[string]ProviderConfig) map[string]ProviderConfig {
 	return out
 }
 
-func copyRoutes(in map[string]string) map[string]string {
-	out := make(map[string]string, len(in))
+func copyRouteMap(in map[string]any) map[string]any {
+	out := make(map[string]any, len(in))
 	for k, v := range in {
 		out[k] = v
 	}

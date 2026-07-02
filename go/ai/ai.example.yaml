@@ -1,5 +1,4 @@
-# AI block — provider routing for translation, chat, and Solidia workflows.
-# Wire via main config ai: node (see appkit/go/ai).
+# AI block — operation-level provider routing.
 
 enabled: true
 
@@ -11,7 +10,15 @@ providers:
     default_model: gpt-4o-mini
     timeout: 30s
 
+  local:
+    driver: local
+
 routes:
-  translation: openai
-  chat: openai
-  chat_translation: openai
+  translation:
+    default: openai
+    operations:
+      detect: local
+      translate: openai
+
+  chat:
+    default: openai

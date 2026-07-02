@@ -21,30 +21,56 @@ func testAIConfig(t *testing.T) AIConfig {
 				BaseURL:      "https://example.test/v1",
 				DefaultModel: "gpt-4o-mini",
 			},
+			"local": {
+				Driver: "local",
+			},
 		},
-		Routes: map[string]string{
-			"translation":      "openai",
-			"chat":             "openai",
-			"chat_translation": "openai",
+		Routes: map[string]any{
+			"translation": map[string]any{
+				"default": "openai",
+				"operations": map[string]any{
+					"detect": "local",
+				},
+			},
+			"chat": map[string]any{
+				"default": "openai",
+			},
 		},
 	}
 }
 
 func TestAIConfigRequiresTranslationRoute(t *testing.T) {
 	cfg := testAIConfig(t)
-	delete(cfg.Routes, "translation")
+	cfg.Routes = map[string]any{
+		"chat": map[string]any{"default": "openai"},
+	}
 
 	if err := cfg.Validate(); err == nil {
-		t.Fatal("expected validation error for missing translation route")
+		t.Fatal("expected validation error for missing translation.translate route")
 	}
 }
 
-func TestAIConfigRequiresAPIKey(t *testing.T) {
+func TestAIConfigRequiresAPIKeyForOpenAI(t *testing.T) {
 	os.Unsetenv("OPENAI_API_KEY")
 	cfg := testAIConfig(t)
 
 	if err := cfg.Validate(); err == nil {
 		t.Fatal("expected validation error for missing api key")
+	}
+}
+
+func TestAIConfigRejectsUnsupportedOperationRoute(t *testing.T) {
+	cfg := testAIConfig(t)
+	cfg.Routes = map[string]any{
+		"translation": map[string]any{
+			"operations": map[string]any{
+				"translate": "local",
+			},
+		},
+	}
+
+	if err := cfg.Validate(); err == nil {
+		t.Fatal("expected validation error when local is routed for translate")
 	}
 }
 
@@ -70,7 +96,7 @@ func TestServiceTranslate(t *testing.T) {
 		t.Fatalf("NewService: %v", err)
 	}
 
-	resp, err := svc.Translate(context.Background(), TranslateRequest{
+	resp, err := svc.Translation().Translate(context.Background(), TranslateRequest{
 		Text:           "Olá",
 		TargetLanguage: "en",
 	})
@@ -85,6 +111,31 @@ func TestServiceTranslate(t *testing.T) {
 	}
 }
 
+func TestServiceDetectUsesLocalRoute(t *testing.T) {
+	cfg := testAIConfig(t)
+	cfg.Providers["openai"] = ProviderConfig{
+		Driver:       "openai",
+		BaseURL:      "https://example.test/v1",
+		DefaultModel: "gpt-4o-mini",
+	}
+
+	svc, err := NewService(cfg)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	resp, err := svc.Translation().Detect(context.Background(), "Hello world")
+	if err != nil {
+		t.Fatalf("Detect: %v", err)
+	}
+	if resp.Provider != "local" {
+		t.Fatalf("expected local provider, got %q", resp.Provider)
+	}
+	if resp.Language == "" {
+		t.Fatal("expected language code")
+	}
+}
+
 func TestWireDisabled(t *testing.T) {
 	svc, err := Wire(context.Background(), AIConfig{Enabled: false}, WireOptions{})
 	if err != nil {
@@ -95,11 +146,37 @@ func TestWireDisabled(t *testing.T) {
 	}
 }
 
-func TestParseServiceType(t *testing.T) {
-	if _, err := ParseServiceType("translation"); err != nil {
+func TestParseRouteMapLegacyShorthand(t *testing.T) {
+	table, err := ParseRouteMap(map[string]any{
+		"translation": "openai",
+		"chat":        "openai",
+	})
+	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := ParseServiceType("nope"); err == nil {
-		t.Fatal("expected error")
+	if providerID, ok := table.resolve(CapabilityTranslation, OpTranslate); !ok || providerID != "openai" {
+		t.Fatalf("translate route: got %q ok=%v", providerID, ok)
+	}
+}
+
+func TestRouteSummary(t *testing.T) {
+	cfg := testAIConfig(t)
+	cfg.Providers["openai"] = ProviderConfig{
+		Driver:       "openai",
+		BaseURL:      "https://example.test/v1",
+		DefaultModel: "gpt-4o-mini",
+	}
+
+	svc, err := NewService(cfg)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	summary := svc.RouteSummary()
+	if summary["translation.detect"] != "local" {
+		t.Fatalf("unexpected summary: %#v", summary)
+	}
+	if summary["translation.default"] != "openai" {
+		t.Fatalf("unexpected summary: %#v", summary)
 	}
 }

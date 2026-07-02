@@ -6,6 +6,9 @@ node_modules/
 dist/
 **/dist/
 
+# Local smoke-test secrets
+go/ai/cmd/smoke/secret.yaml
+
 # IDE / OS
 .idea/
 .vscode/

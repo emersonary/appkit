@@ -28,24 +28,31 @@ var (
 		Kind:    apperror.KindValidation,
 	}
 
-	ErrServiceNotRouted = apperror.Error{
-		Code:    "AI_SERVICE_NOT_ROUTED",
+	ErrOperationNotRouted = apperror.Error{
+		Code:    "AI_OPERATION_NOT_ROUTED",
 		Domain:  "ai",
-		Message: "ai service type is not routed to a provider",
+		Message: "ai capability operation is not routed to a provider",
 		Kind:    apperror.KindValidation,
 	}
 
-	ErrNotImplemented = apperror.Error{
-		Code:    "AI_NOT_IMPLEMENTED",
+	ErrOperationNotSupported = apperror.Error{
+		Code:    "AI_OPERATION_NOT_SUPPORTED",
 		Domain:  "ai",
-		Message: "ai operation is not implemented for this provider",
+		Message: "ai provider does not support this capability operation",
 		Kind:    apperror.KindValidation,
 	}
 
-	ErrTranslateFailed = apperror.Error{
-		Code:    "AI_TRANSLATE_FAILED",
+	ErrCompletionFailed = apperror.Error{
+		Code:    "AI_COMPLETION_FAILED",
 		Domain:  "ai",
-		Message: "translation request failed",
+		Message: "ai completion request failed",
+		Kind:    apperror.KindInternal,
+	}
+
+	ErrDetectFailed = apperror.Error{
+		Code:    "AI_DETECT_FAILED",
+		Domain:  "ai",
+		Message: "language detection failed",
 		Kind:    apperror.KindInternal,
 	}
 
