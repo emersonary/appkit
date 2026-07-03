@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/emersonary/appkit/accounts"
-	appkitconfig "github.com/emersonary/appkit/config"
 	"github.com/emersonary/appkit/ai"
+	appkitconfig "github.com/emersonary/appkit/config"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
@@ -15,8 +15,10 @@ import (
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
+	"github.com/emersonary/appkit/weather"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -29,6 +31,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	Logger        *zap.Logger
 	Pool          *pgxpool.Pool
 	NATS          *nats.Conn
+	Redis         *redis.Client
 	HealthHandler *health.Handler
 	Accounts      *accounts.Service
 	Tenants       *tenants.Service
@@ -37,6 +40,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	AI            *ai.Service
 	Permissions   *permissions.Service
 	Menu          *menu.Service
+	Weather       *weather.Service
 	Email         *email.Handler
 
 	httpServer   *http.Server
@@ -73,6 +77,13 @@ func New[T appkitconfig.AppConfig](ctx context.Context, cfg T, opts Options[T]) 
 
 	if base.NATS.URL != "" {
 		if err := app.createNATSConnection(base.NATS.URL); err != nil {
+			app.Shutdown(context.Background())
+			return nil, err
+		}
+	}
+
+	if base.Redis.Enabled {
+		if err := app.createRedisConnection(ctx); err != nil {
 			app.Shutdown(context.Background())
 			return nil, err
 		}
@@ -166,6 +177,12 @@ func (a *Application[T]) Shutdown(ctx context.Context) error {
 	if a.NATS != nil {
 		a.NATS.Close()
 		a.NATS = nil
+	}
+	if a.Redis != nil {
+		if err := a.Redis.Close(); err != nil && shutdownErr == nil {
+			shutdownErr = err
+		}
+		a.Redis = nil
 	}
 	if a.Pool != nil {
 		a.Pool.Close()

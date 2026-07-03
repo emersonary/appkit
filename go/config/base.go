@@ -52,6 +52,13 @@ type NATS struct {
 	URL string `mapstructure:"url" json:"url"`
 }
 
+type Redis struct {
+	Enabled  bool   `mapstructure:"enabled" json:"enabled"`
+	Addr     string `mapstructure:"addr" json:"addr"`
+	Password string `mapstructure:"password" json:"-"`
+	DB       int    `mapstructure:"db" json:"db"`
+}
+
 type Migrations struct {
 	Path string `mapstructure:"path" json:"path"`
 }
@@ -64,6 +71,7 @@ type BaseConfig struct {
 	Server     Server           `mapstructure:"server" json:"server"`
 	Database   Database         `mapstructure:"database" json:"database"`
 	NATS       NATS             `mapstructure:"nats" json:"nats"`
+	Redis      Redis            `mapstructure:"redis" json:"redis"`
 	Migrations Migrations       `mapstructure:"migrations" json:"migrations"`
 	Blocks     `mapstructure:",squash"`
 }
@@ -94,6 +102,9 @@ func (b *BaseConfig) ApplyDefaults(defaultAppName string) {
 	}
 	if b.NATS.URL == "" {
 		b.NATS.URL = "nats://localhost:4222"
+	}
+	if b.Redis.Enabled && b.Redis.Addr == "" {
+		b.Redis.Addr = "localhost:6379"
 	}
 	if b.Log.Level == "" {
 		b.Log.Level = "info"

@@ -11,6 +11,7 @@ import (
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
+	"github.com/emersonary/appkit/weather"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 )
@@ -22,7 +23,7 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.Weather.Enabled {
 		return nil
 	}
 
@@ -144,6 +145,26 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		if svc != nil {
 			a.Logger.Info("ai block enabled",
 				zap.Any("routes", svc.RouteSummary()),
+			)
+		}
+	}
+
+	if base.Weather.Enabled {
+		workerCtx, _ := a.RegisterWorker()
+		svc, err := weather.Wire(ctx, base.Weather, weather.WireOptions{
+			Redis:     a.Redis,
+			Logger:    a.Logger.Named("weather"),
+			WorkerCtx: workerCtx,
+		})
+		if err != nil {
+			a.stopWorkers()
+			return err
+		}
+		a.Weather = svc
+		if svc != nil {
+			a.Logger.Info("weather block enabled",
+				zap.String("key_prefix", svc.Config().KeyPrefix),
+				zap.Duration("refresh_interval", svc.Config().RefreshInterval),
 			)
 		}
 	}

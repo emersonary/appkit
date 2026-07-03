@@ -9,6 +9,7 @@ import (
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
+	"github.com/emersonary/appkit/weather"
 )
 
 // Blocks holds optional appkit block configs from the main YAML file.
@@ -20,6 +21,7 @@ type Blocks struct {
 	Permissions      permissions.SetupInput   `mapstructure:"permissions" json:"permissions"`
 	Menu             menu.AppConfig           `mapstructure:"menu" json:"menu"`
 	AI               ai.AIConfig              `mapstructure:"ai" json:"ai"`
+	Weather          weather.AppConfig        `mapstructure:"weather" json:"weather"`
 	Email            email.Config             `mapstructure:"email" json:"email"`
 	MailProvisioning email.ProvisioningConfig `mapstructure:"mail_provisioning" json:"mail_provisioning"`
 }

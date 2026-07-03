@@ -30,6 +30,11 @@
   "nats": {
     "url": "nats://localhost:4222"
   },
+  "redis": {
+    "enabled": false,
+    "addr": "localhost:6379",
+    "db": 0
+  },
   "migrations": {
     "path": "db/migrations"
   },
@@ -117,6 +122,21 @@
     "enabled": false,
     "providers": null,
     "routes": null
+  },
+  "weather": {
+    "enabled": false,
+    "key_prefix": "weather:openmeteo:jeri",
+    "refresh_interval": 3600000000000,
+    "cache_ttl": 864000000000000,
+    "low_wind_max_knots": 12,
+    "open_meteo": {
+      "base_url": "https://api.open-meteo.com/v1/forecast",
+      "latitude": -2.795,
+      "longitude": -40.514,
+      "forecast_days": 7,
+      "wind_speed_unit": "kn",
+      "timezone": "auto"
+    }
   },
   "email": {
     "from": "noreply@example.com",
