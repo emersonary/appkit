@@ -73,7 +73,12 @@ func buildWindSlot(day DayForecast, window windSlotWindow) WindSlot {
 			continue
 		}
 
-		speed := hour.Wind10m.SpeedKnots
+		speed := EstimateWindGuru(
+			hour.Wind10m.SpeedKnots,
+			hour.Wind80m.SpeedKnots,
+			hour.Wind120m.SpeedKnots,
+			hour.Wind180m.SpeedKnots,
+		)
 		if speed < minKnots {
 			minKnots = speed
 		}

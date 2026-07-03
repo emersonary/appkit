@@ -12,16 +12,22 @@ func TestBuildWindSlotsAggregatesMinMaxDirectionAndStars(t *testing.T) {
 		UpdatedAt: time.Date(2026, 7, 3, 14, 0, 0, 0, time.UTC),
 		LowWindHours: []LowWindHour{
 			{
-				Time:    time.Date(2026, 7, 3, 6, 0, 0, 0, loc),
-				Wind10m: WindSample{SpeedKnots: 11, DirectionDeg: 90},
+				Time:     time.Date(2026, 7, 3, 6, 0, 0, 0, loc),
+				Wind10m:  WindSample{SpeedKnots: 11, DirectionDeg: 90},
+				Wind80m:  WindSample{SpeedKnots: 12},
+				Wind120m: WindSample{SpeedKnots: 14},
 			},
 			{
-				Time:    time.Date(2026, 7, 3, 7, 0, 0, 0, loc),
-				Wind10m: WindSample{SpeedKnots: 14, DirectionDeg: 100},
+				Time:     time.Date(2026, 7, 3, 7, 0, 0, 0, loc),
+				Wind10m:  WindSample{SpeedKnots: 14, DirectionDeg: 100},
+				Wind80m:  WindSample{SpeedKnots: 16},
+				Wind120m: WindSample{SpeedKnots: 18},
 			},
 			{
-				Time:    time.Date(2026, 7, 3, 8, 0, 0, 0, loc),
-				Wind10m: WindSample{SpeedKnots: 12, DirectionDeg: 110},
+				Time:     time.Date(2026, 7, 3, 8, 0, 0, 0, loc),
+				Wind10m:  WindSample{SpeedKnots: 12, DirectionDeg: 110},
+				Wind80m:  WindSample{SpeedKnots: 14},
+				Wind120m: WindSample{SpeedKnots: 16},
 			},
 		},
 	}
@@ -31,7 +37,7 @@ func TestBuildWindSlotsAggregatesMinMaxDirectionAndStars(t *testing.T) {
 		t.Fatalf("expected 4 slots, got %d", len(forecast.Slots))
 	}
 	morning := forecast.Slots[0]
-	if morning.MinKnots != 11 || morning.MaxKnots != 14 {
+	if morning.MinKnots != 12.7 || morning.MaxKnots != 16.7 {
 		t.Fatalf("unexpected min/max: %+v", morning)
 	}
 	if morning.DirectionCompass != "E" {
