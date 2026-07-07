@@ -1,0 +1,27 @@
+{
+  "name": "@emersonary/appkit-shell",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "App shell loading state for AppKit menu navigation and page content",
+  "scripts": {
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./shell.css": "./src/shell.css"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "next": "^15.3.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "typescript": "~5.8.3"
+  }
+}
