@@ -1,0 +1,176 @@
+.appkit-resource-list,
+.appkit-resource-form {
+  color: #172033;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.appkit-resource-list__header,
+.appkit-resource-form__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.appkit-resource-list__header h1,
+.appkit-resource-form__title {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.appkit-resource-list__header p,
+.appkit-resource-form__description,
+.appkit-resource-form__section-head p {
+  color: #667085;
+  margin: 0.25rem 0 0;
+}
+
+.appkit-resource-list__count,
+.appkit-resource-form__eyebrow {
+  color: #667085;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.appkit-resource-table-wrap {
+  border: 1px solid #e4e7ec;
+  border-radius: 0.9rem;
+  overflow: auto;
+}
+
+.appkit-resource-table {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.appkit-resource-table th,
+.appkit-resource-table td {
+  border-bottom: 1px solid #eef2f6;
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.appkit-resource-table th {
+  background: #f8fafc;
+  color: #475467;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.appkit-resource-table__row:hover {
+  background: #f9fbff;
+}
+
+.appkit-resource-table__actions {
+  text-align: right;
+}
+
+.appkit-resource-tree-cell {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.appkit-resource-tree-toggle,
+.appkit-resource-tree-spacer {
+  align-items: center;
+  display: inline-flex;
+  height: 1.3rem;
+  justify-content: center;
+  width: 1.3rem;
+}
+
+.appkit-resource-tree-toggle {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  color: #344054;
+  cursor: pointer;
+}
+
+.appkit-resource-form__section {
+  border: 1px solid #e4e7ec;
+  border-radius: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.appkit-resource-form__section-head h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.appkit-resource-form__fields {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 1rem;
+}
+
+.appkit-resource-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.appkit-resource-field__label {
+  color: #344054;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.appkit-resource-field__control {
+  border: 1px solid #d0d5dd;
+  border-radius: 0.55rem;
+  font: inherit;
+  padding: 0.62rem 0.72rem;
+}
+
+.appkit-resource-field__checkbox {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.appkit-resource-field__help {
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.appkit-resource-form__actions,
+.appkit-resource-list__pager {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.appkit-resource-button {
+  background: #1d4ed8;
+  border: 1px solid #1d4ed8;
+  border-radius: 0.55rem;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem 0.85rem;
+}
+
+.appkit-resource-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.appkit-resource-button--ghost {
+  background: #fff;
+  border-color: #d0d5dd;
+  color: #344054;
+}
