@@ -5,6 +5,9 @@ export {
   resolveActiveMenuItem,
   matchesMenuRoute,
   firstMenuItemRoute,
+  flattenMenuItems,
+  collectAllMenuRoutes,
+  normalizeMenuPath,
 } from "./routes";
 export type {
   GetMenuResponse,

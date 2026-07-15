@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useAccountsConfig } from './context';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingButtonContent } from './LoadingButtonContent';
 import type { AccountsClassNames, AccountsUILabels } from './types';
 
 export type VerifyEmailPageProps = {
@@ -141,7 +141,7 @@ export function VerifyEmailPage({
           disabled={isSending}
           aria-busy={isSending}
         >
-          {isSending ? <LoadingSpinner label={labels.sending} size="sm" /> : labels.verifyEmailResend}
+          {isSending ? <LoadingButtonContent label={labels.sending} /> : labels.verifyEmailResend}
         </button>
       )}
       <p className="appkit-login-workflow__back-row">

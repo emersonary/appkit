@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS ` + accounts + ` (
 );
 
 ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS id_profile TEXT;
+ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS language TEXT;
 
 CREATE TABLE IF NOT EXISTS ` + oauth + ` (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -2,7 +2,7 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import { useAccountsConfig } from './context';
 import { FieldLabel } from './FieldLabel';
 import { FieldIcon } from './fieldIcons';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingButtonContent } from './LoadingButtonContent';
 import type { AccountsClassNames, AccountsUILabels } from './types';
 
 export type ForgotPasswordPageProps = {
@@ -85,7 +85,7 @@ export function ForgotPasswordPage({
           />
         </div>
         <button className={classNames.submit} type="submit" disabled={isSending} aria-busy={isSending}>
-          {isSending ? <LoadingSpinner label={labels.sending} size="sm" /> : labels.forgotPasswordSubmit}
+          {isSending ? <LoadingButtonContent label={labels.sending} /> : labels.forgotPasswordSubmit}
         </button>
       </form>
       <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>

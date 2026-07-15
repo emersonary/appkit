@@ -24,7 +24,7 @@ const (
 	FieldTypeDateTime FieldType = "datetime"
 	FieldTypeEnum     FieldType = "enum"
 	FieldTypeRelation FieldType = "relation"
-	FieldTypeJSON     FieldType = "json"
+	FieldTypeObject   FieldType = "object"
 )
 
 type FieldOption struct {

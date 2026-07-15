@@ -1,0 +1,590 @@
+.appkit-resource-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-form__description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-form__error {
+  border: 1px solid color-mix(in srgb, var(--appkit-resource-edit-danger, #ef4444) 30%, transparent);
+  background: color-mix(in srgb, var(--appkit-resource-edit-danger, #ef4444) 10%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-danger-text, #fecaca);
+}
+
+.appkit-resource-edit-form__section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--appkit-resource-edit-muted, #667085);
+  margin: 0;
+}
+
+.appkit-resource-edit-form__grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.appkit-resource-edit-form__grid--two-col {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .appkit-resource-edit-form__grid--two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .appkit-resource-edit-form__field--wide {
+    grid-column: span 2;
+  }
+}
+
+.appkit-resource-edit-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-label__required {
+  color: var(--appkit-resource-edit-accent, #10b981);
+}
+
+.appkit-resource-edit-field {
+  margin-top: 0.375rem;
+  width: 100%;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  border-radius: 0.5rem;
+  background: var(--appkit-resource-edit-field-bg, #fff);
+  color: var(--appkit-resource-edit-text, #172033);
+  padding: 0.625rem 0.75rem;
+  font: inherit;
+}
+
+.appkit-resource-edit-field:focus {
+  outline: none;
+  border-color: var(--appkit-resource-edit-accent, #10b981);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--appkit-resource-edit-accent, #10b981) 22%, transparent);
+}
+
+.appkit-resource-edit-field--readonly {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+.appkit-resource-edit-field--textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.appkit-resource-edit-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-checkbox__input {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  accent-color: var(--appkit-resource-edit-accent, #10b981);
+}
+
+.appkit-resource-edit-checkbox__input--list {
+  opacity: 1;
+  cursor: default;
+  pointer-events: none;
+  accent-color: var(--appkit-resource-edit-accent, #10b981);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-help {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-error {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--appkit-resource-edit-danger-text, #fca5a5);
+}
+
+.appkit-resource-edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.appkit-resource-edit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.appkit-resource-edit-button--primary {
+  background: var(--appkit-resource-edit-accent, #10b981);
+  color: var(--appkit-resource-edit-on-accent, #09090b);
+}
+
+.appkit-resource-edit-button--secondary {
+  background: var(--appkit-resource-edit-field-bg, #fff);
+  border-color: var(--appkit-resource-edit-border, #d0d5dd);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-button__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 999px;
+  animation: appkit-resource-edit-spin 0.8s linear infinite;
+}
+
+@keyframes appkit-resource-edit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.appkit-resource-edit-image {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.375rem;
+  min-height: 2.5rem;
+}
+
+.appkit-resource-edit-image__preview {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  object-fit: contain;
+  background: var(--appkit-resource-edit-field-bg, #fff);
+}
+
+.appkit-resource-edit-image__file {
+  display: none;
+}
+
+.appkit-resource-edit-image__remove {
+  font-size: 0.75rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.appkit-resource-edit-location {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.appkit-resource-edit-location__coords {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .appkit-resource-edit-location__coords {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.appkit-resource-edit-location__coord-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-location__map {
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+}
+
+.appkit-resource-edit-location__map iframe {
+  width: 100%;
+  height: 14rem;
+  border: 0;
+}
+
+.appkit-resource-edit-location__placeholder {
+  border-radius: 0.5rem;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  background: var(--appkit-resource-edit-surface, #f8fafc);
+  padding: 1rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-related {
+  border-radius: 0.75rem;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 40%, transparent);
+  padding: 1rem;
+}
+
+.appkit-resource-edit-related__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--appkit-resource-edit-muted, #667085);
+  margin: 0;
+}
+
+.appkit-resource-edit-related__list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.appkit-resource-edit-related__list > li + li {
+  border-top: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+}
+
+.appkit-resource-edit-related__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.appkit-resource-edit-related__link:hover .appkit-resource-edit-related__label {
+  color: var(--appkit-resource-edit-accent, #10b981);
+}
+
+.appkit-resource-edit-related__icon {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: var(--appkit-resource-edit-field-bg, #fff);
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-related__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.appkit-resource-edit-related__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-related__description {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-related__chevron {
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.appkit-resource-edit-form__submit {
+  margin-left: auto;
+}
+
+.appkit-resource-edit-form__back-top {
+  margin-top: -0.5rem;
+}
+
+.appkit-resource-edit-button--ghost {
+  background: transparent;
+  border-color: var(--appkit-resource-edit-border, #d0d5dd);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-button__back-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.appkit-resource-edit-button__back-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.appkit-resource-edit-view__error {
+  border: 1px solid color-mix(in srgb, var(--appkit-resource-edit-danger, #ef4444) 30%, transparent);
+  background: color-mix(in srgb, var(--appkit-resource-edit-danger, #ef4444) 10%, transparent);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-danger-text, #fecaca);
+}
+
+.appkit-resource-edit-button--sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.appkit-resource-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.appkit-resource-edit-list__description {
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-list__create {
+  flex-shrink: 0;
+}
+
+.appkit-resource-edit-list__status {
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-list__empty {
+  border: 1px dashed var(--appkit-resource-edit-border, #d0d5dd);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 40%, transparent);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.appkit-resource-edit-list__empty-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.appkit-resource-edit-list__empty-description {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-list__empty-action {
+  margin-top: 1rem;
+}
+
+.appkit-resource-edit-list__table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  border-radius: 0.75rem;
+}
+
+.appkit-resource-edit-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.appkit-resource-edit-list__head {
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 60%, transparent);
+}
+
+.appkit-resource-edit-list__th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-list__th--bool {
+  text-align: center;
+}
+
+.appkit-resource-edit-list__th--actions {
+  text-align: left;
+}
+
+.appkit-resource-edit-list__row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.appkit-resource-edit-list__row--bordered {
+  border-bottom: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+}
+
+.appkit-resource-edit-list__row--selected {
+  background: color-mix(in srgb, var(--appkit-resource-edit-accent, #10b981) 25%, transparent);
+  border-left-color: var(--appkit-resource-edit-accent, #10b981);
+}
+
+.appkit-resource-edit-list__row:not(.appkit-resource-edit-list__row--selected):hover {
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 40%, transparent);
+}
+
+.appkit-resource-edit-list__td {
+  padding: 0.75rem 1rem;
+  color: var(--appkit-resource-edit-muted, #667085);
+}
+
+.appkit-resource-edit-list__td--primary {
+  font-weight: 500;
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-list__td--bool {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.appkit-resource-edit-list__bool-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.appkit-resource-edit-list__td--bool .appkit-resource-edit-checkbox__input--list {
+  display: block;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.appkit-resource-edit-list__td--actions {
+  text-align: left;
+}
+
+.appkit-resource-edit-list__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+.appkit-resource-edit-list__menu-root {
+  position: relative;
+}
+
+.appkit-resource-edit-list__menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--appkit-resource-edit-muted, #667085);
+  cursor: pointer;
+}
+
+.appkit-resource-edit-list__menu-trigger:hover {
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 70%, transparent);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-list__menu-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.appkit-resource-edit-list__menu {
+  position: fixed;
+  z-index: 50;
+  overflow: hidden;
+  border: 1px solid var(--appkit-resource-edit-border, #d0d5dd);
+  border-radius: 0.5rem;
+  background: var(--appkit-resource-edit-field-bg, #fff);
+  padding: 0.25rem;
+  box-shadow: 0 10px 25px rgb(15 23 42 / 0.12);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-list__menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--appkit-resource-edit-text, #172033);
+  cursor: pointer;
+}
+
+.appkit-resource-edit-list__menu-item:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--appkit-resource-edit-surface, #f8fafc) 85%, var(--appkit-resource-edit-text, #172033) 8%);
+  color: var(--appkit-resource-edit-text, #172033);
+}
+
+.appkit-resource-edit-list__menu-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.appkit-resource-edit-list__menu-item--danger {
+  color: var(--appkit-resource-edit-danger-text, #fca5a5);
+}
+
+.appkit-resource-edit-list__menu-item--danger:hover {
+  background: color-mix(in srgb, var(--appkit-resource-edit-danger, #ef4444) 10%, transparent);
+}
+
+.appkit-resource-edit-list__menu-item-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.appkit-resource-edit-list__menu-item-icon svg {
+  width: 100%;
+  height: 100%;
+}

@@ -33,6 +33,14 @@ function defaultClassifyResetError(err: unknown): string | null {
   return 'generic';
 }
 
+function browserLanguage(): string | undefined {
+  if (typeof navigator === 'undefined') {
+    return undefined;
+  }
+  const code = navigator.language.split('-')[0]?.toLowerCase();
+  return code || undefined;
+}
+
 export function useLoginWorkflowHandlers({
   apiBaseUrl = '',
   onAccountError,
@@ -68,7 +76,7 @@ export function useLoginWorkflowHandlers({
 
   const onRegister = useCallback(
     (email: string, password: string, firstName: string, lastName?: string) =>
-      wrap(() => register(email, password, firstName, lastName)),
+      wrap(() => register(email, password, firstName, lastName, browserLanguage())),
     [register, wrap],
   );
 

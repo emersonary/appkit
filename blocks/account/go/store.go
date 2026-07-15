@@ -49,16 +49,16 @@ func (s *Store) accountTenantsTable() string {
 }
 
 func (s *Store) selectColumns() string {
-	return `id, email, password_hash, first_name, last_name, avatar_url, email_verified_at, is_admin, id_profile, created_at, updated_at`
+	return `id, email, password_hash, first_name, last_name, avatar_url, email_verified_at, is_admin, id_profile, language, created_at, updated_at`
 }
 
-func (s *Store) Create(ctx context.Context, email, passwordHash string, firstName, lastName *string, emailVerified, isAdmin bool) (Account, error) {
+func (s *Store) Create(ctx context.Context, email, passwordHash string, firstName, lastName, language *string, emailVerified, isAdmin bool) (Account, error) {
 	email = strings.ToLower(strings.TrimSpace(email))
 	row := s.db.QueryRowContext(ctx, `
-		INSERT INTO `+s.accountsTable()+` (email, password_hash, first_name, last_name, email_verified_at, is_admin)
-		VALUES ($1, NULLIF($2, ''), $3, $4, CASE WHEN $5 THEN NOW() ELSE NULL END, $6)
+		INSERT INTO `+s.accountsTable()+` (email, password_hash, first_name, last_name, email_verified_at, is_admin, language)
+		VALUES ($1, NULLIF($2, ''), $3, $4, CASE WHEN $5 THEN NOW() ELSE NULL END, $6, $7)
 		RETURNING `+s.selectColumns()+`
-	`, email, passwordHash, firstName, lastName, emailVerified, isAdmin)
+	`, email, passwordHash, firstName, lastName, emailVerified, isAdmin, language)
 	return scanAccount(row)
 }
 
@@ -100,14 +100,13 @@ func (s *Store) FindOrCreateOAuthAccount(
 
 	var account Account
 	err = tx.QueryRowContext(ctx, `
-		SELECT a.id, a.email, a.password_hash, a.first_name, a.last_name, a.avatar_url, a.email_verified_at,
-		       a.is_admin, a.created_at, a.updated_at
+		SELECT `+s.selectColumns()+`
 		FROM `+s.oauthTable()+` o
 		JOIN `+s.accountsTable()+` a ON a.id = o.account_id
 		WHERE o.provider = $1 AND o.provider_user_id = $2
 	`, provider, providerUserID).Scan(
 		&account.ID, &account.Email, &account.PasswordHash, &account.FirstName, &account.LastName, &account.AvatarURL,
-		&account.EmailVerifiedAt, &account.IsAdmin, &account.CreatedAt, &account.UpdatedAt,
+		&account.EmailVerifiedAt, &account.IsAdmin, &account.IDProfile, &account.Language, &account.CreatedAt, &account.UpdatedAt,
 	)
 	if err == nil {
 		account, err = refreshOAuthProfile(ctx, tx, s, account, firstName, lastName, avatarURL)
@@ -129,7 +128,7 @@ func (s *Store) FindOrCreateOAuthAccount(
 		FROM `+s.accountsTable()+` WHERE email = $1
 	`, email).Scan(
 		&account.ID, &account.Email, &account.PasswordHash, &account.FirstName, &account.LastName, &account.AvatarURL,
-		&account.EmailVerifiedAt, &account.IsAdmin, &account.CreatedAt, &account.UpdatedAt,
+		&account.EmailVerifiedAt, &account.IsAdmin, &account.IDProfile, &account.Language, &account.CreatedAt, &account.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = tx.QueryRowContext(ctx, `
@@ -138,7 +137,7 @@ func (s *Store) FindOrCreateOAuthAccount(
 			RETURNING `+s.selectColumns()+`
 		`, email, firstName, lastName, avatarURL).Scan(
 			&account.ID, &account.Email, &account.PasswordHash, &account.FirstName, &account.LastName, &account.AvatarURL,
-			&account.EmailVerifiedAt, &account.IsAdmin, &account.CreatedAt, &account.UpdatedAt,
+			&account.EmailVerifiedAt, &account.IsAdmin, &account.IDProfile, &account.Language, &account.CreatedAt, &account.UpdatedAt,
 		)
 	} else if err == nil {
 		account, err = refreshOAuthProfile(ctx, tx, s, account, firstName, lastName, avatarURL)
@@ -204,7 +203,7 @@ func refreshOAuthProfile(
 		RETURNING `+s.selectColumns()+`
 	`, account.ID, firstName, lastName, avatarURL).Scan(
 		&account.ID, &account.Email, &account.PasswordHash, &account.FirstName, &account.LastName, &account.AvatarURL,
-		&account.EmailVerifiedAt, &account.IsAdmin, &account.CreatedAt, &account.UpdatedAt,
+		&account.EmailVerifiedAt, &account.IsAdmin, &account.IDProfile, &account.Language, &account.CreatedAt, &account.UpdatedAt,
 	)
 	if err != nil {
 		return Account{}, fmt.Errorf("refresh oauth profile: %w", err)
@@ -350,6 +349,7 @@ func scanAccount(row *sql.Row) (Account, error) {
 		&account.EmailVerifiedAt,
 		&account.IsAdmin,
 		&account.IDProfile,
+		&account.Language,
 		&account.CreatedAt,
 		&account.UpdatedAt,
 	)

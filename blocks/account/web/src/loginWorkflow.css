@@ -65,6 +65,14 @@
   border-color: var(--appkit-account-primary, #5c2438);
 }
 
+.appkit-login-workflow__tab:disabled {
+  cursor: default;
+}
+
+.appkit-login-workflow__tab.active:disabled {
+  opacity: 1;
+}
+
 .appkit-login-workflow__divider {
   text-align: center;
   margin: 1.25rem 0 0.75rem;
@@ -107,15 +115,3 @@
   margin-top: 1.5rem;
 }
 
-.appkit-login-workflow__form--register {
-  position: relative;
-}
-
-.appkit-login-workflow__autofill-trap {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}

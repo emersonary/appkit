@@ -1,7 +1,17 @@
+/**
+ * Schema-driven resource edit (protobuf ResourceEditResponse contract).
+ * Primary API for host apps like Solidia Command Center.
+ */
+export * from "./edit";
+
+/**
+ * Legacy registry-driven list/edit UI (FieldType schema).
+ * Prefer the edit exports above for new work.
+ */
 export { FieldRenderer, type FieldRendererProps } from "./FieldRenderer";
 export {
-  ResourceEdit,
-  type ResourceEditProps,
+  ResourceEdit as LegacyRegistryResourceEdit,
+  type ResourceEditProps as LegacyRegistryResourceEditProps,
   type ResourceFieldInterceptProps,
 } from "./ResourceEdit";
 export {
@@ -11,10 +21,10 @@ export {
   type ResourceRowAction,
 } from "./ResourceList";
 export {
-  ResourceListAndEdit,
-  type ResourceEditConfig,
-  type ResourceListAndEditActions,
-  type ResourceListAndEditProps,
+  ResourceListAndEdit as LegacyRegistryResourceListAndEdit,
+  type ResourceEditConfig as LegacyRegistryResourceEditConfig,
+  type ResourceListAndEditActions as LegacyRegistryResourceListAndEditActions,
+  type ResourceListAndEditProps as LegacyRegistryResourceListAndEditProps,
 } from "./ResourceListAndEdit";
 export {
   fieldByKey,
@@ -32,13 +42,13 @@ export type {
   Relation,
   ResourceClient,
   ResourceColumn,
-  ResourceEditMode,
-  ResourceField,
+  ResourceField as LegacyResourceField,
   ResourceFormSection,
   ResourceFormView,
+  ResourceEditMode,
   ResourceItem,
   ResourceListResponse,
   ResourceListView,
-  ResourceSchema,
+  ResourceSchema as LegacyResourceSchema,
   TreeConfig,
 } from "./types";

@@ -15,6 +15,7 @@ export type AccountsSessionContextValue = {
     password: string,
     firstName: string,
     lastName?: string,
+    language?: string,
   ) => Promise<{ verificationRequired: boolean; email: string }>;
   logout: () => Promise<void>;
   completeOAuthLogin: (accessToken: string) => Promise<void>;
@@ -93,10 +94,10 @@ export function AccountsProvider({
   );
 
   const register = useCallback(
-    async (email: string, password: string, firstName: string, lastName?: string) => {
+    async (email: string, password: string, firstName: string, lastName?: string, language?: string) => {
       setIsLoading(true);
       try {
-        const result = await accountClient.register(email, password, firstName, lastName);
+        const result = await accountClient.register(email, password, firstName, lastName, language);
         if (!result.verificationRequired) {
           await refreshSession();
         } else {

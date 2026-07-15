@@ -9,11 +9,11 @@ import (
 	"github.com/emersonary/appkit/ai"
 	appkitconfig "github.com/emersonary/appkit/config"
 	"github.com/emersonary/appkit/currency"
-	"github.com/emersonary/appkit/dbhist"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
+	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -38,8 +38,9 @@ type Application[T appkitconfig.AppConfig] struct {
 	grpcListener net.Listener
 	wsServer     *http.Server
 
-	workerCancels []context.CancelFunc
-	wireShutdown  WireShutdownFunc[T]
+	workerCancels  []context.CancelFunc
+	wireShutdown   WireShutdownFunc[T]
+	migrationsWire MigrationsWireFunc[T]
 
 	Health      *health.Service
 	Accounts    *accounts.Service
@@ -50,7 +51,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	Permissions *permissions.Service
 	Menu        *menu.Service
 	Email       *email.Service
-	DBHist      *dbhist.Service
+	DBHist      *migrate.Service
 }
 
 // Base returns the embedded appkit infra config from the product config.
@@ -61,8 +62,9 @@ func (a *Application[T]) Base() *appkitconfig.BaseConfig {
 // New builds logger, database, messaging, health, product services, and transport.
 func New[T appkitconfig.AppConfig](ctx context.Context, cfg T, opts Options[T]) (*Application[T], error) {
 	app := &Application[T]{
-		Config:       cfg,
-		wireShutdown: opts.WireShutdown,
+		Config:         cfg,
+		wireShutdown:   opts.WireShutdown,
+		migrationsWire: opts.MigrationsWire,
 	}
 
 	base := cfg.Infra()

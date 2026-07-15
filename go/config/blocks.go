@@ -4,10 +4,10 @@ import (
 	"github.com/emersonary/appkit/accounts"
 	"github.com/emersonary/appkit/ai"
 	"github.com/emersonary/appkit/currency"
-	"github.com/emersonary/appkit/dbhist"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
+	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
 )
@@ -21,7 +21,7 @@ type Blocks struct {
 	Permissions      permissions.SetupInput   `mapstructure:"permissions" json:"permissions"`
 	Menu             menu.AppConfig           `mapstructure:"menu" json:"menu"`
 	AI               ai.AIConfig              `mapstructure:"ai" json:"ai"`
-	DBHist           dbhist.AppConfig         `mapstructure:"dbhist" json:"dbhist"`
+	DBHist           migrate.AppConfig        `mapstructure:"dbhist" json:"dbhist"`
 	Email            email.Config             `mapstructure:"email" json:"email"`
 	MailProvisioning email.ProvisioningConfig `mapstructure:"mail_provisioning" json:"mail_provisioning"`
 }

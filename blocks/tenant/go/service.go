@@ -50,7 +50,7 @@ func (s *Service) CreateTenant(ctx context.Context, accountID, name, slug, timez
 		return Membership{}, ErrInvalidArgument.With("slug", err.Error())
 	}
 
-	tenant, err := s.store.CreateTenant(ctx, slug, name, timezone)
+	tenant, err := s.store.CreateTenant(ctx, slug, name, timezone, "", "")
 	if err != nil {
 		if isUniqueViolation(err) {
 			return Membership{}, ErrAlreadyExists
@@ -58,7 +58,7 @@ func (s *Service) CreateTenant(ctx context.Context, accountID, name, slug, timez
 		return Membership{}, err
 	}
 
-	if err := s.store.AddMember(ctx, tenant.ID, accountID, RoleOwner); err != nil {
+	if err := s.store.AddMember(ctx, tenant.ID, accountID, RoleOwner, nil); err != nil {
 		return Membership{}, err
 	}
 
@@ -107,7 +107,7 @@ func (s *Service) InviteMember(ctx context.Context, inviterAccountID, tenantID, 
 		return "", err
 	}
 
-	_, err = s.store.CreateInvite(ctx, tenantID, email, role, tokenHash, time.Now().Add(s.cfg.inviteTokenTTL()))
+	_, err = s.store.CreateInvite(ctx, tenantID, email, role, tokenHash, inviterAccountID, time.Now().Add(s.cfg.inviteTokenTTL()))
 	if err != nil {
 		return "", err
 	}

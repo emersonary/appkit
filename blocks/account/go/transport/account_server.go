@@ -37,7 +37,11 @@ func (s *AccountServer) Register(ctx context.Context, req *accountv1.RegisterReq
 	if name := req.GetLastName(); name != "" {
 		lastName = &name
 	}
-	result, err := s.svc.Register(ctx, req.GetEmail(), req.GetPassword(), firstName, lastName)
+	var language *string
+	if code := req.GetLanguage(); code != "" {
+		language = &code
+	}
+	result, err := s.svc.Register(ctx, req.GetEmail(), req.GetPassword(), firstName, lastName, language)
 	if err != nil {
 		return nil, MapGRPCError(err)
 	}

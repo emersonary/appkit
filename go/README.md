@@ -32,49 +32,45 @@ Adjust the `replace` path relative to your consumer module.
 |---------|---------|
 | `apperror` | Structured application errors with gRPC mapping and zap fields |
 | `log` | Zap logger setup and consistent error logging |
-| `dbhist` | Generate audit/history SQL and repo functions from live PostgreSQL schemas |
+| `migrate` | SQL instruction runner + audit/history/repo functions (`UpdateHist`) from live PostgreSQL schemas |
 | `currency` | ISO 4217 catalog, config-driven enabled currencies, schema bootstrap, rate sync, conversion — see [currency/README.md](currency/README.md) |
 | `accounts` | Multi-tenant auth (accounts schema, OAuth, JWT sessions) — see [accounts/accounts.example.yaml](accounts/accounts.example.yaml) |
 | `heapedcache` | Fixed-size thread-safe in-memory cache with LRU-style eviction — see [heapedcache/README.md](heapedcache/README.md) |
+| `resource` | Reflect struct `resource` tags into UI schema + value maps for schema-driven edit forms — see [resource/README.md](resource/README.md) |
 
 ---
 
-## dbhist
+## migrate
 
-Generates PostgreSQL audit columns, history tables/triggers, and JSON repo functions from existing tables. Intended to run after normal schema migrations.
+Owns schema lifecycle in one package:
 
-Config file example (`dbhist.yaml`):
+- **Instructions** — up-only SQL registered in code (`Runner`, `platform.schema_instructions`)
+- **Audit / repo** — `UpdateHist` generates history triggers and versioned JSON repo functions from table comments (`AUDIT=true` / `REPO=true`)
+
+YAML block on the app config:
 
 ```yaml
-schemas:
-  - core
-  - catalog
-
-table_pattern: tbl_%
-
-exclude_patterns:
-  - tmp_%
-
-modules:
-  audit: true
-  history: true
-  repo_functions: true
+dbhist:
+  enabled: true
 ```
 
 Usage:
 
 ```go
-cfg, err := dbhist.LoadConfig("dbhist.yaml")
+runner, db, err := migrate.OpenRunner(ctx, dsn, migrate.ApplyConfig{Instructions: instr})
 if err != nil {
     return err
 }
-
-result, err := dbhist.UpdateHist(ctx, db, cfg, dbhist.Options{
-    Logger: logger,
-})
+if err := runner.Apply(ctx); err != nil {
+    return err
+}
+if _, err := migrate.Wire(ctx, db, migrate.AppConfig{Enabled: true}, migrate.WireOptions{Logger: logger}); err != nil {
+    return err
+}
+fns, err := migrate.MustFunctions("tenant", "tenant_locations")
 ```
 
-Override the config path with `DBHIST_CONFIG`.
+The former `dbhist` import path remains as a thin compatibility shim over `migrate`.
 
 ---
 
@@ -95,5 +91,5 @@ go test ./currency/...
 
 ## Reference integrations
 
-- **via-jeri** — `backend/cmd/db/main.go` uses `dbhist` and `log`
+- **via-jeri** — `backend/cmd/db/main.go` uses `migrate` (audit/repo) and `log`
 - **sahar** — `internal/db/currency.go`, `cmd/server/main.go`

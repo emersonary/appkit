@@ -29,6 +29,7 @@ const defaultLabels: Required<AccountsUILabels> = {
   logInAction: 'Sign in',
   createAccount: 'Create account',
   signingIn: 'Please wait…',
+  creatingAccount: 'Creating account…',
   requiredMarker: ' (*)',
   verifyEmailInstructions: 'We sent a verification link to:',
   verifyEmailCheckSpam: 'If you do not see it, check your spam folder.',

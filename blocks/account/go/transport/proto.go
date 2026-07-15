@@ -21,6 +21,9 @@ func ToProtoAccount(account accounts.Account) *accountv1.Account {
 	if account.AvatarURL != nil {
 		pb.AvatarUrl = *account.AvatarURL
 	}
+	if account.Language != nil {
+		pb.Language = *account.Language
+	}
 	return pb
 }
 

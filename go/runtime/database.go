@@ -9,6 +9,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// ApplyConfig is the product migration registry passed to appkit migrate.
+type ApplyConfig = migrate.ApplyConfig
+
 func NewPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	poolCfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -41,5 +44,19 @@ func (a *Application[T]) createDatabaseConnection(ctx context.Context) error {
 	a.Pool = pool
 	a.Logger.Info("postgres connected")
 
-	return migrate.RunMigrations(ctx, pool, a.Base().Migrations.Path)
+	if path := a.Base().Migrations.Path; path != "" {
+		if err := migrate.RunGooseUp(ctx, pool, path); err != nil {
+			return err
+		}
+	}
+
+	cfg := migrate.ApplyConfig{}
+	if a.migrationsWire != nil {
+		cfg, err = a.migrationsWire(ctx, a.Config)
+		if err != nil {
+			return err
+		}
+	}
+
+	return migrate.RunMigrations(ctx, pool, cfg)
 }

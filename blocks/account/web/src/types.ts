@@ -5,6 +5,8 @@ export type Account = {
   lastName?: string;
   avatarUrl?: string;
   isAdmin?: boolean;
+  /** BCP 47 primary language code, e.g. "en". Undefined when unset on the account. */
+  language?: string;
 };
 
 export type AccountSession = {
@@ -47,6 +49,7 @@ export type AccountsUILabels = {
   logInAction?: string;
   createAccount?: string;
   signingIn?: string;
+  creatingAccount?: string;
   requiredMarker?: string;
   verifyEmailInstructions?: string;
   verifyEmailCheckSpam?: string;
@@ -125,6 +128,7 @@ export type AccountsClient = {
     password: string,
     firstName: string,
     lastName?: string,
+    language?: string,
   ) => Promise<RegisterResult>;
   logout: () => Promise<void>;
   getSession: () => Promise<AccountSession | null>;

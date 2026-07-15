@@ -2,7 +2,7 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import { useAccountsConfig } from './context';
 import { FieldLabel } from './FieldLabel';
 import { FieldIcon } from './fieldIcons';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingButtonContent } from './LoadingButtonContent';
 import type { AccountsClassNames, AccountsUILabels } from './types';
 
 export type ResetPasswordPageProps = {
@@ -145,7 +145,7 @@ export function ResetPasswordPage({
           />
         </div>
         <button className={classNames.submit} type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
-          {isSubmitting ? <LoadingSpinner label={labels.sending} size="sm" /> : labels.resetPasswordSubmit}
+          {isSubmitting ? <LoadingButtonContent label={labels.sending} /> : labels.resetPasswordSubmit}
         </button>
       </form>
       <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>

@@ -14,11 +14,13 @@ const (
 )
 
 type Tenant struct {
-	ID       string
-	Slug     string
-	Name     string
-	Timezone string
-	Status   string
+	ID                string
+	Slug              string
+	Name              string
+	BusinessTypeID    string
+	DefaultLanguageID string
+	Timezone          string
+	Status            string
 }
 
 type Membership struct {

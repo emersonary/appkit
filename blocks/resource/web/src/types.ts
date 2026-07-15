@@ -9,7 +9,7 @@ export type FieldType =
   | "datetime"
   | "enum"
   | "relation"
-  | "json";
+  | "object";
 
 export type FieldOption = {
   value: string;
