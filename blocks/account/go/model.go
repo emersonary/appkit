@@ -12,6 +12,7 @@ type Account struct {
 	EmailVerifiedAt *time.Time
 	IsAdmin         bool
 	IDProfile       *string
+	Language        *string
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }

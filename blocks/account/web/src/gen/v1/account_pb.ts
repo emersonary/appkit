@@ -45,6 +45,13 @@ export class Account extends Message<Account> {
    */
   lastName = "";
 
+  /**
+   * BCP 47 language code (e.g. "en", "pt"). Empty when unset.
+   *
+   * @generated from field: string language = 8;
+   */
+  language = "";
+
   constructor(data?: PartialMessage<Account>) {
     super();
     proto3.util.initPartial(data, this);
@@ -60,6 +67,7 @@ export class Account extends Message<Account> {
     { no: 5, name: "avatar_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "is_admin", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 7, name: "last_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "language", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Account {
@@ -146,6 +154,13 @@ export class RegisterRequest extends Message<RegisterRequest> {
    */
   lastName = "";
 
+  /**
+   * Optional BCP 47 language code stored on the account.
+   *
+   * @generated from field: string language = 5;
+   */
+  language = "";
+
   constructor(data?: PartialMessage<RegisterRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -158,6 +173,7 @@ export class RegisterRequest extends Message<RegisterRequest> {
     { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "first_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "last_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "language", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterRequest {

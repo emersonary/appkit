@@ -39,14 +39,14 @@ export function FieldRenderer({
     required: field.required,
   };
 
-  if (field.type === "textarea" || field.type === "json") {
+  if (field.type === "textarea" || field.type === "object") {
     return (
       <textarea
         {...commonProps}
         className="appkit-resource-field__control"
-        value={field.type === "json" && typeof value !== "string" ? JSON.stringify(value ?? {}, null, 2) : stringValue(value)}
+        value={field.type === "object" && typeof value !== "string" ? JSON.stringify(value ?? {}, null, 2) : stringValue(value)}
         onChange={(event) => onChange(field.key, event.target.value)}
-        rows={field.type === "json" ? 8 : 4}
+        rows={field.type === "object" ? 8 : 4}
       />
     );
   }

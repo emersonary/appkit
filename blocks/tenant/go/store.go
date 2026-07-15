@@ -23,17 +23,25 @@ func (s *Store) tenantsTable() string     { return qualifiedName(s.schema, "tena
 func (s *Store) accountsTable() string    { return qualifiedName(s.schema, "tenant_accounts") }
 func (s *Store) invitesTable() string     { return qualifiedName(s.schema, "tenant_invites") }
 
-func (s *Store) CreateTenant(ctx context.Context, slug, name, timezone string) (Tenant, error) {
+func (s *Store) CreateTenant(ctx context.Context, slug, name, timezone, businessTypeID, defaultLanguageID string) (Tenant, error) {
 	if timezone == "" {
 		timezone = "UTC"
 	}
 	var tenant Tenant
+	var businessTypeIDArg any
+	if strings.TrimSpace(businessTypeID) != "" {
+		businessTypeIDArg = businessTypeID
+	}
+	var defaultLanguageIDArg any
+	if strings.TrimSpace(defaultLanguageID) != "" {
+		defaultLanguageIDArg = defaultLanguageID
+	}
 	err := s.db.QueryRowContext(ctx, `
-		INSERT INTO `+s.tenantsTable()+` (slug, name, timezone, status)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id, slug, name, timezone, status
-	`, slug, name, timezone, StatusTrial).Scan(
-		&tenant.ID, &tenant.Slug, &tenant.Name, &tenant.Timezone, &tenant.Status,
+		INSERT INTO `+s.tenantsTable()+` (slug, name, timezone, status, business_type_id, default_language_id)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id, slug, name, timezone, status, COALESCE(business_type_id::text, ''), COALESCE(default_language_id::text, '')
+	`, slug, name, timezone, StatusTrial, businessTypeIDArg, defaultLanguageIDArg).Scan(
+		&tenant.ID, &tenant.Slug, &tenant.Name, &tenant.Timezone, &tenant.Status, &tenant.BusinessTypeID, &tenant.DefaultLanguageID,
 	)
 	return tenant, err
 }
@@ -58,12 +66,13 @@ func (s *Store) UpsertCatalogTenant(ctx context.Context, slug, name, timezone st
 	return tenant, err
 }
 
-func (s *Store) AddMember(ctx context.Context, tenantID, accountID, role string) error {
+func (s *Store) AddMember(ctx context.Context, tenantID, accountID, role string, resourceID *string) error {
 	_, err := s.db.ExecContext(ctx, `
-		INSERT INTO `+s.accountsTable()+` (tenant_id, account_id, role)
-		VALUES ($1, $2, $3)
-		ON CONFLICT (tenant_id, account_id) DO UPDATE SET role = EXCLUDED.role, updated_at = NOW()
-	`, tenantID, accountID, role)
+		INSERT INTO `+s.accountsTable()+` (tenant_id, account_id, role, resource_id)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (tenant_id, account_id) DO UPDATE
+		SET role = EXCLUDED.role, resource_id = EXCLUDED.resource_id, updated_at = NOW()
+	`, tenantID, accountID, role, resourceID)
 	return err
 }
 
@@ -118,12 +127,16 @@ func (s *Store) ListMemberships(ctx context.Context, accountID string) ([]Member
 	return out, rows.Err()
 }
 
-func (s *Store) CreateInvite(ctx context.Context, tenantID, email, role, tokenHash string, expiresAt time.Time) (string, error) {
+func (s *Store) CreateInvite(ctx context.Context, tenantID, email, role, tokenHash, invitedByAccountID string, expiresAt time.Time) (string, error) {
 	id := uuid.NewString()
+	var invitedBy any
+	if strings.TrimSpace(invitedByAccountID) != "" {
+		invitedBy = invitedByAccountID
+	}
 	_, err := s.db.ExecContext(ctx, `
-		INSERT INTO `+s.invitesTable()+` (id, tenant_id, email, role, token_hash, expires_at)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`, id, tenantID, strings.ToLower(strings.TrimSpace(email)), role, tokenHash, expiresAt)
+		INSERT INTO `+s.invitesTable()+` (id, tenant_id, email, role, token_hash, invited_by_account_id, expires_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, id, tenantID, strings.ToLower(strings.TrimSpace(email)), role, tokenHash, invitedBy, expiresAt)
 	return id, err
 }
 

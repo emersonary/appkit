@@ -9,7 +9,7 @@ export type FieldType =
   | "datetime"
   | "enum"
   | "relation"
-  | "json";
+  | "object";
 
 export type FieldOption = {
   value: string;
@@ -85,6 +85,8 @@ export type ResourceSchema = {
 };
 
 export type ResourceItem = Record<string, unknown>;
+
+export type ResourceEditMode = "create" | "edit" | "replicate";
 
 export type ResourceListResponse = {
   items: ResourceItem[];

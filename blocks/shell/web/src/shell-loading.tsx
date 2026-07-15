@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type ShellLoadingContextValue = {
   contentLoading: boolean;
@@ -23,20 +23,17 @@ const ShellLoadingContext = createContext<ShellLoadingContextValue | null>(null)
 
 export function ShellLoadingProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const routeKey = useMemo(() => {
-    const search = searchParams.toString();
-    return search ? `${pathname}?${search}` : pathname;
-  }, [pathname, searchParams]);
   const [contentLoading, setContentLoadingState] = useState(false);
   const [routeGeneration, setRouteGeneration] = useState(0);
   const routeGenerationRef = useRef(0);
 
+  // Only reset loading on pathname changes (menu navigation), not query-only updates
+  // such as list row selection (?selected=) which would otherwise flash the overlay.
   useLayoutEffect(() => {
     routeGenerationRef.current += 1;
     setRouteGeneration(routeGenerationRef.current);
     setContentLoadingState(true);
-  }, [routeKey]);
+  }, [pathname]);
 
   const setContentLoading = useCallback((loading: boolean) => {
     if (loading) {

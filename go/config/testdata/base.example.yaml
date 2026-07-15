@@ -102,6 +102,9 @@ permissions:
   schema: account
   default_profile: member
 
+dbhist:
+  enabled: false
+
 email:
   from: noreply@example.com
   brand: Example

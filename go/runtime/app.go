@@ -10,6 +10,7 @@ import (
 	appkitconfig "github.com/emersonary/appkit/config"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
+	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/health"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
@@ -42,6 +43,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	Menu          *menu.Service
 	Weather       *weather.Service
 	Email         *email.Handler
+	DBHist        *migrate.Service
 
 	httpServer   *http.Server
 	grpcServer   *grpc.Server
@@ -50,6 +52,7 @@ type Application[T appkitconfig.AppConfig] struct {
 
 	workerCancels []context.CancelFunc
 	wireShutdown  WireShutdownFunc[T]
+	migrationsWire MigrationsWireFunc[T]
 }
 
 // Base returns the embedded appkit infra config from the product config.
@@ -60,8 +63,9 @@ func (a *Application[T]) Base() *appkitconfig.BaseConfig {
 // New builds logger, database, messaging, health, product services, and transport.
 func New[T appkitconfig.AppConfig](ctx context.Context, cfg T, opts Options[T]) (*Application[T], error) {
 	app := &Application[T]{
-		Config:       cfg,
-		wireShutdown: opts.WireShutdown,
+		Config:         cfg,
+		wireShutdown:   opts.WireShutdown,
+		migrationsWire: opts.MigrationsWire,
 	}
 
 	base := cfg.Infra()

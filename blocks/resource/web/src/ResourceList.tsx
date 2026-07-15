@@ -2,6 +2,21 @@ import { useMemo, useState, type ReactNode } from "react";
 import { fieldByKey, itemID, itemName, listColumns, nameField, parentIDField } from "./schema";
 import type { ResourceColumn, ResourceItem, ResourceSchema } from "./types";
 
+export type ResourceCellInterceptProps = {
+  item: ResourceItem;
+  column: ResourceColumn;
+  value: unknown;
+  depth: number;
+};
+
+export type ResourceRowAction = {
+  id: string;
+  label: string;
+  onAction: (item: ResourceItem) => void;
+  disabled?: boolean | ((item: ResourceItem) => boolean);
+  destructive?: boolean;
+};
+
 export type ResourceListProps = {
   schema: ResourceSchema;
   items: ResourceItem[];
@@ -9,13 +24,9 @@ export type ResourceListProps = {
   page?: number;
   pageSize?: number;
   loading?: boolean;
-  renderCell?: (props: {
-    item: ResourceItem;
-    column: ResourceColumn;
-    value: unknown;
-    depth: number;
-  }) => ReactNode;
-  onEdit?: (item: ResourceItem) => void;
+  renderCell?: (props: ResourceCellInterceptProps) => ReactNode;
+  interceptCell?: (props: ResourceCellInterceptProps) => ReactNode | null | undefined;
+  rowActions?: ResourceRowAction[];
   onPageChange?: (page: number) => void;
   onToggle?: (item: ResourceItem, expanded: boolean) => void;
 };
@@ -77,7 +88,8 @@ export function ResourceList({
   pageSize = schema.list?.page_size ?? 25,
   loading,
   renderCell,
-  onEdit,
+  interceptCell,
+  rowActions,
   onPageChange,
   onToggle,
 }: ResourceListProps) {
@@ -88,6 +100,7 @@ export function ResourceList({
   const treeEnabled = Boolean(parentIDField(schema));
   const firstColumnKey = nameField(schema);
   const pageCount = total == null ? 1 : Math.max(1, Math.ceil(total / pageSize));
+  const hasRowActions = (rowActions?.length ?? 0) > 0;
 
   const toggle = (row: Row) => {
     setExpanded((current) => {
@@ -125,18 +138,18 @@ export function ResourceList({
                   </th>
                 );
               })}
-              {onEdit ? <th aria-label="Actions" /> : null}
+              {hasRowActions ? <th aria-label="Actions" /> : null}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={columns.length + (onEdit ? 1 : 0)}>Loading...</td>
+                <td colSpan={columns.length + (hasRowActions ? 1 : 0)}>Loading...</td>
               </tr>
             ) : null}
             {!loading && rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (onEdit ? 1 : 0)}>No {schema.name.toLowerCase()} found.</td>
+                <td colSpan={columns.length + (hasRowActions ? 1 : 0)}>No {schema.name.toLowerCase()} found.</td>
               </tr>
             ) : null}
             {!loading
@@ -167,17 +180,36 @@ export function ResourceList({
                             <span>
                               {renderCell
                                 ? renderCell({ item: row.item, column, value, depth: row.depth })
-                                : stringValue(value)}
+                                : (interceptCell?.({ item: row.item, column, value, depth: row.depth }) ??
+                                  stringValue(value))}
                             </span>
                           </div>
                         </td>
                       );
                     })}
-                    {onEdit ? (
+                    {hasRowActions ? (
                       <td className="appkit-resource-table__actions">
-                        <button type="button" className="appkit-resource-button appkit-resource-button--ghost" onClick={() => onEdit(row.item)}>
-                          Edit
-                        </button>
+                        {rowActions?.map((action) => {
+                          const isDisabled =
+                            typeof action.disabled === "function"
+                              ? action.disabled(row.item)
+                              : Boolean(action.disabled);
+                          return (
+                          <button
+                            key={action.id}
+                            type="button"
+                            className={
+                              action.destructive
+                                ? "appkit-resource-button appkit-resource-button--ghost appkit-resource-button--danger"
+                                : "appkit-resource-button appkit-resource-button--ghost"
+                            }
+                            disabled={isDisabled}
+                            onClick={() => action.onAction(row.item)}
+                          >
+                            {action.label}
+                          </button>
+                          );
+                        })}
                       </td>
                     ) : null}
                   </tr>

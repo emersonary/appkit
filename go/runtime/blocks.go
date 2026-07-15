@@ -7,6 +7,7 @@ import (
 	"github.com/emersonary/appkit/ai"
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
+	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
@@ -23,12 +24,25 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.Weather.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.Weather.Enabled && !base.DBHist.Enabled {
 		return nil
 	}
 
 	// sqlDB wraps the application pool; do not Close here — Shutdown closes a.Pool.
 	sqlDB := stdlib.OpenDBFromPool(a.Pool)
+
+	var dbhistWorker context.Context
+	if base.DBHist.Enabled {
+		dbhistWorker, _ = a.RegisterWorker()
+	}
+	svc, err := migrate.Wire(ctx, sqlDB, base.DBHist, migrate.WireOptions{
+		Logger:    a.Logger.Named("migrate"),
+		WorkerCtx: dbhistWorker,
+	})
+	if err != nil {
+		return err
+	}
+	a.DBHist = svc
 
 	if base.Permissions.Enabled {
 		svc, err := permissions.Wire(ctx, sqlDB, base.Permissions, permissions.WireOptions{})

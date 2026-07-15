@@ -75,10 +75,11 @@ func (s *Service) OAccountProvider(name string) (oauth.Provider, bool) {
 	return p, ok
 }
 
-func (s *Service) Register(ctx context.Context, emailAddr, password string, firstName, lastName *string) (RegisterResult, error) {
+func (s *Service) Register(ctx context.Context, emailAddr, password string, firstName, lastName, language *string) (RegisterResult, error) {
 	emailAddr = strings.TrimSpace(emailAddr)
 	firstName = trimStringPtr(firstName)
 	lastName = trimStringPtr(lastName)
+	language = normalizeLanguageCode(language)
 	if !isValidEmail(emailAddr) || len(password) < 6 || firstName == nil {
 		return RegisterResult{}, ErrInvalidArgument
 	}
@@ -94,7 +95,7 @@ func (s *Service) Register(ctx context.Context, emailAddr, password string, firs
 
 	skipVerify := s.cfg.SkipEmailVerification()
 	registerAsAdmin := s.cfg.RegisterAsAdmin()
-	account, err := s.store.Create(ctx, emailAddr, hash, firstName, lastName, skipVerify, registerAsAdmin)
+	account, err := s.store.Create(ctx, emailAddr, hash, firstName, lastName, language, skipVerify, registerAsAdmin)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return RegisterResult{}, ErrAlreadyExists

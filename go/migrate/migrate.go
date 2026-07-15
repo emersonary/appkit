@@ -7,44 +7,49 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/pressly/goose/v3"
 )
 
-// RunMigrations applies pending goose migrations on startup.
-func RunMigrations(ctx context.Context, pool *pgxpool.Pool, migrationsPath string) error {
+// ApplyConfig configures RunMigrations.
+type ApplyConfig struct {
+	Instructions []Instruction
+}
+
+// RunMigrations applies pending SQL instructions on startup.
+func RunMigrations(ctx context.Context, pool *pgxpool.Pool, cfg ApplyConfig) error {
 	if err := pool.Ping(ctx); err != nil {
 		return fmt.Errorf("ping postgres: %w", err)
 	}
-
-	if err := goose.SetDialect("postgres"); err != nil {
-		return fmt.Errorf("goose dialect: %w", err)
+	if len(cfg.Instructions) == 0 {
+		return nil
 	}
 
 	sqlDB := stdlib.OpenDBFromPool(pool)
 	defer sqlDB.Close()
 
-	if err := goose.UpContext(ctx, sqlDB, migrationsPath); err != nil {
-		return fmt.Errorf("goose up: %w", err)
+	runner := NewRunner(sqlDB)
+	if err := runner.Register(cfg.Instructions...); err != nil {
+		return err
 	}
-
+	if err := runner.Apply(ctx); err != nil {
+		return fmt.Errorf("apply migrations: %w", err)
+	}
 	return nil
 }
 
-// RunGoose runs a goose CLI command (up, down, status, create, etc.).
-func RunGoose(ctx context.Context, dsn, migrationsPath, command string, args []string) error {
-	if err := goose.SetDialect("postgres"); err != nil {
-		return fmt.Errorf("goose dialect: %w", err)
-	}
-
+// OpenRunner opens a sql.DB runner for CLI use.
+func OpenRunner(ctx context.Context, dsn string, cfg ApplyConfig) (*Runner, *sql.DB, error) {
 	sqlDB, err := sql.Open("pgx", dsn)
 	if err != nil {
-		return fmt.Errorf("open database: %w", err)
+		return nil, nil, fmt.Errorf("open database: %w", err)
 	}
-	defer sqlDB.Close()
-
 	if err := sqlDB.PingContext(ctx); err != nil {
-		return fmt.Errorf("ping database: %w", err)
+		sqlDB.Close()
+		return nil, nil, fmt.Errorf("ping database: %w", err)
 	}
-
-	return goose.RunContext(ctx, command, sqlDB, migrationsPath, args...)
+	runner := NewRunner(sqlDB)
+	if err := runner.Register(cfg.Instructions...); err != nil {
+		sqlDB.Close()
+		return nil, nil, err
+	}
+	return runner, sqlDB, nil
 }

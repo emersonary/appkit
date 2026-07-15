@@ -73,7 +73,7 @@ func inferFieldType(t reflect.Type) FieldType {
 		reflect.Float32, reflect.Float64:
 		return FieldTypeNumber
 	case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-		return FieldTypeJSON
+		return FieldTypeObject
 	default:
 		return FieldTypeText
 	}

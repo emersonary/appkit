@@ -36,11 +36,15 @@ type WireWebSocketServerFunc[T appkitconfig.AppConfig] func(ctx context.Context,
 // WireShutdownFunc runs product cleanup after servers stop and before infra closes.
 type WireShutdownFunc[T appkitconfig.AppConfig] func(ctx context.Context, app *Application[T]) error
 
+// MigrationsWireFunc supplies SQL instructions applied after the database pool connects.
+type MigrationsWireFunc[T appkitconfig.AppConfig] func(ctx context.Context, cfg T) (ApplyConfig, error)
+
 // Options holds product wiring hooks; product config type is T.
 type Options[T appkitconfig.AppConfig] struct {
 	AccountsWire        AccountsWireFunc[T]
 	CurrencyWire        CurrencyWireFunc[T]
 	WireServices        WireFunc[T]
+	MigrationsWire      MigrationsWireFunc[T]
 	Transport           TransportWire[T]
 	WireWebSocket       WireWebSocketFunc[T]
 	WireWebSocketServer WireWebSocketServerFunc[T]

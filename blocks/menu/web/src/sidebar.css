@@ -99,6 +99,16 @@
   border-left-color: rgba(0, 0, 0, 0.35);
 }
 
+.appkit-menu__link--heading {
+  cursor: default;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.appkit-menu--flat .appkit-menu__chevron {
+  display: none;
+}
+
 .appkit-menu__icon {
   display: inline-flex;
   align-items: center;

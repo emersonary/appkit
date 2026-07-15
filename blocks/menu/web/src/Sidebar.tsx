@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import type { GetMenuResponse, Menu, MenuItem } from "./gen/v1/menu_pb";
-import { itemContainsSelectedDescendant } from "./routes";
 
 export type SidebarProps = {
   layout: GetMenuResponse;
   activeMenuId?: string;
   selectedPermissionId?: string;
   collapsed?: boolean;
+  collapsible?: boolean;
   onSelectItem?: (item: MenuItem, menu: Menu) => void;
   onMenuChange?: (menuId: string) => void;
   onCollapsedChange?: (collapsed: boolean) => void;
@@ -32,10 +32,6 @@ function defaultLink(props: {
       {props.children}
     </a>
   );
-}
-
-function itemHasActiveDescendant(item: MenuItem, selectedPermissionId: string): boolean {
-  return itemContainsSelectedDescendant(item, selectedPermissionId);
 }
 
 type MenuSection = {
@@ -66,11 +62,52 @@ function groupMenuItems(items: MenuItem[]): MenuSection[] {
   return sections;
 }
 
+function itemHasRoute(item: MenuItem): boolean {
+  const route = item.routeName?.trim();
+  return Boolean(route && route !== "#");
+}
+
+function MenuItemRow({
+  item,
+  selected,
+  onSelect,
+  renderIcon,
+  linkComponent = defaultLink,
+}: {
+  item: MenuItem;
+  selected: boolean;
+  onSelect: (item: MenuItem) => void;
+  renderIcon?: (item: MenuItem) => ReactNode;
+  linkComponent?: SidebarProps["linkComponent"];
+}) {
+  const content = (
+    <>
+      <span className="appkit-menu__icon" aria-hidden="true">
+        {renderIcon?.(item)}
+      </span>
+      <span className="appkit-menu__label">{item.name}</span>
+    </>
+  );
+
+  if (!itemHasRoute(item)) {
+    return (
+      <div className="appkit-menu__link appkit-menu__link--heading">
+        {content}
+      </div>
+    );
+  }
+
+  return linkComponent({
+    href: item.routeName,
+    className: selected ? "appkit-menu__link is-selected" : "appkit-menu__link",
+    onClick: () => onSelect(item),
+    children: content,
+  });
+}
+
 function MenuTree({
   items,
   selectedPermissionId,
-  expandedIds,
-  onToggle,
   onSelect,
   renderIcon,
   linkComponent = defaultLink,
@@ -78,8 +115,6 @@ function MenuTree({
 }: {
   items: MenuItem[];
   selectedPermissionId: string;
-  expandedIds: Set<string>;
-  onToggle: (fullId: string) => void;
   onSelect: (item: MenuItem) => void;
   renderIcon?: (item: MenuItem) => ReactNode;
   linkComponent?: SidebarProps["linkComponent"];
@@ -91,42 +126,22 @@ function MenuTree({
         const hasChildren = item.children.length > 0;
         const selected =
           Boolean(selectedPermissionId) && item.permissionId === selectedPermissionId;
-        const expanded =
-          expandedIds.has(item.fullId) || itemHasActiveDescendant(item, selectedPermissionId);
-        const href = item.routeName || "#";
 
         return (
           <li key={item.fullId} className="appkit-menu__tree-item">
             <div className="appkit-menu__row">
-              {linkComponent({
-                href,
-                className: selected ? "appkit-menu__link is-selected" : "appkit-menu__link",
-                onClick: () => onSelect(item),
-                children: (
-                  <>
-                    <span className="appkit-menu__icon" aria-hidden="true">
-                      {renderIcon?.(item)}
-                    </span>
-                    <span className="appkit-menu__label">{item.name}</span>
-                  </>
-                ),
-              })}
-              {hasChildren ? (
-                <button
-                  type="button"
-                  className={`appkit-menu__chevron${expanded ? " is-expanded" : ""}`}
-                  aria-expanded={expanded}
-                  aria-label={expanded ? `Collapse ${item.name}` : `Expand ${item.name}`}
-                  onClick={() => onToggle(item.fullId)}
-                />
-              ) : null}
+              <MenuItemRow
+                item={item}
+                selected={selected}
+                onSelect={onSelect}
+                renderIcon={renderIcon}
+                linkComponent={linkComponent}
+              />
             </div>
-            {hasChildren && expanded ? (
+            {hasChildren ? (
               <MenuTree
                 items={item.children}
                 selectedPermissionId={selectedPermissionId}
-                expandedIds={expandedIds}
-                onToggle={onToggle}
                 onSelect={onSelect}
                 renderIcon={renderIcon}
                 linkComponent={linkComponent}
@@ -145,6 +160,7 @@ export function Sidebar({
   activeMenuId,
   selectedPermissionId,
   collapsed,
+  collapsible = false,
   onSelectItem,
   onMenuChange,
   onCollapsedChange,
@@ -158,29 +174,11 @@ export function Sidebar({
   const currentMenuId = activeMenuId ?? menus[0]?.id ?? "";
   const currentMenu = menus.find((menu) => menu.id === currentMenuId) ?? menus[0];
   const selected = selectedPermissionId ?? layout.defaultSelectedPermissionId ?? "";
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
   const sections = useMemo(
     () => groupMenuItems(currentMenu?.items ?? []),
     [currentMenu?.items],
   );
-
-  useEffect(() => {
-    if (!currentMenu || !selected) {
-      return;
-    }
-    const next = new Set<string>();
-    const visit = (items: MenuItem[]) => {
-      for (const item of items) {
-        if (item.children.length > 0 && itemHasActiveDescendant(item, selected)) {
-          next.add(item.fullId);
-        }
-        visit(item.children);
-      }
-    };
-    visit(currentMenu.items);
-    setExpandedIds(next);
-  }, [currentMenu, selected]);
 
   const rootClass = [
     "appkit-menu",
@@ -188,6 +186,7 @@ export function Sidebar({
     sidebar?.floating ? "appkit-menu--floating" : "",
     sidebar?.locked ? "appkit-menu--locked" : "",
     collapsed ? "appkit-menu--collapsed" : "",
+    collapsible ? "" : "appkit-menu--flat",
   ]
     .filter(Boolean)
     .join(" ");
@@ -199,18 +198,6 @@ export function Sidebar({
     if (sidebar?.hideWhenSelected && !sidebar.locked) {
       onCollapsedChange?.(true);
     }
-  };
-
-  const toggleExpanded = (fullId: string) => {
-    setExpandedIds((current) => {
-      const next = new Set(current);
-      if (next.has(fullId)) {
-        next.delete(fullId);
-      } else {
-        next.add(fullId);
-      }
-      return next;
-    });
   };
 
   return (
@@ -234,8 +221,6 @@ export function Sidebar({
                 <MenuTree
                   items={section.items}
                   selectedPermissionId={selected}
-                  expandedIds={expandedIds}
-                  onToggle={toggleExpanded}
                   onSelect={handleSelect}
                   renderIcon={renderIcon}
                   linkComponent={linkComponent}

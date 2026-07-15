@@ -19,6 +19,7 @@ function toSession(response: {
     lastName?: string;
     avatarUrl?: string;
     isAdmin?: boolean;
+    language?: string;
   };
 }): AccountSession {
   return {
@@ -30,6 +31,7 @@ function toSession(response: {
       lastName: response.account?.lastName || undefined,
       avatarUrl: response.account?.avatarUrl || undefined,
       isAdmin: response.account?.isAdmin ?? false,
+      language: response.account?.language || undefined,
     },
   };
 }
@@ -59,13 +61,14 @@ export function createConnectAccountClient({
       }
     },
 
-    async register(email, password, firstName, lastName) {
+    async register(email, password, firstName, lastName, language) {
       try {
         const response = await client.register({
           email: email.trim(),
           password,
           firstName: firstName.trim(),
           lastName: lastName?.trim() ?? '',
+          language: language?.trim() ?? '',
         });
         if (response.verificationRequired) {
           storage.write(null);

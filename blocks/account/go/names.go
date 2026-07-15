@@ -25,3 +25,21 @@ func trimStringPtr(v *string) *string {
 	}
 	return &trimmed
 }
+
+// normalizeLanguageCode stores a short BCP 47 primary language tag or nil when unset/invalid.
+func normalizeLanguageCode(code *string) *string {
+	code = trimStringPtr(code)
+	if code == nil {
+		return nil
+	}
+	primary := strings.ToLower(strings.Split(*code, "-")[0])
+	if primary == "" || len(primary) > 8 {
+		return nil
+	}
+	for _, r := range primary {
+		if r < 'a' || r > 'z' {
+			return nil
+		}
+	}
+	return &primary
+}

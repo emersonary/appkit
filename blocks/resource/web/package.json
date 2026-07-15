@@ -9,9 +9,12 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./edit": "./src/edit/index.ts",
+    "./edit.css": "./src/edit/edit.css",
     "./resource.css": "./src/resource.css"
   },
   "peerDependencies": {
+    "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

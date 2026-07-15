@@ -123,6 +123,9 @@
     "providers": null,
     "routes": null
   },
+  "dbhist": {
+    "enabled": false
+  },
   "weather": {
     "enabled": false,
     "key_prefix": "weather:openmeteo:jeri",

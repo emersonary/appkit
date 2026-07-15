@@ -85,9 +85,14 @@ export function firstMenuItemRoute(items: MenuItem[]): string {
 export function resolveActiveMenuItem(
   pathname: string,
   menus: Menu[],
-): { menuId: string; permissionId: string } | null {
+): { menuId: string; permissionId: string; item: MenuItem } | null {
   const allRoutes = collectAllMenuRoutes(menus);
-  const candidates: Array<{ menuId: string; permissionId: string; routeLen: number }> = [];
+  const candidates: Array<{
+    menuId: string;
+    permissionId: string;
+    item: MenuItem;
+    routeLen: number;
+  }> = [];
 
   for (const menu of menus) {
     for (const { menuId, item } of flattenMenuItems(menu.items, menu.id)) {
@@ -97,6 +102,7 @@ export function resolveActiveMenuItem(
       candidates.push({
         menuId,
         permissionId: item.permissionId,
+        item,
         routeLen: normalizeMenuPath(item.routeName).length,
       });
     }
@@ -107,7 +113,10 @@ export function resolveActiveMenuItem(
   }
 
   candidates.sort((a, b) => b.routeLen - a.routeLen);
-  return candidates[0];
+  const best = candidates[0];
+  return best
+    ? { menuId: best.menuId, permissionId: best.permissionId, item: best.item }
+    : null;
 }
 
 export function itemContainsSelectedDescendant(

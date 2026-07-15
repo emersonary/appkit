@@ -69,8 +69,38 @@
   background: #f9fbff;
 }
 
+.appkit-resource-view__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.appkit-resource-view__loading,
+.appkit-resource-view__error,
+.appkit-resource-form__error {
+  border-radius: 0.55rem;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.appkit-resource-view__loading {
+  background: #f8fafc;
+  border: 1px solid #e4e7ec;
+  color: #475467;
+}
+
+.appkit-resource-view__error,
+.appkit-resource-form__error {
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  color: #b42318;
+}
+
 .appkit-resource-table__actions {
-  text-align: right;
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
 }
 
 .appkit-resource-tree-cell {
@@ -173,4 +203,9 @@
   background: #fff;
   border-color: #d0d5dd;
   color: #344054;
+}
+
+.appkit-resource-button--danger {
+  border-color: #fecdca;
+  color: #b42318;
 }

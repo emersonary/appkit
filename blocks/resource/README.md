@@ -61,18 +61,27 @@ fields := resource.FieldsFromStruct(Product{})
 
 Use this to reduce boilerplate, then explicitly register the final `Resource`.
 
-## Frontend pattern
+## Frontend pattern (schema-driven edit)
 
-Import the components and CSS:
+Import the protobuf-aligned edit components:
 
 ```tsx
 import {
-  ResourceEditForm,
-  ResourceList,
-  type ResourceSchema,
+  ResourceEdit,
+  ResourceFieldInput,
+  ResourceFieldKind,
+  type ResourceEditState,
 } from "@emersonary/appkit-resource";
-import "@emersonary/appkit-resource/resource.css";
+import "@emersonary/appkit-resource/edit.css";
 ```
+
+`ResourceFieldInput` maps each `ResourceFieldKind` to a widget (text, textarea, checkbox, country select, image upload, location map, etc.).
+
+Host apps pass navigation via `LinkComponent` and optional `renderRelatedLinkIcon` on `ResourceEdit`.
+
+### Legacy registry UI
+
+The older `FieldType` list/edit components remain available as `LegacyRegistryResourceEdit` and `ResourceList`.
 
 List:
 
@@ -90,7 +99,7 @@ List:
 Edit:
 
 ```tsx
-<ResourceEditForm
+<ResourceEdit
   schema={schema}
   item={product}
   relationOptions={{ category_id: categoryOptions }}
