@@ -10,19 +10,29 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type Service struct {
-	store *Store
-	cfg   Config
+	store  *Store
+	cfg    Config
+	logger *zap.Logger
 }
 
-func New(db *sql.DB, cfg Config) (*Service, error) {
+func New(db *sql.DB, cfg Config, logger *zap.Logger) (*Service, error) {
 	cfg.normalize()
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
-	return &Service{store: NewStore(db, cfg.Schema), cfg: cfg}, nil
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+	return &Service{
+		store:  NewStore(db, cfg.Schema, logger.Named("store")),
+		cfg:    cfg,
+		logger: logger,
+	}, nil
 }
 
 func (s *Service) CreateTenant(ctx context.Context, accountID, name, slug, timezone string) (Membership, error) {

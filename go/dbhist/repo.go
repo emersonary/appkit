@@ -6,19 +6,37 @@ import (
 	"strings"
 )
 
-func buildRepoFunctionsSQL(tables []Table) string {
+type repoNames map[funcKey]string
+
+func (n repoNames) qual(schema, table, operation string) string {
+	name, ok := n[makeFuncKey(schema, table, operation)]
+	if !ok {
+		name = versionedRepoFunctionName(table, operation, 1)
+	}
+	return quoteQualifiedIdent(schema, name)
+}
+
+func buildRepoFunctionsSQL(tables []Table, names repoNames) (string, error) {
+	if names == nil {
+		names = repoNames{}
+	}
+	ordered, err := sortTablesChildrenFirst(tables)
+	if err != nil {
+		return "", err
+	}
+
 	var b strings.Builder
 	tableMap := indexTables(tables)
 
-	for _, table := range sortTablesChildrenFirst(tables) {
-		b.WriteString(buildInsertFunctionSQL(table))
-		b.WriteString(buildUpdateFunctionSQL(table))
-		b.WriteString(buildUpsertFunctionSQL(table))
-		b.WriteString(buildDeleteFunctionSQL(table, tableMap))
-		b.WriteString(buildGetFunctionSQL(table, tableMap))
+	for _, table := range ordered {
+		b.WriteString(buildInsertFunctionSQL(table, names))
+		b.WriteString(buildUpdateFunctionSQL(table, names))
+		b.WriteString(buildUpsertFunctionSQL(table, names))
+		b.WriteString(buildDeleteFunctionSQL(table, tableMap, names))
+		b.WriteString(buildGetFunctionSQL(table, tableMap, names))
 	}
 
-	return b.String()
+	return b.String(), nil
 }
 
 func indexTables(tables []Table) map[string]Table {
@@ -30,9 +48,16 @@ func indexTables(tables []Table) map[string]Table {
 	return tableMap
 }
 
-func sortTablesChildrenFirst(tables []Table) []Table {
+func sortTablesChildrenFirst(tables []Table) ([]Table, error) {
+	const (
+		unvisited = 0
+		visiting  = 1
+		visited   = 2
+	)
+
 	index := make(map[string]int, len(tables))
 	depth := make(map[string]int, len(tables))
+	state := make(map[string]int, len(tables))
 
 	for i, table := range tables {
 		key := tableKey(table.Schema, table.Name)
@@ -40,13 +65,17 @@ func sortTablesChildrenFirst(tables []Table) []Table {
 		depth[key] = 0
 	}
 
-	var computeDepth func(table Table) int
-	computeDepth = func(table Table) int {
+	var visit func(table Table) error
+	visit = func(table Table) error {
 		key := tableKey(table.Schema, table.Name)
-		if depth[key] > 0 {
-			return depth[key]
+		switch state[key] {
+		case visiting:
+			return ErrRepoCycle.With("table", key)
+		case visited:
+			return nil
 		}
 
+		state[key] = visiting
 		maxChildDepth := 0
 		for _, child := range table.Children {
 			childKey := tableKey(child.Schema, child.Table)
@@ -55,18 +84,23 @@ func sortTablesChildrenFirst(tables []Table) []Table {
 				continue
 			}
 
-			childDepth := computeDepth(tables[childIndex])
-			if childDepth > maxChildDepth {
-				maxChildDepth = childDepth
+			if err := visit(tables[childIndex]); err != nil {
+				return err
+			}
+			if depth[childKey] > maxChildDepth {
+				maxChildDepth = depth[childKey]
 			}
 		}
 
 		depth[key] = maxChildDepth + 1
-		return depth[key]
+		state[key] = visited
+		return nil
 	}
 
 	for _, table := range tables {
-		computeDepth(table)
+		if err := visit(table); err != nil {
+			return nil, err
+		}
 	}
 
 	sorted := append([]Table(nil), tables...)
@@ -84,14 +118,11 @@ func sortTablesChildrenFirst(tables []Table) []Table {
 		return sorted[i].Name < sorted[j].Name
 	})
 
-	return sorted
+	return sorted, nil
 }
 
-func repoFunctionName(table Table, operation string) string {
-	return fmt.Sprintf("func_%s_%s", operation, table.Name)
-}
 
-func buildInsertFunctionSQL(table Table) string {
+func buildInsertFunctionSQL(table Table, names repoNames) string {
 	rowStatusColumn := findRowStatusColumn(table)
 	insertColumns := insertableColumns(table, rowStatusColumn)
 	pkVar := "v_" + strings.ToLower(table.PrimaryKey)
@@ -110,7 +141,7 @@ DECLARE
 	v_item JSONB;
 BEGIN
 `,
-		quoteQualifiedIdent(table.Schema, repoFunctionName(table, "insert")),
+		names.qual(table.Schema, table.Name, "insert"),
 		pkVar,
 	))
 
@@ -150,21 +181,18 @@ BEGIN
 		pkVar,
 	))
 
-	b.WriteString(buildChildInsertCallsSQL(table, pkVar))
+	b.WriteString(buildChildInsertCallsSQL(table, pkVar, names))
 
 	b.WriteString("\n\tRETURN v_result;\nEND;\n$$;\n")
 
 	return b.String()
 }
 
-func buildChildInsertCallsSQL(table Table, pkVar string) string {
+func buildChildInsertCallsSQL(table Table, pkVar string, names repoNames) string {
 	var b strings.Builder
 
 	for _, child := range table.Children {
-		functionName := quoteQualifiedIdent(child.Schema, repoFunctionName(Table{
-			Schema: child.Schema,
-			Name:   child.Table,
-		}, "insert"))
+		functionName := names.qual(child.Schema, child.Table, "insert")
 
 		if child.IsOneToOne {
 			b.WriteString(fmt.Sprintf(`
@@ -216,7 +244,7 @@ func buildChildInsertCallsSQL(table Table, pkVar string) string {
 	return b.String()
 }
 
-func buildUpdateFunctionSQL(table Table) string {
+func buildUpdateFunctionSQL(table Table, names repoNames) string {
 	rowStatusColumn := findRowStatusColumn(table)
 	updatableCols := updatableColumns(table, rowStatusColumn)
 	pkVar := "v_" + strings.ToLower(table.PrimaryKey)
@@ -263,7 +291,7 @@ BEGIN
 
 	v_result := jsonb_build_object(%s, %s);
 `,
-		quoteQualifiedIdent(table.Schema, repoFunctionName(table, "update")),
+		names.qual(table.Schema, table.Name, "update"),
 		pkVar,
 		quoteLiteral(table.PrimaryKey),
 		quoteLiteral(table.PrimaryKey),
@@ -280,20 +308,17 @@ BEGIN
 		pkVar,
 	))
 
-	b.WriteString(buildChildUpsertCallsSQL(table, pkVar))
+	b.WriteString(buildChildUpsertCallsSQL(table, pkVar, names))
 	b.WriteString("\n\tRETURN v_result;\nEND;\n$$;\n")
 
 	return b.String()
 }
 
-func buildChildUpsertCallsSQL(table Table, pkVar string) string {
+func buildChildUpsertCallsSQL(table Table, pkVar string, names repoNames) string {
 	var b strings.Builder
 
 	for _, child := range table.Children {
-		upsertFunction := quoteQualifiedIdent(child.Schema, repoFunctionName(Table{
-			Schema: child.Schema,
-			Name:   child.Table,
-		}, "upsert"))
+		upsertFunction := names.qual(child.Schema, child.Table, "upsert")
 
 		if child.IsOneToOne {
 			b.WriteString(fmt.Sprintf(`
@@ -345,9 +370,9 @@ func buildChildUpsertCallsSQL(table Table, pkVar string) string {
 	return b.String()
 }
 
-func buildUpsertFunctionSQL(table Table) string {
-	insertFunction := quoteQualifiedIdent(table.Schema, repoFunctionName(table, "insert"))
-	updateFunction := quoteQualifiedIdent(table.Schema, repoFunctionName(table, "update"))
+func buildUpsertFunctionSQL(table Table, names repoNames) string {
+	insertFunction := names.qual(table.Schema, table.Name, "insert")
+	updateFunction := names.qual(table.Schema, table.Name, "update")
 	rowStatusColumn := findRowStatusColumn(table)
 
 	var existsCondition string
@@ -380,7 +405,7 @@ BEGIN
 END;
 $$;
 `,
-		quoteQualifiedIdent(table.Schema, repoFunctionName(table, "upsert")),
+		names.qual(table.Schema, table.Name, "upsert"),
 		quoteLiteral(table.PrimaryKey),
 		quoteQualifiedIdent(table.Schema, table.Name),
 		quoteIdent(table.PrimaryKey),
@@ -391,7 +416,7 @@ $$;
 	)
 }
 
-func buildDeleteFunctionSQL(table Table, tableMap map[string]Table) string {
+func buildDeleteFunctionSQL(table Table, tableMap map[string]Table, names repoNames) string {
 	rowStatusColumn := findRowStatusColumn(table)
 	pkVar := "v_" + strings.ToLower(table.PrimaryKey)
 
@@ -412,7 +437,7 @@ BEGIN
 
 	%s := (payload->>%s)::UUID;
 `,
-		quoteQualifiedIdent(table.Schema, repoFunctionName(table, "delete")),
+		names.qual(table.Schema, table.Name, "delete"),
 		pkVar,
 		quoteLiteral(table.PrimaryKey),
 		quoteLiteral(table.PrimaryKey),
@@ -420,7 +445,7 @@ BEGIN
 		quoteLiteral(table.PrimaryKey),
 	))
 
-	b.WriteString(buildChildDeleteCallsSQL(table, tableMap, pkVar))
+	b.WriteString(buildChildDeleteCallsSQL(table, tableMap, pkVar, names))
 
 	if rowStatusColumn != "" {
 		b.WriteString(fmt.Sprintf(`
@@ -455,16 +480,13 @@ $$;
 	return b.String()
 }
 
-func buildChildDeleteCallsSQL(table Table, tableMap map[string]Table, pkVar string) string {
+func buildChildDeleteCallsSQL(table Table, tableMap map[string]Table, pkVar string, names repoNames) string {
 	var b strings.Builder
 
 	for _, child := range table.Children {
 		childTable := tableMap[tableKey(child.Schema, child.Table)]
 		childRowStatusColumn := findRowStatusColumn(childTable)
-		deleteFunction := quoteQualifiedIdent(child.Schema, repoFunctionName(Table{
-			Schema: child.Schema,
-			Name:   child.Table,
-		}, "delete"))
+		deleteFunction := names.qual(child.Schema, child.Table, "delete")
 
 		activeFilter := "TRUE"
 		if childRowStatusColumn != "" {
@@ -494,7 +516,7 @@ func buildChildDeleteCallsSQL(table Table, tableMap map[string]Table, pkVar stri
 	return b.String()
 }
 
-func buildGetFunctionSQL(table Table, tableMap map[string]Table) string {
+func buildGetFunctionSQL(table Table, tableMap map[string]Table, names repoNames) string {
 	rowStatusColumn := findRowStatusColumn(table)
 	pkVar := "v_" + strings.ToLower(table.PrimaryKey)
 	rowVar := "v_row"
@@ -532,7 +554,7 @@ BEGIN
 
 	v_result := %s;
 `,
-		quoteQualifiedIdent(table.Schema, repoFunctionName(table, "get")),
+		names.qual(table.Schema, table.Name, "get"),
 		pkVar,
 		rowVar,
 		quoteQualifiedIdent(table.Schema, table.Name),
@@ -550,22 +572,19 @@ BEGIN
 		buildRowToJSONObject(table, rowVar),
 	))
 
-	b.WriteString(buildChildGetCallsSQL(table, tableMap, pkVar))
+	b.WriteString(buildChildGetCallsSQL(table, tableMap, pkVar, names))
 	b.WriteString("\n\tRETURN v_result;\nEND;\n$$;\n")
 
 	return b.String()
 }
 
-func buildChildGetCallsSQL(table Table, tableMap map[string]Table, pkVar string) string {
+func buildChildGetCallsSQL(table Table, tableMap map[string]Table, pkVar string, names repoNames) string {
 	var b strings.Builder
 
 	for _, child := range table.Children {
 		childTable := tableMap[tableKey(child.Schema, child.Table)]
 		childRowStatusColumn := findRowStatusColumn(childTable)
-		getFunction := quoteQualifiedIdent(child.Schema, repoFunctionName(Table{
-			Schema: child.Schema,
-			Name:   child.Table,
-		}, "get"))
+		getFunction := names.qual(child.Schema, child.Table, "get")
 
 		activeFilter := "TRUE"
 		if childRowStatusColumn != "" {

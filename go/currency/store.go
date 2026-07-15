@@ -8,15 +8,20 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"go.uber.org/zap"
 )
 
 type Store struct {
 	db     *sql.DB
 	schema string
+	logger *zap.Logger
 }
 
-func NewStore(db *sql.DB, schema string) *Store {
-	return &Store{db: db, schema: schema}
+func NewStore(db *sql.DB, schema string, logger *zap.Logger) *Store {
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+	return &Store{db: db, schema: schema, logger: logger}
 }
 
 func (s *Store) table(name string) string {

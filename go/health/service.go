@@ -16,6 +16,9 @@ type Service struct {
 }
 
 func NewService(db *pgxpool.Pool, nc *nats.Conn, logger *zap.Logger) *Service {
+	if logger == nil {
+		logger = zap.NewNop()
+	}
 	return &Service{
 		db:     db,
 		nc:     nc,
@@ -38,7 +41,7 @@ func (s *Service) IsInfraHealthy() error {
 		return err
 	}
 
-	if !s.nc.IsConnected() {
+	if s.nc != nil && !s.nc.IsConnected() {
 		s.logger.Error("nats health check failed", zap.Error(ErrNatsDisconnected))
 		return ErrNatsDisconnected
 	}

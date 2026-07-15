@@ -10,15 +10,8 @@ func TestLoadConfigFromFile(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "dbhist.yaml")
 	content := `
-schemas:
-  - core
-  - trip
 exclude_patterns:
   - tbl_%_staging
-modules:
-  audit: true
-  history: false
-  repo_functions: true
 `
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
@@ -29,11 +22,20 @@ modules:
 		t.Fatal(err)
 	}
 
-	if len(cfg.Schemas) != 2 || cfg.Schemas[0] != "core" {
-		t.Fatalf("unexpected schemas: %#v", cfg.Schemas)
+	if len(cfg.ExcludePatterns) != 1 {
+		t.Fatalf("exclude_patterns: %#v", cfg.ExcludePatterns)
 	}
+}
 
-	if !cfg.Modules.Audit || cfg.Modules.History || !cfg.Modules.RepoFunctions {
-		t.Fatalf("unexpected modules: %#v", cfg.Modules)
+func TestCommentHasMarker(t *testing.T) {
+	comment := "audit=true repo=true"
+	if !commentHasMarker(comment, auditCommentMarker) {
+		t.Fatal("expected AUDIT marker")
+	}
+	if !commentHasMarker(comment, repoCommentMarker) {
+		t.Fatal("expected REPO marker")
+	}
+	if commentHasMarker("AUDIT=true", repoCommentMarker) {
+		t.Fatal("did not expect REPO marker")
 	}
 }

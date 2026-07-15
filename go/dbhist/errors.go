@@ -3,27 +3,6 @@ package dbhist
 import "github.com/emersonary/appkit/apperror"
 
 var (
-	ErrSchemasEmpty = apperror.Error{
-		Code:    "DBHIST_SCHEMAS_EMPTY",
-		Domain:  "dbhist",
-		Message: "schemas must not be empty",
-		Kind:    apperror.KindValidation,
-	}
-
-	ErrInvalidSchema = apperror.Error{
-		Code:    "DBHIST_INVALID_SCHEMA",
-		Domain:  "dbhist",
-		Message: "schema name is invalid",
-		Kind:    apperror.KindValidation,
-	}
-
-	ErrInvalidTablePattern = apperror.Error{
-		Code:    "DBHIST_INVALID_TABLE_PATTERN",
-		Domain:  "dbhist",
-		Message: "table pattern contains invalid characters",
-		Kind:    apperror.KindValidation,
-	}
-
 	ErrInvalidExcludePattern = apperror.Error{
 		Code:    "DBHIST_INVALID_EXCLUDE_PATTERN",
 		Domain:  "dbhist",
@@ -78,6 +57,13 @@ var (
 		Domain:  "dbhist",
 		Message: "failed to apply repository functions",
 		Kind:    apperror.KindInternal,
+	}
+
+	ErrRepoCycle = apperror.Error{
+		Code:    "DBHIST_REPO_CYCLE",
+		Domain:  "dbhist",
+		Message: "cycle detected while resolving repository function dependencies",
+		Kind:    apperror.KindValidation,
 	}
 )
 

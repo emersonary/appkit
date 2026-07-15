@@ -7,32 +7,32 @@ import (
 	"go.uber.org/zap"
 )
 
-func TestNewHandler_ClientUsesLogModeWhenSMTPDisabled(t *testing.T) {
-	h := NewHandler(Config{}, ProvisioningConfig{}, nil)
-	if h.Client == nil {
+func TestNewService_ClientUsesLogModeWhenSMTPDisabled(t *testing.T) {
+	s := NewService(Config{}, ProvisioningConfig{}, nil)
+	if s.Client == nil {
 		t.Fatal("expected client")
 	}
-	if h.Client.SMTPConfigured() {
+	if s.Client.SMTPConfigured() {
 		t.Fatal("expected SMTP disabled")
 	}
 }
 
-func TestNewHandler_ClientUsesSMTPWhenEnabled(t *testing.T) {
-	h := NewHandler(Config{
+func TestNewService_ClientUsesSMTPWhenEnabled(t *testing.T) {
+	s := NewService(Config{
 		SMTP: SMTPConfig{Host: "smtp.example.com", Port: 587},
 	}, ProvisioningConfig{}, nil)
-	if !h.Client.SMTPConfigured() {
+	if !s.Client.SMTPConfigured() {
 		t.Fatal("expected SMTP enabled")
 	}
 }
 
-func TestNewHandler_APIOnlyWhenProvisioningActive(t *testing.T) {
-	h := NewHandler(Config{}, ProvisioningConfig{Enabled: true}, nil)
-	if h.API != nil {
+func TestNewService_APIOnlyWhenProvisioningActive(t *testing.T) {
+	s := NewService(Config{}, ProvisioningConfig{Enabled: true}, nil)
+	if s.API != nil {
 		t.Fatal("expected nil API when provisioning fields incomplete")
 	}
 
-	h = NewHandler(Config{}, ProvisioningConfig{
+	s = NewService(Config{}, ProvisioningConfig{
 		Enabled:    true,
 		JMAPURL:    "https://mail.example.com/api",
 		APIToken:   "token",
@@ -40,7 +40,7 @@ func TestNewHandler_APIOnlyWhenProvisioningActive(t *testing.T) {
 		Password:   "secret",
 		MailDomain: "example.com",
 	}, nil)
-	if h.API == nil {
+	if s.API == nil {
 		t.Fatal("expected API when provisioning active")
 	}
 }
@@ -52,9 +52,9 @@ func TestClient_SendPlain_DevMode(t *testing.T) {
 	}
 }
 
-func TestHandler_AccountMailer(t *testing.T) {
-	h := NewHandler(Config{Brand: "Awaken Womb"}, ProvisioningConfig{}, zap.NewNop())
-	m := h.AccountMailer()
+func TestService_AccountMailer(t *testing.T) {
+	s := NewService(Config{Brand: "Awaken Womb"}, ProvisioningConfig{}, zap.NewNop())
+	m := s.AccountMailer()
 	ctx := context.Background()
 	if err := m.SendVerificationEmail(ctx, "a@b.com", "https://example.com/verify"); err != nil {
 		t.Fatalf("SendVerificationEmail: %v", err)

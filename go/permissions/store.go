@@ -4,19 +4,26 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"go.uber.org/zap"
 )
 
 type Store struct {
-	db              *sql.DB
-	schema          string
-	accountsSchema  string
+	db             *sql.DB
+	schema         string
+	accountsSchema string
+	logger         *zap.Logger
 }
 
-func NewStore(db *sql.DB, setup Setup) *Store {
+func NewStore(db *sql.DB, setup Setup, logger *zap.Logger) *Store {
+	if logger == nil {
+		logger = zap.NewNop()
+	}
 	return &Store{
 		db:             db,
 		schema:         setup.Schema,
 		accountsSchema: setup.AccountsSchema,
+		logger:         logger,
 	}
 }
 

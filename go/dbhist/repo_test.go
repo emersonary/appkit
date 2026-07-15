@@ -5,6 +5,16 @@ import (
 	"testing"
 )
 
+func testRepoNames(tables ...Table) repoNames {
+	names := repoNames{}
+	for _, table := range tables {
+		for _, op := range repoOperations() {
+			names[makeFuncKey(table.Schema, table.Name, op)] = versionedRepoFunctionName(table.Name, op, 1)
+		}
+	}
+	return names
+}
+
 func TestJsonKeyForChild(t *testing.T) {
 	tests := []struct {
 		table    string
@@ -62,8 +72,9 @@ func TestBuildInsertFunctionSQLContainsChildCalls(t *testing.T) {
 		},
 	}
 
-	sqlText := buildInsertFunctionSQL(tables[1])
-	if !strings.Contains(sqlText, "func_insert_tbl_trip_luggage") {
+	names := testRepoNames(tables...)
+	sqlText := buildInsertFunctionSQL(tables[1], names)
+	if !strings.Contains(sqlText, "func_insert_tbl_trip_luggage_v000001") {
 		t.Fatal("expected participant insert to call luggage insert")
 	}
 
@@ -104,8 +115,10 @@ func TestBuildDeleteFunctionSQLSoftDeletesChildrenFirst(t *testing.T) {
 		},
 	})
 
-	sqlText := buildDeleteFunctionSQL(tables[tableKey("trip", "tbl_trip")], tables)
-	if !strings.Contains(sqlText, "func_delete_tbl_trip_stop") {
+	flat := []Table{tables[tableKey("trip", "tbl_trip")], tables[tableKey("trip", "tbl_trip_stop")]}
+	names := testRepoNames(flat...)
+	sqlText := buildDeleteFunctionSQL(tables[tableKey("trip", "tbl_trip")], tables, names)
+	if !strings.Contains(sqlText, "func_delete_tbl_trip_stop_v000001") {
 		t.Fatal("expected trip delete to call stop delete")
 	}
 
@@ -187,12 +200,20 @@ func TestBuildGetFunctionSQLIncludesChildren(t *testing.T) {
 		},
 	})
 
-	sqlText := buildGetFunctionSQL(tables[tableKey("trip", "tbl_trip")], tables)
-	if !strings.Contains(sqlText, "func_get_tbl_trip_stop") {
+	flat := []Table{
+		tables[tableKey("trip", "tbl_trip")],
+		tables[tableKey("trip", "tbl_trip_stop")],
+		tables[tableKey("trip", "tbl_trip_participant")],
+		tables[tableKey("trip", "tbl_trip_luggage")],
+	}
+	names := testRepoNames(flat...)
+
+	sqlText := buildGetFunctionSQL(tables[tableKey("trip", "tbl_trip")], tables, names)
+	if !strings.Contains(sqlText, "func_get_tbl_trip_stop_v000001") {
 		t.Fatal("expected trip get to load stops")
 	}
 
-	if !strings.Contains(sqlText, "func_get_tbl_trip_participant") {
+	if !strings.Contains(sqlText, "func_get_tbl_trip_participant_v000001") {
 		t.Fatal("expected trip get to load participants")
 	}
 
@@ -200,8 +221,8 @@ func TestBuildGetFunctionSQLIncludesChildren(t *testing.T) {
 		t.Fatal("expected trip_stops array in result")
 	}
 
-	participantSQL := buildGetFunctionSQL(tables[tableKey("trip", "tbl_trip_participant")], tables)
-	if !strings.Contains(participantSQL, "func_get_tbl_trip_luggage") {
+	participantSQL := buildGetFunctionSQL(tables[tableKey("trip", "tbl_trip_participant")], tables, names)
+	if !strings.Contains(participantSQL, "func_get_tbl_trip_luggage_v000001") {
 		t.Fatal("expected participant get to load luggage")
 	}
 }
@@ -227,21 +248,10 @@ func TestBuildRowToJSONObject(t *testing.T) {
 	}
 }
 
-func TestValidateEmptySchemas(t *testing.T) {
-	cfg := Config{}
-	cfg.applyDefaults()
-
-	if err := cfg.Validate(); err != ErrSchemasEmpty {
-		t.Fatalf("expected ErrSchemasEmpty, got %v", err)
-	}
-}
-
 func TestLoadConfigMergesImplicitExcludePatterns(t *testing.T) {
 	cfg := Config{
-		Schemas:         []string{"trip"},
 		ExcludePatterns: []string{"tbl_%_staging"},
 	}
-	cfg.applyDefaults()
 
 	if err := cfg.Validate(); err != nil {
 		t.Fatal(err)
@@ -254,5 +264,28 @@ func TestLoadConfigMergesImplicitExcludePatterns(t *testing.T) {
 
 	if patterns[0] != "%_hist" || patterns[1] != "%_hist_detail" {
 		t.Fatalf("unexpected implicit patterns: %#v", patterns[:2])
+	}
+}
+
+func TestSortTablesChildrenFirstDetectsCycle(t *testing.T) {
+	tables := []Table{
+		{
+			Schema: "trip",
+			Name:   "tbl_a",
+			Children: []ChildRelation{
+				{Schema: "trip", Table: "tbl_b"},
+			},
+		},
+		{
+			Schema: "trip",
+			Name:   "tbl_b",
+			Children: []ChildRelation{
+				{Schema: "trip", Table: "tbl_a"},
+			},
+		},
+	}
+
+	if _, err := sortTablesChildrenFirst(tables); err == nil {
+		t.Fatal("expected cycle error")
 	}
 }

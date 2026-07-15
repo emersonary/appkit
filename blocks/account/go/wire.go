@@ -58,5 +58,6 @@ func Wire(ctx context.Context, db *sql.DB, app AppConfig, opts Options) (*Servic
 		return nil, err
 	}
 
+	svc.logger.Info("accounts block enabled")
 	return svc, nil
 }

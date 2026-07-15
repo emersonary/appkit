@@ -9,13 +9,13 @@ import (
 	"github.com/emersonary/appkit/ai"
 	appkitconfig "github.com/emersonary/appkit/config"
 	"github.com/emersonary/appkit/currency"
+	"github.com/emersonary/appkit/dbhist"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/health"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
-	"github.com/emersonary/appkit/weather"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 	"github.com/redis/go-redis/v9"
@@ -28,20 +28,10 @@ import (
 type Application[T appkitconfig.AppConfig] struct {
 	Config T
 
-	Logger        *zap.Logger
-	Pool          *pgxpool.Pool
-	NATS          *nats.Conn
-	Redis         *redis.Client
-	HealthHandler *health.Handler
-	Accounts      *accounts.Service
-	Tenants       *tenants.Service
-	Currency      *currency.Service
-	Language      *language.Service
-	AI            *ai.Service
-	Permissions   *permissions.Service
-	Menu          *menu.Service
-	Weather       *weather.Service
-	Email         *email.Handler
+	Logger *zap.Logger
+	Pool   *pgxpool.Pool
+	NATS   *nats.Conn
+	Redis  *redis.Client
 
 	httpServer   *http.Server
 	grpcServer   *grpc.Server
@@ -50,6 +40,17 @@ type Application[T appkitconfig.AppConfig] struct {
 
 	workerCancels []context.CancelFunc
 	wireShutdown  WireShutdownFunc[T]
+
+	Health      *health.Service
+	Accounts    *accounts.Service
+	Tenants     *tenants.Service
+	Currency    *currency.Service
+	Language    *language.Service
+	AI          *ai.Service
+	Permissions *permissions.Service
+	Menu        *menu.Service
+	Email       *email.Service
+	DBHist      *dbhist.Service
 }
 
 // Base returns the embedded appkit infra config from the product config.
@@ -89,7 +90,7 @@ func New[T appkitconfig.AppConfig](ctx context.Context, cfg T, opts Options[T]) 
 		}
 	}
 
-	app.createHealthHandler()
+	app.createHealthService()
 	app.wireEmail()
 
 	if err := app.wireBlocks(ctx, opts); err != nil {

@@ -7,21 +7,27 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"go.uber.org/zap"
 )
 
 type Service struct {
-	setup Setup
-	store *Store
+	setup  Setup
+	store  *Store
+	logger *zap.Logger
 }
 
-func NewService(db *sql.DB, setup Setup) (*Service, error) {
+func NewService(db *sql.DB, setup Setup, logger *zap.Logger) (*Service, error) {
 	setup.normalize()
 	if err := setup.Validate(); err != nil {
 		return nil, err
 	}
+	if logger == nil {
+		logger = zap.NewNop()
+	}
 	return &Service{
-		setup: setup,
-		store: NewStore(db, setup),
+		setup:  setup,
+		store:  NewStore(db, setup, logger.Named("store")),
+		logger: logger,
 	}, nil
 }
 

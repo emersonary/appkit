@@ -7,12 +7,12 @@ import (
 	"github.com/emersonary/appkit/accounts"
 )
 
-// AccountMailer adapts Handler.Client for the accounts block.
-func (h *Handler) AccountMailer() accounts.Mailer {
-	if h == nil || h.Client == nil {
+// AccountMailer adapts Service.Client for the accounts block.
+func (s *Service) AccountMailer() accounts.Mailer {
+	if s == nil || s.Client == nil {
 		return accounts.NoopMailer{}
 	}
-	return &accountMailer{client: h.Client}
+	return &accountMailer{client: s.Client}
 }
 
 type accountMailer struct {

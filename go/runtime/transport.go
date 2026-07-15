@@ -7,6 +7,7 @@ import (
 	"time"
 
 	appkitconfig "github.com/emersonary/appkit/config"
+	healthtransport "github.com/emersonary/appkit/health/transport"
 	"google.golang.org/grpc"
 )
 
@@ -30,7 +31,11 @@ func (a *Application[T]) createConnectionHandlers(ctx context.Context, opts Opti
 
 		if httpEnabled {
 			httpMux = http.NewServeMux()
-			a.HealthHandler.RegisterRoutes(httpMux)
+			healthtransport.New(a.Health, &healthtransport.Mount{
+				HTTPMux: httpMux,
+				AppName: a.Base().AppName(),
+				Logger:  a.Logger.Named("health"),
+			})
 			appkitconfig.NewHandler(func() any { return a.Config }).RegisterRoutes(httpMux, "GET /config")
 		}
 

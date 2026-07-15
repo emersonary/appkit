@@ -1,6 +1,21 @@
 export { FieldRenderer, type FieldRendererProps } from "./FieldRenderer";
-export { ResourceEditForm, type ResourceEditFormProps } from "./ResourceEditForm";
-export { ResourceList, type ResourceListProps } from "./ResourceList";
+export {
+  ResourceEdit,
+  type ResourceEditProps,
+  type ResourceFieldInterceptProps,
+} from "./ResourceEdit";
+export {
+  ResourceList,
+  type ResourceCellInterceptProps,
+  type ResourceListProps,
+  type ResourceRowAction,
+} from "./ResourceList";
+export {
+  ResourceListAndEdit,
+  type ResourceEditConfig,
+  type ResourceListAndEditActions,
+  type ResourceListAndEditProps,
+} from "./ResourceListAndEdit";
 export {
   fieldByKey,
   formSections,
@@ -17,6 +32,7 @@ export type {
   Relation,
   ResourceClient,
   ResourceColumn,
+  ResourceEditMode,
   ResourceField,
   ResourceFormSection,
   ResourceFormView,

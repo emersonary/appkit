@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/emersonary/appkit/accounts/oauth"
+	"go.uber.org/zap"
 )
 
 type Service struct {
@@ -18,17 +19,22 @@ type Service struct {
 	mailer      Mailer
 	oauth       map[string]oauth.Provider
 	afterCreate func(ctx context.Context, account Account, registerAsAdmin bool) error
+	logger      *zap.Logger
 }
 
 type Options struct {
 	Mailer Mailer
 	// AfterCreate runs after a new account row is inserted (e.g. assign permissions profile).
 	AfterCreate func(ctx context.Context, account Account, registerAsAdmin bool) error
+	Logger      *zap.Logger
 }
 
 func (o Options) normalized() Options {
 	if o.Mailer == nil {
 		o.Mailer = NoopMailer{}
+	}
+	if o.Logger == nil {
+		o.Logger = zap.NewNop()
 	}
 	return o
 }
@@ -46,11 +52,12 @@ func New(db *sql.DB, cfg Config, secrets Secrets, opts Options) (*Service, error
 	svc := &Service{
 		cfg:         cfg,
 		secrets:     secrets,
-		store:       NewStore(db, cfg),
+		store:       NewStore(db, cfg, opts.Logger.Named("store")),
 		tokens:      NewTokenService(secrets.JWTSecret, cfg.AccessTokenTTL(), cfg.EffectiveTenantID()),
 		mailer:      opts.Mailer,
 		oauth:       map[string]oauth.Provider{},
 		afterCreate: opts.AfterCreate,
+		logger:      opts.Logger,
 	}
 	return svc, nil
 }

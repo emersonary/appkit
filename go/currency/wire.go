@@ -66,5 +66,9 @@ func Wire(ctx context.Context, db *sql.DB, app AppConfig, opts WireOptions) (*Se
 		go svc.RunExchangeRateUpdater(opts.WorkerCtx, app.UpdateInterval)
 	}
 
+	svc.logger.Info("currency block enabled",
+		zap.Duration("interval", app.UpdateInterval),
+		zap.String("api", app.APIURL),
+	)
 	return svc, nil
 }

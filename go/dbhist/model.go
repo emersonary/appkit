@@ -14,6 +14,8 @@ type Table struct {
 	Name         string
 	PrimaryKey   string
 	IDAuditTable int64
+	Audit        bool // COMMENT contains AUDIT=true
+	Repo         bool // COMMENT contains REPO=true
 	Columns      []Column
 	Children     []ChildRelation
 }

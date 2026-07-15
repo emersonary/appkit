@@ -7,17 +7,24 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type Store struct {
 	db     *sql.DB
 	schema string
+	logger *zap.Logger
 }
 
-func NewStore(db *sql.DB, cfg Config) *Store {
+func NewStore(db *sql.DB, cfg Config, logger *zap.Logger) *Store {
+	if logger == nil {
+		logger = zap.NewNop()
+	}
 	return &Store{
 		db:     db,
 		schema: cfg.Schema,
+		logger: logger,
 	}
 }
 

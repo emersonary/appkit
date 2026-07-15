@@ -3,17 +3,22 @@ package language
 import (
 	"context"
 	"database/sql"
+
+	"go.uber.org/zap"
 )
 
-type Options struct{}
+type Options struct {
+	Logger *zap.Logger
+}
 
 type Service struct {
 	cfg     LanguageConfig
 	enabled map[string]struct{}
 	store   *Store
+	logger  *zap.Logger
 }
 
-func NewService(db *sql.DB, cfg LanguageConfig, _ Options) (*Service, error) {
+func NewService(db *sql.DB, cfg LanguageConfig, opts Options) (*Service, error) {
 	cfg.normalize()
 	if err := cfg.Validate(); err != nil {
 		return nil, err
@@ -21,11 +26,16 @@ func NewService(db *sql.DB, cfg LanguageConfig, _ Options) (*Service, error) {
 	if err := cfg.ensureDefaultInLanguages(); err != nil {
 		return nil, err
 	}
+	logger := opts.Logger
+	if logger == nil {
+		logger = zap.NewNop()
+	}
 
 	return &Service{
 		cfg:     cfg,
 		enabled: cfg.EnabledSet(),
-		store:   NewStore(db, cfg.Schema),
+		store:   NewStore(db, cfg.Schema, logger.Named("store")),
+		logger:  logger,
 	}, nil
 }
 

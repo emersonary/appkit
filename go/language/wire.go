@@ -4,10 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"go.uber.org/zap"
 )
 
 // WireOptions configures optional language wiring behavior.
-type WireOptions struct{}
+type WireOptions struct {
+	Logger *zap.Logger
+}
 
 // ApplySchemaFromLanguageConfig resolves language config and applies the schema when enabled.
 func ApplySchemaFromLanguageConfig(ctx context.Context, db *sql.DB, app LanguageConfig) error {
@@ -40,7 +44,7 @@ func ApplySchemaFromFile(ctx context.Context, db *sql.DB, configPath string) err
 
 // Wire applies the language schema and builds the service when app.Enabled is true.
 // Returns nil, nil when disabled.
-func Wire(ctx context.Context, db *sql.DB, app LanguageConfig, _ WireOptions) (*Service, error) {
+func Wire(ctx context.Context, db *sql.DB, app LanguageConfig, opts WireOptions) (*Service, error) {
 	if !app.Enabled {
 		return nil, nil
 	}
@@ -54,10 +58,13 @@ func Wire(ctx context.Context, db *sql.DB, app LanguageConfig, _ WireOptions) (*
 		return nil, fmt.Errorf("apply language schema: %w", err)
 	}
 
-	svc, err := NewService(db, blockCfg, Options{})
+	svc, err := NewService(db, blockCfg, Options{Logger: opts.Logger})
 	if err != nil {
 		return nil, err
 	}
 
+	svc.logger.Info("language block enabled",
+		zap.String("default", blockCfg.DefaultLanguage),
+	)
 	return svc, nil
 }

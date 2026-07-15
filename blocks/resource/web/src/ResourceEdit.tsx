@@ -1,37 +1,53 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { FieldRenderer } from "./FieldRenderer";
 import { fieldByKey, formSections, itemID } from "./schema";
-import type { ResourceField, ResourceItem, ResourceSchema } from "./types";
+import type { ResourceField, ResourceItem, ResourceEditMode, ResourceSchema } from "./types";
 
-export type ResourceEditFormProps = {
+export type ResourceFieldInterceptProps = {
+  field: ResourceField;
+  value: unknown;
+  item: ResourceItem;
+  onChange: (key: string, value: unknown) => void;
+  readOnly?: boolean;
+};
+
+export type ResourceEditProps = {
   schema: ResourceSchema;
   item?: ResourceItem;
+  mode?: ResourceEditMode;
+  error?: string | null;
   relationOptions?: Record<string, { value: string; label: string }[]>;
   saving?: boolean;
   readOnly?: boolean;
   submitLabel?: string;
-  renderField?: (props: {
-    field: ResourceField;
-    value: unknown;
-    item: ResourceItem;
-    onChange: (key: string, value: unknown) => void;
-    readOnly?: boolean;
-  }) => ReactNode;
+  cancelLabel?: string;
+  renderField?: (props: ResourceFieldInterceptProps) => ReactNode;
+  interceptField?: (props: ResourceFieldInterceptProps) => ReactNode | null | undefined;
   onSubmit?: (values: ResourceItem) => void | Promise<void>;
   onCancel?: () => void;
 };
 
-export function ResourceEditForm({
+function modeLabel(mode: ResourceEditMode | undefined, editing: boolean): string {
+  if (mode === "replicate") return "Replicate";
+  if (mode === "create" || !editing) return "Create";
+  return "Edit";
+}
+
+export function ResourceEdit({
   schema,
   item,
+  mode,
+  error,
   relationOptions,
   saving,
   readOnly,
   submitLabel = "Save",
+  cancelLabel = "Cancel",
   renderField,
+  interceptField,
   onSubmit,
   onCancel,
-}: ResourceEditFormProps) {
+}: ResourceEditProps) {
   const [values, setValues] = useState<ResourceItem>(() => ({ ...(item ?? {}) }));
   const fields = useMemo(() => fieldByKey(schema), [schema]);
   const sections = useMemo(() => formSections(schema), [schema]);
@@ -54,13 +70,15 @@ export function ResourceEditForm({
     <form className="appkit-resource-form" onSubmit={submit}>
       <header className="appkit-resource-form__header">
         <div>
-          <p className="appkit-resource-form__eyebrow">{editing ? "Edit" : "Create"}</p>
+          <p className="appkit-resource-form__eyebrow">{modeLabel(mode, editing)}</p>
           <h1 className="appkit-resource-form__title">{schema.name}</h1>
           {schema.description ? (
             <p className="appkit-resource-form__description">{schema.description}</p>
           ) : null}
         </div>
       </header>
+
+      {error ? <p className="appkit-resource-form__error">{error}</p> : null}
 
       {sections.map((section) => (
         <section key={section.id} className="appkit-resource-form__section">
@@ -82,24 +100,30 @@ export function ResourceEditForm({
                       {field.required ? <span aria-hidden="true"> *</span> : null}
                     </span>
                   ) : null}
-                  {renderField ? (
-                    renderField({
-                      field,
-                      value: values[field.key],
-                      item: values,
-                      onChange: updateValue,
-                      readOnly,
-                    })
-                  ) : (
-                    <FieldRenderer
-                      field={field}
-                      value={values[field.key]}
-                      item={values}
-                      onChange={updateValue}
-                      relationOptions={relationOptions}
-                      readOnly={readOnly}
-                    />
-                  )}
+                  {renderField
+                    ? renderField({
+                        field,
+                        value: values[field.key],
+                        item: values,
+                        onChange: updateValue,
+                        readOnly,
+                      })
+                    : (interceptField?.({
+                        field,
+                        value: values[field.key],
+                        item: values,
+                        onChange: updateValue,
+                        readOnly,
+                      }) ?? (
+                        <FieldRenderer
+                          field={field}
+                          value={values[field.key]}
+                          item={values}
+                          onChange={updateValue}
+                          relationOptions={relationOptions}
+                          readOnly={readOnly}
+                        />
+                      ))}
                   {field.help_text ? (
                     <span className="appkit-resource-field__help">{field.help_text}</span>
                   ) : null}
@@ -113,7 +137,7 @@ export function ResourceEditForm({
       <footer className="appkit-resource-form__actions">
         {onCancel ? (
           <button type="button" className="appkit-resource-button appkit-resource-button--ghost" onClick={onCancel}>
-            Cancel
+            {cancelLabel}
           </button>
         ) : null}
         {!readOnly ? (

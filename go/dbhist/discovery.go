@@ -9,19 +9,7 @@ import (
 )
 
 func loadTables(ctx context.Context, db *sql.DB, cfg Config) ([]Table, []SkippedTable, error) {
-	query := fmt.Sprintf(`
-		SELECT table_schema, table_name
-		FROM information_schema.tables
-		WHERE table_type = 'BASE TABLE'
-		  AND table_name LIKE %s
-		  %s
-		  AND table_schema IN (%s)
-		ORDER BY table_schema, table_name;
-	`,
-		quoteLiteral(cfg.TablePattern),
-		buildExcludePatternsSQL("table_name", cfg.allExcludePatterns()),
-		quoteIdentList(cfg.Schemas),
-	)
+	query := buildLoadTablesSQL(cfg)
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -35,8 +23,9 @@ func loadTables(ctx context.Context, db *sql.DB, cfg Config) ([]Table, []Skipped
 	for rows.Next() {
 		var schemaName string
 		var tableName string
+		var tableComment string
 
-		if err := rows.Scan(&schemaName, &tableName); err != nil {
+		if err := rows.Scan(&schemaName, &tableName, &tableComment); err != nil {
 			return nil, nil, err
 		}
 
@@ -63,6 +52,8 @@ func loadTables(ctx context.Context, db *sql.DB, cfg Config) ([]Table, []Skipped
 			Schema:     schemaName,
 			Name:       tableName,
 			PrimaryKey: pk,
+			Audit:      commentHasMarker(tableComment, auditCommentMarker),
+			Repo:       commentHasMarker(tableComment, repoCommentMarker),
 			Columns:    cols,
 		})
 	}
@@ -71,38 +62,7 @@ func loadTables(ctx context.Context, db *sql.DB, cfg Config) ([]Table, []Skipped
 }
 
 func loadForeignKeys(ctx context.Context, db *sql.DB, cfg Config) ([]ForeignKey, error) {
-	query := fmt.Sprintf(`
-		SELECT
-			src_ns.nspname AS child_schema,
-			src.relname AS child_table,
-			src_att.attname AS child_column,
-			tgt_ns.nspname AS parent_schema,
-			tgt.relname AS parent_table,
-			tgt_att.attname AS parent_column
-		FROM pg_constraint con
-		JOIN pg_class src ON src.oid = con.conrelid
-		JOIN pg_namespace src_ns ON src_ns.oid = src.relnamespace
-		JOIN pg_class tgt ON tgt.oid = con.confrelid
-		JOIN pg_namespace tgt_ns ON tgt_ns.oid = tgt.relnamespace
-		JOIN unnest(con.conkey) WITH ORDINALITY AS src_cols(attnum, ord) ON TRUE
-		JOIN unnest(con.confkey) WITH ORDINALITY AS tgt_cols(attnum, ord)
-		  ON src_cols.ord = tgt_cols.ord
-		JOIN pg_attribute src_att
-		  ON src_att.attrelid = src.oid
-		 AND src_att.attnum = src_cols.attnum
-		JOIN pg_attribute tgt_att
-		  ON tgt_att.attrelid = tgt.oid
-		 AND tgt_att.attnum = tgt_cols.attnum
-		WHERE con.contype = 'f'
-		  AND src.relname LIKE %s
-		  %s
-		  AND src_ns.nspname IN (%s)
-		ORDER BY child_schema, child_table, child_column;
-	`,
-		quoteLiteral(cfg.TablePattern),
-		buildExcludePatternsSQL("src.relname", cfg.allExcludePatterns()),
-		quoteIdentList(cfg.Schemas),
-	)
+	query := buildLoadForeignKeysSQL(cfg)
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -148,15 +108,6 @@ func buildExcludePatternsSQL(columnExpr string, patterns []string) string {
 	}
 
 	return b.String()
-}
-
-func quoteIdentList(values []string) string {
-	quoted := make([]string, len(values))
-	for i, value := range values {
-		quoted[i] = quoteLiteral(value)
-	}
-
-	return strings.Join(quoted, ", ")
 }
 
 func loadPrimaryKey(ctx context.Context, db *sql.DB, schemaName, tableName string) (string, error) {

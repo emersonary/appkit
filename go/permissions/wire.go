@@ -4,9 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"go.uber.org/zap"
 )
 
-type WireOptions struct{}
+type WireOptions struct {
+	Logger *zap.Logger
+}
 
 func ApplySchemaFromSetupInput(ctx context.Context, db *sql.DB, input SetupInput) error {
 	if !input.Enabled {
@@ -25,7 +29,7 @@ func ApplySchemaFromSetupInput(ctx context.Context, db *sql.DB, input SetupInput
 	return nil
 }
 
-func Wire(ctx context.Context, db *sql.DB, input SetupInput, _ WireOptions) (*Service, error) {
+func Wire(ctx context.Context, db *sql.DB, input SetupInput, opts WireOptions) (*Service, error) {
 	if !input.Enabled {
 		return nil, nil
 	}
@@ -39,10 +43,13 @@ func Wire(ctx context.Context, db *sql.DB, input SetupInput, _ WireOptions) (*Se
 		return nil, fmt.Errorf("apply permissions schema: %w", err)
 	}
 
-	svc, err := NewService(db, setup)
+	svc, err := NewService(db, setup, opts.Logger)
 	if err != nil {
 		return nil, err
 	}
 
+	svc.logger.Info("permissions block enabled",
+		zap.String("default_profile", setup.DefaultProfile),
+	)
 	return svc, nil
 }

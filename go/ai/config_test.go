@@ -91,7 +91,7 @@ func TestServiceTranslate(t *testing.T) {
 		DefaultModel: "gpt-4o-mini",
 	}
 
-	svc, err := NewService(cfg)
+	svc, err := NewService(cfg, nil)
 	if err != nil {
 		t.Fatalf("NewService: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestServiceDetectUsesLocalRoute(t *testing.T) {
 		DefaultModel: "gpt-4o-mini",
 	}
 
-	svc, err := NewService(cfg)
+	svc, err := NewService(cfg, nil)
 	if err != nil {
 		t.Fatalf("NewService: %v", err)
 	}
@@ -167,7 +167,7 @@ func TestRouteSummary(t *testing.T) {
 		DefaultModel: "gpt-4o-mini",
 	}
 
-	svc, err := NewService(cfg)
+	svc, err := NewService(cfg, nil)
 	if err != nil {
 		t.Fatalf("NewService: %v", err)
 	}

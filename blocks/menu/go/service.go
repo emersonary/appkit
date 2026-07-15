@@ -5,15 +5,17 @@ import (
 	"strings"
 
 	"github.com/emersonary/appkit/permissions"
+	"go.uber.org/zap"
 )
 
 // Service resolves backend-defined menus for authenticated accounts.
 type Service struct {
 	setup       Setup
 	permissions *permissions.Service
+	logger      *zap.Logger
 }
 
-func NewService(setup Setup, perms *permissions.Service) (*Service, error) {
+func NewService(setup Setup, perms *permissions.Service, logger *zap.Logger) (*Service, error) {
 	if perms == nil {
 		return nil, ErrPermissionsRequired
 	}
@@ -24,7 +26,10 @@ func NewService(setup Setup, perms *permissions.Service) (*Service, error) {
 	if err := setup.ValidateAgainstPermissions(perms.Setup()); err != nil {
 		return nil, err
 	}
-	return &Service{setup: setup, permissions: perms}, nil
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+	return &Service{setup: setup, permissions: perms, logger: logger}, nil
 }
 
 func (s *Service) Setup() Setup {

@@ -3,6 +3,8 @@ package ai
 import (
 	"context"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 // Service routes AI capability operations to configured providers.
@@ -11,12 +13,16 @@ type Service struct {
 	router      *Router
 	translation *Translation
 	chat        *Chat
+	logger      *zap.Logger
 }
 
-func NewService(cfg AIConfig) (*Service, error) {
+func NewService(cfg AIConfig, logger *zap.Logger) (*Service, error) {
 	cfg.normalize()
 	if err := cfg.Validate(); err != nil {
 		return nil, err
+	}
+	if logger == nil {
+		logger = zap.NewNop()
 	}
 
 	providers := make(map[string]Provider, len(cfg.Providers))
@@ -37,6 +43,7 @@ func NewService(cfg AIConfig) (*Service, error) {
 		router:      router,
 		translation: newTranslation(router),
 		chat:        newChat(router),
+		logger:      logger,
 	}, nil
 }
 

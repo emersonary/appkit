@@ -6,58 +6,57 @@ import (
 	"github.com/emersonary/appkit/accounts"
 	"github.com/emersonary/appkit/ai"
 	"github.com/emersonary/appkit/currency"
+	"github.com/emersonary/appkit/dbhist"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
-	"github.com/emersonary/appkit/weather"
 	"github.com/jackc/pgx/v5/stdlib"
-	"go.uber.org/zap"
 )
 
 func (a *Application[T]) wireEmail() {
 	base := a.Base()
-	a.Email = email.NewHandler(base.Email, base.MailProvisioning, a.Logger.Named("email"))
+	a.Email = email.NewService(base.Email, base.MailProvisioning, a.Logger.Named("email"))
 }
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.Weather.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.DBHist.Enabled {
 		return nil
 	}
 
 	// sqlDB wraps the application pool; do not Close here — Shutdown closes a.Pool.
 	sqlDB := stdlib.OpenDBFromPool(a.Pool)
 
-	if base.Permissions.Enabled {
-		svc, err := permissions.Wire(ctx, sqlDB, base.Permissions, permissions.WireOptions{})
-		if err != nil {
-			return err
-		}
-		a.Permissions = svc
-		if svc != nil {
-			a.Logger.Info("permissions block enabled",
-				zap.String("default_profile", base.Permissions.DefaultProfile),
-			)
-		}
+	svc, err := dbhist.Wire(ctx, sqlDB, base.DBHist, dbhist.WireOptions{
+		Logger: a.Logger.Named("dbhist"),
+	})
+	if err != nil {
+		return err
 	}
+	a.DBHist = svc
 
-	if base.Menu.Enabled {
-		svc, err := menu.Wire(ctx, base.Menu, menu.WireOptions{Permissions: a.Permissions})
-		if err != nil {
-			return err
-		}
-		a.Menu = svc
-		if svc != nil {
-			a.Logger.Info("menu block enabled",
-				zap.Int("menus", len(svc.Setup().Menus)),
-			)
-		}
+	permSvc, err := permissions.Wire(ctx, sqlDB, base.Permissions, permissions.WireOptions{
+		Logger: a.Logger.Named("permissions"),
+	})
+	if err != nil {
+		return err
 	}
+	a.Permissions = permSvc
 
+	menuSvc, err := menu.Wire(ctx, base.Menu, menu.WireOptions{
+		Permissions: a.Permissions,
+		Logger:      a.Logger.Named("menu"),
+	})
+	if err != nil {
+		return err
+	}
+	a.Menu = menuSvc
+
+	// AccountsWire / default hooks are caller-side prep; only build when accounts will wire.
+	accOpts := accounts.Options{}
 	if base.Accounts.Enabled {
-		accOpts := accounts.Options{}
 		if opts.AccountsWire != nil {
 			var err error
 			accOpts, err = opts.AccountsWire(ctx, a)
@@ -74,32 +73,30 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 				return perm.AssignNewAccountProfile(ctx, account.ID, registerAsAdmin || account.IsAdmin)
 			}
 		}
-
-		svc, err := accounts.Wire(ctx, sqlDB, base.Accounts, accOpts)
-		if err != nil {
-			return err
-		}
-		a.Accounts = svc
-		if svc != nil {
-			a.Logger.Info("accounts block enabled")
+		if accOpts.Logger == nil {
+			accOpts.Logger = a.Logger.Named("accounts")
 		}
 	}
 
-	if base.Tenants.Enabled {
-		svc, err := tenants.Wire(ctx, sqlDB, base.Tenants)
-		if err != nil {
-			return err
-		}
-		a.Tenants = svc
-		if svc != nil {
-			a.Logger.Info("tenants block enabled")
-		}
+	accSvc, err := accounts.Wire(ctx, sqlDB, base.Accounts, accOpts)
+	if err != nil {
+		return err
 	}
+	a.Accounts = accSvc
 
+	tenSvc, err := tenants.Wire(ctx, sqlDB, base.Tenants, tenants.WireOptions{
+		Logger: a.Logger.Named("tenants"),
+	})
+	if err != nil {
+		return err
+	}
+	a.Tenants = tenSvc
+
+	// RegisterWorker has side effects; only prepare when currency will actually wire.
+	curOpts := currency.WireOptions{Logger: a.Logger.Named("currency")}
 	if base.Currency.Enabled {
 		workerCtx, _ := a.RegisterWorker()
-
-		curOpts := currency.WireOptions{Logger: a.Logger.Named("currency"), WorkerCtx: workerCtx}
+		curOpts.WorkerCtx = workerCtx
 		if opts.CurrencyWire != nil {
 			var err error
 			curOpts, err = opts.CurrencyWire(ctx, a, workerCtx)
@@ -108,66 +105,33 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 				return err
 			}
 		}
-
-		svc, err := currency.Wire(ctx, sqlDB, base.Currency, curOpts)
-		if err != nil {
-			a.stopWorkers()
-			return err
-		}
-		a.Currency = svc
-		if svc != nil {
-			a.Logger.Info("currency block enabled",
-				zap.Duration("interval", base.Currency.UpdateInterval),
-				zap.String("api", base.Currency.APIURL),
-			)
+		if curOpts.Logger == nil {
+			curOpts.Logger = a.Logger.Named("currency")
 		}
 	}
 
-	if base.Language.Enabled {
-		svc, err := language.Wire(ctx, sqlDB, base.Language, language.WireOptions{})
-		if err != nil {
-			return err
-		}
-		a.Language = svc
-		if svc != nil {
-			a.Logger.Info("language block enabled",
-				zap.String("default", base.Language.DefaultLanguage),
-			)
-		}
+	curSvc, err := currency.Wire(ctx, sqlDB, base.Currency, curOpts)
+	if err != nil {
+		a.stopWorkers()
+		return err
 	}
+	a.Currency = curSvc
 
-	if base.AI.Enabled {
-		svc, err := ai.Wire(ctx, base.AI, ai.WireOptions{})
-		if err != nil {
-			return err
-		}
-		a.AI = svc
-		if svc != nil {
-			a.Logger.Info("ai block enabled",
-				zap.Any("routes", svc.RouteSummary()),
-			)
-		}
+	langSvc, err := language.Wire(ctx, sqlDB, base.Language, language.WireOptions{
+		Logger: a.Logger.Named("language"),
+	})
+	if err != nil {
+		return err
 	}
+	a.Language = langSvc
 
-	if base.Weather.Enabled {
-		workerCtx, _ := a.RegisterWorker()
-		svc, err := weather.Wire(ctx, base.Weather, weather.WireOptions{
-			Redis:     a.Redis,
-			Logger:    a.Logger.Named("weather"),
-			WorkerCtx: workerCtx,
-		})
-		if err != nil {
-			a.stopWorkers()
-			return err
-		}
-		a.Weather = svc
-		if svc != nil {
-			a.Logger.Info("weather block enabled",
-				zap.String("key_prefix", svc.Config().KeyPrefix),
-				zap.Duration("refresh_interval", svc.Config().RefreshInterval),
-			)
-		}
+	aiSvc, err := ai.Wire(ctx, base.AI, ai.WireOptions{
+		Logger: a.Logger.Named("ai"),
+	})
+	if err != nil {
+		return err
 	}
+	a.AI = aiSvc
 
 	return nil
 }

@@ -86,6 +86,8 @@ export type ResourceSchema = {
 
 export type ResourceItem = Record<string, unknown>;
 
+export type ResourceEditMode = "create" | "edit" | "replicate";
+
 export type ResourceListResponse = {
   items: ResourceItem[];
   total: number;

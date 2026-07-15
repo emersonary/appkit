@@ -7,11 +7,13 @@ type Options struct {
 }
 
 type Result struct {
-	TablesFound     int
-	SkippedTables   []SkippedTable
-	AuditApplied    bool
-	HistoryApplied  bool
-	RepoApplied     bool
+	TablesFound             int
+	SkippedTables           []SkippedTable
+	AuditApplied            bool
+	HistoryApplied          bool
+	RepoApplied             bool
+	RepoFunctionsCreated    int
+	RepoFunctionsUnchanged  int
 }
 
 type SkippedTable struct {

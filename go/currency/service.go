@@ -19,6 +19,9 @@ func (o Options) normalized() Options {
 	if out.APIURL == "" {
 		out.APIURL = DefaultAPIURL
 	}
+	if out.Logger == nil {
+		out.Logger = zap.NewNop()
+	}
 
 	return out
 }
@@ -29,6 +32,7 @@ type Service struct {
 	store   *Store
 	client  *Client
 	opts    Options
+	logger  *zap.Logger
 }
 
 func NewService(db *sql.DB, cfg Config, opts Options) (*Service, error) {
@@ -42,9 +46,10 @@ func NewService(db *sql.DB, cfg Config, opts Options) (*Service, error) {
 	return &Service{
 		cfg:     cfg,
 		enabled: cfg.EnabledSet(),
-		store:   NewStore(db, cfg.Schema),
+		store:   NewStore(db, cfg.Schema, opts.Logger.Named("store")),
 		client:  NewClient(opts.APIURL),
 		opts:    opts,
+		logger:  opts.Logger,
 	}, nil
 }
 
@@ -92,12 +97,10 @@ func (s *Service) SyncExchangeRates(ctx context.Context) (SyncResult, error) {
 		rate, ok := snapshot.Rates[code]
 		if !ok || rate <= 0 {
 			result.Skipped++
-			if s.opts.Logger != nil {
-				s.opts.Logger.Warn("currency rate missing from feed",
-					zap.String("code", code),
-					zap.String("feed", snapshot.Source),
-				)
-			}
+			s.logger.Warn("currency rate missing from feed",
+				zap.String("code", code),
+				zap.String("feed", snapshot.Source),
+			)
 
 			continue
 		}
@@ -112,13 +115,11 @@ func (s *Service) SyncExchangeRates(ctx context.Context) (SyncResult, error) {
 		result.Updated++
 	}
 
-	if s.opts.Logger != nil {
-		s.opts.Logger.Info("currency rates synced",
-			zap.Int("updated", result.Updated),
-			zap.Int("skipped", result.Skipped),
-			zap.String("feed", snapshot.Source),
-		)
-	}
+	s.logger.Info("currency rates synced",
+		zap.Int("updated", result.Updated),
+		zap.Int("skipped", result.Skipped),
+		zap.String("feed", snapshot.Source),
+	)
 
 	return result, nil
 }
@@ -132,8 +133,8 @@ func (s *Service) RunExchangeRateUpdater(ctx context.Context, interval time.Dura
 		syncCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 		defer cancel()
 
-		if _, err := s.SyncExchangeRates(syncCtx); err != nil && s.opts.Logger != nil {
-			s.opts.Logger.Error("currency rate sync failed", zap.Error(err))
+		if _, err := s.SyncExchangeRates(syncCtx); err != nil {
+			s.logger.Error("currency rate sync failed", zap.Error(err))
 		}
 	}
 

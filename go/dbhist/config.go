@@ -4,31 +4,27 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	defaultTablePattern = "tbl_%"
+	auditCommentMarker   = "AUDIT=true"
+	repoCommentMarker    = "REPO=true"
+	repoVersionWidth     = 6
+	repoGeneratorVersion = "dbhist-repo/1"
 )
 
 var (
 	implicitExcludePatterns = []string{"%_hist", "%_hist_detail"}
-	identPattern            = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
 	tablePatternPattern     = regexp.MustCompile(`^[a-zA-Z0-9_%]+$`)
 )
 
-type Modules struct {
-	Audit         bool `yaml:"audit"`
-	History       bool `yaml:"history"`
-	RepoFunctions bool `yaml:"repo_functions"`
-}
-
+// Config is the resolved dbhist settings used by UpdateHist.
+// Table selection is driven by COMMENT markers (AUDIT=true / REPO=true), not YAML modules.
 type Config struct {
-	Schemas         []string `yaml:"schemas"`
-	ExcludePatterns []string `yaml:"exclude_patterns"`
-	TablePattern    string   `yaml:"table_pattern"`
-	Modules         Modules  `yaml:"modules"`
+	ExcludePatterns []string `yaml:"exclude_patterns" mapstructure:"exclude_patterns" json:"exclude_patterns,omitempty"`
 }
 
 func LoadConfig(path string) (Config, error) {
@@ -42,7 +38,6 @@ func LoadConfig(path string) (Config, error) {
 		return Config{}, wrapErr(ErrLoadConfig, "parse", err)
 	}
 
-	cfg.applyDefaults()
 	if err := cfg.Validate(); err != nil {
 		return Config{}, err
 	}
@@ -50,39 +45,12 @@ func LoadConfig(path string) (Config, error) {
 	return cfg, nil
 }
 
-func (c *Config) applyDefaults() {
-	if c.TablePattern == "" {
-		c.TablePattern = defaultTablePattern
-	}
-
-	if !c.Modules.Audit && !c.Modules.History && !c.Modules.RepoFunctions {
-		c.Modules.Audit = true
-		c.Modules.History = true
-		c.Modules.RepoFunctions = true
-	}
-}
-
 func (c Config) Validate() error {
-	if len(c.Schemas) == 0 {
-		return ErrSchemasEmpty
-	}
-
-	for _, schema := range c.Schemas {
-		if err := validateIdent(schema); err != nil {
-			return ErrInvalidSchema.With(schema, err.Error())
-		}
-	}
-
-	if !tablePatternPattern.MatchString(c.TablePattern) {
-		return ErrInvalidTablePattern.With("table_pattern", c.TablePattern)
-	}
-
 	for _, pattern := range c.ExcludePatterns {
 		if !tablePatternPattern.MatchString(pattern) {
 			return ErrInvalidExcludePattern.With("exclude_pattern", pattern)
 		}
 	}
-
 	return nil
 }
 
@@ -93,10 +61,9 @@ func (c Config) allExcludePatterns() []string {
 	return patterns
 }
 
-func validateIdent(name string) error {
-	if !identPattern.MatchString(name) {
-		return fmt.Errorf("invalid identifier %q", name)
-	}
-
-	return nil
+func commentHasMarker(comment, marker string) bool {
+	return strings.Contains(
+		strings.ToLower(comment),
+		strings.ToLower(strings.TrimSpace(marker)),
+	)
 }
