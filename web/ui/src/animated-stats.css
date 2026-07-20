@@ -1,0 +1,31 @@
+.ak-stats {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.ak-stats-item {
+  text-align: center;
+}
+
+.ak-stat-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+}
+
+.ak-stat-digit {
+  display: inline-block;
+  width: 0.62em;
+  text-align: center;
+}
+
+.ak-stat-char {
+  display: inline-block;
+}
+
+.ak-stat-label {
+  margin-top: 0.5rem;
+}
