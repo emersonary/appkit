@@ -5,14 +5,20 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/emersonary/appkit/db/querylog"
 	"github.com/emersonary/appkit/migrate"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
 // ApplyConfig is the product migration registry passed to appkit migrate.
 type ApplyConfig = migrate.ApplyConfig
 
 func NewPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
+	return NewPoolWithLogger(ctx, dsn, nil)
+}
+
+func NewPoolWithLogger(ctx context.Context, dsn string, logger *zap.Logger) (*pgxpool.Pool, error) {
 	poolCfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("parse dsn: %w", err)
@@ -21,6 +27,9 @@ func NewPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	poolCfg.MaxConns = 10
 	poolCfg.MinConns = 1
 	poolCfg.MaxConnLifetime = time.Hour
+	if logger != nil {
+		poolCfg.ConnConfig.Tracer = &querylog.Tracer{Logger: logger.Named("db")}
+	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
@@ -36,7 +45,7 @@ func NewPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 }
 
 func (a *Application[T]) createDatabaseConnection(ctx context.Context) error {
-	pool, err := NewPool(ctx, a.Base().Database.DSN())
+	pool, err := NewPoolWithLogger(ctx, a.Base().Database.DSN(), a.Logger)
 	if err != nil {
 		return err
 	}
