@@ -168,6 +168,17 @@ func (s *Service) Login(ctx context.Context, emailAddr, password string) (Sessio
 	return s.tokens.Issue(account, "")
 }
 
+func (s *Service) AdminLogin(ctx context.Context, emailAddr, password string) (Session, error) {
+	session, err := s.Login(ctx, emailAddr, password)
+	if err != nil {
+		return Session{}, err
+	}
+	if !session.Account.IsAdmin {
+		return Session{}, ErrUnauthenticated
+	}
+	return session, nil
+}
+
 // IssueSession mints a JWT for an account, optionally overriding the configured default tenant id.
 func (s *Service) IssueSession(ctx context.Context, accountID, tenantID string) (Session, error) {
 	account, err := s.store.GetByID(ctx, accountID)

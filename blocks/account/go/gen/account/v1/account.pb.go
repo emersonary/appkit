@@ -848,9 +848,11 @@ const file_v1_account_proto_rawDesc = "" +
 	"\x14ResetPasswordRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"\x17\n" +
-	"\x15ResetPasswordResponse2\xc5\x05\n" +
+	"\x15ResetPasswordResponse2\x8a\x06\n" +
 	"\x0eAccountService\x12>\n" +
-	"\x05Login\x12\x18.account.v1.LoginRequest\x1a\x1b.account.v1.SessionResponse\x12E\n" +
+	"\x05Login\x12\x18.account.v1.LoginRequest\x1a\x1b.account.v1.SessionResponse\x12C\n" +
+	"\n" +
+	"AdminLogin\x12\x18.account.v1.LoginRequest\x1a\x1b.account.v1.SessionResponse\x12E\n" +
 	"\bRegister\x12\x1b.account.v1.RegisterRequest\x1a\x1c.account.v1.RegisterResponse\x12H\n" +
 	"\n" +
 	"GetSession\x12\x1d.account.v1.GetSessionRequest\x1a\x1b.account.v1.SessionResponse\x12?\n" +
@@ -895,23 +897,25 @@ var file_v1_account_proto_depIdxs = []int32{
 	7,  // 0: account.v1.RegisterResponse.session:type_name -> account.v1.SessionResponse
 	0,  // 1: account.v1.SessionResponse.account:type_name -> account.v1.Account
 	1,  // 2: account.v1.AccountService.Login:input_type -> account.v1.LoginRequest
-	2,  // 3: account.v1.AccountService.Register:input_type -> account.v1.RegisterRequest
-	3,  // 4: account.v1.AccountService.GetSession:input_type -> account.v1.GetSessionRequest
-	4,  // 5: account.v1.AccountService.Logout:input_type -> account.v1.LogoutRequest
-	8,  // 6: account.v1.AccountService.GetVerificationStatus:input_type -> account.v1.GetVerificationStatusRequest
-	10, // 7: account.v1.AccountService.ResendVerificationEmail:input_type -> account.v1.ResendVerificationEmailRequest
-	12, // 8: account.v1.AccountService.RequestPasswordReset:input_type -> account.v1.RequestPasswordResetRequest
-	14, // 9: account.v1.AccountService.ResetPassword:input_type -> account.v1.ResetPasswordRequest
-	7,  // 10: account.v1.AccountService.Login:output_type -> account.v1.SessionResponse
-	6,  // 11: account.v1.AccountService.Register:output_type -> account.v1.RegisterResponse
-	7,  // 12: account.v1.AccountService.GetSession:output_type -> account.v1.SessionResponse
-	5,  // 13: account.v1.AccountService.Logout:output_type -> account.v1.LogoutResponse
-	9,  // 14: account.v1.AccountService.GetVerificationStatus:output_type -> account.v1.GetVerificationStatusResponse
-	11, // 15: account.v1.AccountService.ResendVerificationEmail:output_type -> account.v1.ResendVerificationEmailResponse
-	13, // 16: account.v1.AccountService.RequestPasswordReset:output_type -> account.v1.RequestPasswordResetResponse
-	15, // 17: account.v1.AccountService.ResetPassword:output_type -> account.v1.ResetPasswordResponse
-	10, // [10:18] is the sub-list for method output_type
-	2,  // [2:10] is the sub-list for method input_type
+	1,  // 3: account.v1.AccountService.AdminLogin:input_type -> account.v1.LoginRequest
+	2,  // 4: account.v1.AccountService.Register:input_type -> account.v1.RegisterRequest
+	3,  // 5: account.v1.AccountService.GetSession:input_type -> account.v1.GetSessionRequest
+	4,  // 6: account.v1.AccountService.Logout:input_type -> account.v1.LogoutRequest
+	8,  // 7: account.v1.AccountService.GetVerificationStatus:input_type -> account.v1.GetVerificationStatusRequest
+	10, // 8: account.v1.AccountService.ResendVerificationEmail:input_type -> account.v1.ResendVerificationEmailRequest
+	12, // 9: account.v1.AccountService.RequestPasswordReset:input_type -> account.v1.RequestPasswordResetRequest
+	14, // 10: account.v1.AccountService.ResetPassword:input_type -> account.v1.ResetPasswordRequest
+	7,  // 11: account.v1.AccountService.Login:output_type -> account.v1.SessionResponse
+	7,  // 12: account.v1.AccountService.AdminLogin:output_type -> account.v1.SessionResponse
+	6,  // 13: account.v1.AccountService.Register:output_type -> account.v1.RegisterResponse
+	7,  // 14: account.v1.AccountService.GetSession:output_type -> account.v1.SessionResponse
+	5,  // 15: account.v1.AccountService.Logout:output_type -> account.v1.LogoutResponse
+	9,  // 16: account.v1.AccountService.GetVerificationStatus:output_type -> account.v1.GetVerificationStatusResponse
+	11, // 17: account.v1.AccountService.ResendVerificationEmail:output_type -> account.v1.ResendVerificationEmailResponse
+	13, // 18: account.v1.AccountService.RequestPasswordReset:output_type -> account.v1.RequestPasswordResetResponse
+	15, // 19: account.v1.AccountService.ResetPassword:output_type -> account.v1.ResetPasswordResponse
+	11, // [11:20] is the sub-list for method output_type
+	2,  // [2:11] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name

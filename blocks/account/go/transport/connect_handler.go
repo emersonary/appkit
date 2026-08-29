@@ -27,6 +27,17 @@ func (h *connectAccountService) Login(
 	return connect.NewResponse(resp), nil
 }
 
+func (h *connectAccountService) AdminLogin(
+	ctx context.Context,
+	req *connect.Request[accountv1.LoginRequest],
+) (*connect.Response[accountv1.SessionResponse], error) {
+	resp, err := h.inner.AdminLogin(ctx, req.Msg)
+	if err != nil {
+		return nil, ToConnectError(err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
 func (h *connectAccountService) Register(
 	ctx context.Context,
 	req *connect.Request[accountv1.RegisterRequest],

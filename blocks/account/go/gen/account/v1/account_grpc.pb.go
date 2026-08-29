@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	AccountService_Login_FullMethodName                   = "/account.v1.AccountService/Login"
+	AccountService_AdminLogin_FullMethodName              = "/account.v1.AccountService/AdminLogin"
 	AccountService_Register_FullMethodName                = "/account.v1.AccountService/Register"
 	AccountService_GetSession_FullMethodName              = "/account.v1.AccountService/GetSession"
 	AccountService_Logout_FullMethodName                  = "/account.v1.AccountService/Logout"
@@ -34,6 +35,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccountServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*SessionResponse, error)
+	AdminLogin(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*SessionResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetSession(ctx context.Context, in *GetSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
@@ -55,6 +57,16 @@ func (c *accountServiceClient) Login(ctx context.Context, in *LoginRequest, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SessionResponse)
 	err := c.cc.Invoke(ctx, AccountService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountServiceClient) AdminLogin(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*SessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SessionResponse)
+	err := c.cc.Invoke(ctx, AccountService_AdminLogin_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +148,7 @@ func (c *accountServiceClient) ResetPassword(ctx context.Context, in *ResetPassw
 // for forward compatibility.
 type AccountServiceServer interface {
 	Login(context.Context, *LoginRequest) (*SessionResponse, error)
+	AdminLogin(context.Context, *LoginRequest) (*SessionResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetSession(context.Context, *GetSessionRequest) (*SessionResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
@@ -155,6 +168,9 @@ type UnimplementedAccountServiceServer struct{}
 
 func (UnimplementedAccountServiceServer) Login(context.Context, *LoginRequest) (*SessionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAccountServiceServer) AdminLogin(context.Context, *LoginRequest) (*SessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminLogin not implemented")
 }
 func (UnimplementedAccountServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
@@ -212,6 +228,24 @@ func _AccountService_Login_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountService_AdminLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).AdminLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_AdminLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).AdminLogin(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -352,6 +386,10 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AccountService_Login_Handler,
+		},
+		{
+			MethodName: "AdminLogin",
+			Handler:    _AccountService_AdminLogin_Handler,
 		},
 		{
 			MethodName: "Register",

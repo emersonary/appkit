@@ -35,6 +35,9 @@ const (
 const (
 	// AccountServiceLoginProcedure is the fully-qualified name of the AccountService's Login RPC.
 	AccountServiceLoginProcedure = "/account.v1.AccountService/Login"
+	// AccountServiceAdminLoginProcedure is the fully-qualified name of the AccountService's AdminLogin
+	// RPC.
+	AccountServiceAdminLoginProcedure = "/account.v1.AccountService/AdminLogin"
 	// AccountServiceRegisterProcedure is the fully-qualified name of the AccountService's Register RPC.
 	AccountServiceRegisterProcedure = "/account.v1.AccountService/Register"
 	// AccountServiceGetSessionProcedure is the fully-qualified name of the AccountService's GetSession
@@ -59,6 +62,7 @@ const (
 // AccountServiceClient is a client for the account.v1.AccountService service.
 type AccountServiceClient interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error)
+	AdminLogin(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error)
 	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
 	GetSession(context.Context, *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.SessionResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
@@ -83,6 +87,12 @@ func NewAccountServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+AccountServiceLoginProcedure,
 			connect.WithSchema(accountServiceMethods.ByName("Login")),
+			connect.WithClientOptions(opts...),
+		),
+		adminLogin: connect.NewClient[v1.LoginRequest, v1.SessionResponse](
+			httpClient,
+			baseURL+AccountServiceAdminLoginProcedure,
+			connect.WithSchema(accountServiceMethods.ByName("AdminLogin")),
 			connect.WithClientOptions(opts...),
 		),
 		register: connect.NewClient[v1.RegisterRequest, v1.RegisterResponse](
@@ -133,6 +143,7 @@ func NewAccountServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 // accountServiceClient implements AccountServiceClient.
 type accountServiceClient struct {
 	login                   *connect.Client[v1.LoginRequest, v1.SessionResponse]
+	adminLogin              *connect.Client[v1.LoginRequest, v1.SessionResponse]
 	register                *connect.Client[v1.RegisterRequest, v1.RegisterResponse]
 	getSession              *connect.Client[v1.GetSessionRequest, v1.SessionResponse]
 	logout                  *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
@@ -145,6 +156,11 @@ type accountServiceClient struct {
 // Login calls account.v1.AccountService.Login.
 func (c *accountServiceClient) Login(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error) {
 	return c.login.CallUnary(ctx, req)
+}
+
+// AdminLogin calls account.v1.AccountService.AdminLogin.
+func (c *accountServiceClient) AdminLogin(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error) {
+	return c.adminLogin.CallUnary(ctx, req)
 }
 
 // Register calls account.v1.AccountService.Register.
@@ -185,6 +201,7 @@ func (c *accountServiceClient) ResetPassword(ctx context.Context, req *connect.R
 // AccountServiceHandler is an implementation of the account.v1.AccountService service.
 type AccountServiceHandler interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error)
+	AdminLogin(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error)
 	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
 	GetSession(context.Context, *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.SessionResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
@@ -205,6 +222,12 @@ func NewAccountServiceHandler(svc AccountServiceHandler, opts ...connect.Handler
 		AccountServiceLoginProcedure,
 		svc.Login,
 		connect.WithSchema(accountServiceMethods.ByName("Login")),
+		connect.WithHandlerOptions(opts...),
+	)
+	accountServiceAdminLoginHandler := connect.NewUnaryHandler(
+		AccountServiceAdminLoginProcedure,
+		svc.AdminLogin,
+		connect.WithSchema(accountServiceMethods.ByName("AdminLogin")),
 		connect.WithHandlerOptions(opts...),
 	)
 	accountServiceRegisterHandler := connect.NewUnaryHandler(
@@ -253,6 +276,8 @@ func NewAccountServiceHandler(svc AccountServiceHandler, opts ...connect.Handler
 		switch r.URL.Path {
 		case AccountServiceLoginProcedure:
 			accountServiceLoginHandler.ServeHTTP(w, r)
+		case AccountServiceAdminLoginProcedure:
+			accountServiceAdminLoginHandler.ServeHTTP(w, r)
 		case AccountServiceRegisterProcedure:
 			accountServiceRegisterHandler.ServeHTTP(w, r)
 		case AccountServiceGetSessionProcedure:
@@ -278,6 +303,10 @@ type UnimplementedAccountServiceHandler struct{}
 
 func (UnimplementedAccountServiceHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("account.v1.AccountService.Login is not implemented"))
+}
+
+func (UnimplementedAccountServiceHandler) AdminLogin(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.SessionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("account.v1.AccountService.AdminLogin is not implemented"))
 }
 
 func (UnimplementedAccountServiceHandler) Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {

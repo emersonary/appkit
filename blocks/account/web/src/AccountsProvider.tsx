@@ -10,6 +10,7 @@ export type AccountsSessionContextValue = {
   isLoading: boolean;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
+  adminLogin: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
     password: string,
@@ -85,6 +86,19 @@ export function AccountsProvider({
       setIsLoading(true);
       try {
         const next = await accountClient.login(email, password);
+        setSession(next);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accountClient],
+  );
+
+  const adminLogin = useCallback(
+    async (email: string, password: string) => {
+      setIsLoading(true);
+      try {
+        const next = await accountClient.adminLogin(email, password);
         setSession(next);
       } finally {
         setIsLoading(false);
@@ -200,6 +214,7 @@ export function AccountsProvider({
       isLoading,
       isInitialized,
       login,
+      adminLogin,
       register,
       logout,
       completeOAuthLogin,
@@ -214,6 +229,7 @@ export function AccountsProvider({
       isLoading,
       isInitialized,
       login,
+      adminLogin,
       register,
       logout,
       completeOAuthLogin,

@@ -61,6 +61,20 @@ export function createConnectAccountClient({
       }
     },
 
+    async adminLogin(email, password) {
+      try {
+        const response = await client.adminLogin({
+          email: email.trim(),
+          password,
+        });
+        const session = toSession(response);
+        storage.write(session);
+        return session;
+      } catch (err) {
+        throw fromConnectError(err);
+      }
+    },
+
     async register(email, password, firstName, lastName, language) {
       try {
         const response = await client.register({

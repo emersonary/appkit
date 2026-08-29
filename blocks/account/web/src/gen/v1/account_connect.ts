@@ -22,6 +22,15 @@ export const AccountService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc account.v1.AccountService.AdminLogin
+     */
+    adminLogin: {
+      name: "AdminLogin",
+      I: LoginRequest,
+      O: SessionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc account.v1.AccountService.Register
      */
     register: {

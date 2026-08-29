@@ -123,6 +123,7 @@ export type RegisterResult = {
 
 export type AccountsClient = {
   login: (email: string, password: string) => Promise<AccountSession>;
+  adminLogin: (email: string, password: string) => Promise<AccountSession>;
   register: (
     email: string,
     password: string,

@@ -28,6 +28,14 @@ func (s *AccountServer) Login(ctx context.Context, req *accountv1.LoginRequest) 
 	return ToProtoSession(session), nil
 }
 
+func (s *AccountServer) AdminLogin(ctx context.Context, req *accountv1.LoginRequest) (*accountv1.SessionResponse, error) {
+	session, err := s.svc.AdminLogin(ctx, req.GetEmail(), req.GetPassword())
+	if err != nil {
+		return nil, MapGRPCError(err)
+	}
+	return ToProtoSession(session), nil
+}
+
 func (s *AccountServer) Register(ctx context.Context, req *accountv1.RegisterRequest) (*accountv1.RegisterResponse, error) {
 	var firstName *string
 	if name := req.GetFirstName(); name != "" {

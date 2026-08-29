@@ -6,6 +6,7 @@ option go_package = "github.com/emersonary/appkit/accounts/gen/account/v1;accoun
 
 service AccountService {
   rpc Login(LoginRequest) returns (SessionResponse);
+  rpc AdminLogin(LoginRequest) returns (SessionResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc GetSession(GetSessionRequest) returns (SessionResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
