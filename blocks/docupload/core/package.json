@@ -1,0 +1,21 @@
+{
+  "name": "@emersonary/appkit-doc-upload-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chunked gzip document upload protocol shared by web and React Native",
+  "scripts": {
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "spark-md5": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/spark-md5": "^3.0.5",
+    "typescript": "~5.8.3"
+  }
+}

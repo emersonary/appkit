@@ -1,0 +1,35 @@
+{
+  "name": "@emersonary/appkit-doc-upload",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Web DocUploader drop zone, camera capture, and chunked upload",
+  "scripts": {
+    "generate:docupload-proto": "node ./scripts/generate-docupload-proto.mjs",
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./doc-uploader.css": "./src/doc-uploader.css"
+  },
+  "dependencies": {
+    "@emersonary/appkit-doc-upload-core": "file:../core"
+  },
+  "peerDependencies": {
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-web": "^1.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protobuf": "^1.10.1",
+    "@bufbuild/protoc-gen-es": "^1.10.1",
+    "@connectrpc/connect": "1.7.0",
+    "@connectrpc/connect-web": "1.7.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.8.3"
+  }
+}

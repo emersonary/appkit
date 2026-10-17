@@ -1,0 +1,25 @@
+{
+  "name": "@emersonary/appkit-doc-upload-rn",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "React Native CLI DocUploader for gallery and camera uploads",
+  "scripts": {
+    "test": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@emersonary/appkit-doc-upload-core": "file:../core"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.73",
+    "react-native-image-picker": ">=7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "typescript": "~5.8.3"
+  }
+}

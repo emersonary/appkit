@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package docupload.v1;
+
+option go_package = "github.com/emersonary/appkit/docupload/gen/docupload/v1;docuploadv1";
+
+// DocUploadService accepts a gzip-compressed file in fixed-size blocks.
+service DocUploadService {
+  rpc StartUpload(StartUploadRequest) returns (StartUploadResponse);
+  rpc UploadBlock(UploadBlockRequest) returns (UploadBlockResponse);
+  rpc CancelUpload(CancelUploadRequest) returns (CancelUploadResponse);
+}
+
+message StartUploadRequest {
+  string file_id = 1;
+  string file_name = 2;
+  int64 file_unix_ms = 3;
+  int64 original_size = 4;
+  string compressed_md5 = 5;
+  int64 compressed_size = 6;
+  int64 expires_unix_ms = 7;
+  string content_type = 8;
+  string source = 9;
+}
+
+message StartUploadResponse {
+  int32 block_size = 1;
+  repeated int32 pending_blocks = 2;
+  int32 max_threads = 3;
+  int64 expires_unix_ms = 4;
+}
+
+message UploadBlockRequest {
+  string file_id = 1;
+  int32 index = 2;
+  bytes payload = 3;
+  string block_md5 = 4;
+}
+
+message UploadBlockResponse {
+  bool success = 1;
+  repeated int32 pending_blocks = 2;
+}
+
+message CancelUploadRequest {
+  string file_id = 1;
+}
+
+message CancelUploadResponse {}
