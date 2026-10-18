@@ -148,7 +148,7 @@ BEGIN
 
 	if isUUIDColumn(table, table.PrimaryKey) {
 		b.WriteString(fmt.Sprintf(
-			"\t%s := COALESCE((payload->>%s)::UUID, gen_random_uuid());\n\n",
+			"\t%s := COALESCE((payload->>%s)::UUID, "+GenUUIDSQL+");\n\n",
 			pkVar,
 			quoteLiteral(table.PrimaryKey),
 		))

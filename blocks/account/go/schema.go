@@ -47,7 +47,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS ` + accounts + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	email TEXT NOT NULL,
 	password_hash TEXT,
 	first_name TEXT,
@@ -65,7 +65,7 @@ ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS id_profile TEXT;
 ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS language TEXT;
 
 CREATE TABLE IF NOT EXISTS ` + oauth + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	account_id UUID NOT NULL REFERENCES ` + accounts + ` (id) ON DELETE CASCADE,
 	provider TEXT NOT NULL,
 	provider_user_id TEXT NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS ` + oauth + ` (
 CREATE INDEX IF NOT EXISTS idx_oauth_identities_account_id ON ` + oauth + ` (account_id);
 
 CREATE TABLE IF NOT EXISTS ` + verify + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	account_id UUID NOT NULL REFERENCES ` + accounts + ` (id) ON DELETE CASCADE,
 	token_hash TEXT NOT NULL,
 	expires_at TIMESTAMPTZ NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS ` + verify + ` (
 CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_account_id ON ` + verify + ` (account_id);
 
 CREATE TABLE IF NOT EXISTS ` + reset + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	account_id UUID NOT NULL REFERENCES ` + accounts + ` (id) ON DELETE CASCADE,
 	token_hash TEXT NOT NULL,
 	expires_at TIMESTAMPTZ NOT NULL,

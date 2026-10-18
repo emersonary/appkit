@@ -45,7 +45,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS ` + tenants + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	slug TEXT NOT NULL UNIQUE,
 	name TEXT NOT NULL,
 	business_type_id UUID,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS ` + tenants + ` (
 );
 
 CREATE TABLE IF NOT EXISTS ` + accounts + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	tenant_id UUID NOT NULL REFERENCES ` + tenants + ` (id) ON DELETE CASCADE,
 	account_id UUID NOT NULL,
 	role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'staff', 'viewer')),
@@ -67,12 +67,8 @@ CREATE TABLE IF NOT EXISTS ` + accounts + ` (
 	UNIQUE (tenant_id, account_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_tenant_accounts_account ON ` + accounts + ` (account_id);
-CREATE INDEX IF NOT EXISTS idx_tenant_accounts_tenant ON ` + accounts + ` (tenant_id);
-CREATE INDEX IF NOT EXISTS idx_tenant_accounts_resource ON ` + accounts + ` (resource_id);
-
 CREATE TABLE IF NOT EXISTS ` + invites + ` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	tenant_id UUID NOT NULL REFERENCES ` + tenants + ` (id) ON DELETE CASCADE,
 	email TEXT NOT NULL,
 	role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'staff', 'viewer')),
@@ -125,10 +121,14 @@ CREATE TABLE IF NOT EXISTS ` + resourceTypeTranslations + ` (
 ALTER TABLE ` + tenants + ` ADD COLUMN IF NOT EXISTS business_type_id UUID;
 ALTER TABLE ` + tenants + ` ADD COLUMN IF NOT EXISTS default_language_id UUID;
 
-ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS id UUID DEFAULT platform.func_gen_uuid_v7();
 ALTER TABLE ` + accounts + ` ADD COLUMN IF NOT EXISTS resource_id UUID;
 
 ALTER TABLE ` + invites + ` ADD COLUMN IF NOT EXISTS invited_by_account_id UUID;
+
+CREATE INDEX IF NOT EXISTS idx_tenant_accounts_account ON ` + accounts + ` (account_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_accounts_tenant ON ` + accounts + ` (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_accounts_resource ON ` + accounts + ` (resource_id);
 
 DROP TRIGGER IF EXISTS tenants_set_updated_at ON ` + tenants + `;
 CREATE TRIGGER tenants_set_updated_at

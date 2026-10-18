@@ -32,7 +32,7 @@ func ApplyConnectionSchema(ctx context.Context, db *sql.DB, cfg SchemaConfig) er
 
 	ddl := fmt.Sprintf(`
 CREATE TABLE IF NOT EXISTS %s (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	tenant_id TEXT NOT NULL,
 	platform_id TEXT NOT NULL,
 	id_language CHAR(2) NOT NULL,

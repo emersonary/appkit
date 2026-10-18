@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	platformuuid "github.com/emersonary/appkit/uuid"
 	"go.uber.org/zap"
 )
 
@@ -133,7 +133,7 @@ func (s *Store) ListMemberships(ctx context.Context, accountID string) ([]Member
 }
 
 func (s *Store) CreateInvite(ctx context.Context, tenantID, email, role, tokenHash, invitedByAccountID string, expiresAt time.Time) (string, error) {
-	id := uuid.NewString()
+	id := platformuuid.NewString()
 	var invitedBy any
 	if strings.TrimSpace(invitedByAccountID) != "" {
 		invitedBy = invitedByAccountID
