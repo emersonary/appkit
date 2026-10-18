@@ -13,6 +13,7 @@ import (
 	"github.com/emersonary/appkit/health"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
+	"github.com/emersonary/appkit/messenger"
 	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
@@ -52,6 +53,7 @@ type Application[T appkitconfig.AppConfig] struct {
 	Menu        *menu.Service
 	Email       *email.Service
 	DBHist      *migrate.Service
+	Messenger   *messenger.Block
 }
 
 // Base returns the embedded appkit infra config from the product config.

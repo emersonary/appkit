@@ -1,0 +1,188 @@
+.appkit-messenger {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 520px;
+  border: 1px solid #d8dee9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.appkit-messenger__sidebar {
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.appkit-messenger__sidebar-header {
+  padding: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.appkit-messenger__channel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.appkit-messenger__channel {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.appkit-messenger__channel--active,
+.appkit-messenger__channel:hover {
+  background: #eef2ff;
+}
+
+.appkit-messenger__channel-title {
+  font-weight: 600;
+}
+
+.appkit-messenger__channel-preview {
+  color: #64748b;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appkit-messenger__unread {
+  justify-self: start;
+  background: #22c55e;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+.appkit-messenger__thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.appkit-messenger__thread-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.appkit-messenger__thread-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.appkit-messenger__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.appkit-messenger__badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.appkit-messenger__badge--agent {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.appkit-messenger__badge--human {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.appkit-messenger__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appkit-messenger__bubble-row {
+  display: flex;
+}
+
+.appkit-messenger__bubble-row--mine {
+  justify-content: flex-end;
+}
+
+.appkit-messenger__bubble {
+  max-width: 70%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+}
+
+.appkit-messenger__bubble-row--mine .appkit-messenger__bubble {
+  background: #dcf8c6;
+}
+
+.appkit-messenger__sender {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.appkit-messenger__sender-type {
+  margin-left: 0.35rem;
+}
+
+.appkit-messenger__system-row {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  padding: 0.25rem 0;
+}
+
+.appkit-messenger__composer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.appkit-messenger__composer input {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+}
+
+.appkit-messenger__composer button {
+  border: 0;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.appkit-messenger__composer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.appkit-messenger__empty {
+  padding: 1rem;
+  color: #64748b;
+}

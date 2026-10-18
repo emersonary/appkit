@@ -9,6 +9,7 @@ import (
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/language"
 	"github.com/emersonary/appkit/menu"
+	"github.com/emersonary/appkit/messenger"
 	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/permissions"
 	"github.com/emersonary/appkit/tenants"
@@ -22,7 +23,7 @@ func (a *Application[T]) wireEmail() {
 
 func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error {
 	base := a.Base()
-	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.DBHist.Enabled {
+	if !base.Accounts.Enabled && !base.Tenants.Enabled && !base.Currency.Enabled && !base.Language.Enabled && !base.Permissions.Enabled && !base.Menu.Enabled && !base.AI.Enabled && !base.DBHist.Enabled && !base.Messenger.Enabled {
 		return nil
 	}
 
@@ -137,6 +138,15 @@ func (a *Application[T]) wireBlocks(ctx context.Context, opts Options[T]) error 
 		return err
 	}
 	a.AI = aiSvc
+
+	msgBlock, err := messenger.Wire(ctx, sqlDB, base.Messenger, messenger.WireOptions{
+		Logger: a.Logger.Named("messenger"),
+		NATS:   a.NATS,
+	})
+	if err != nil {
+		return err
+	}
+	a.Messenger = msgBlock
 
 	return nil
 }

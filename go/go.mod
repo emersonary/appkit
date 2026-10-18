@@ -5,6 +5,7 @@ go 1.26.3
 require (
 	github.com/emersonary/appkit/accounts v0.0.0
 	github.com/emersonary/appkit/menu v0.0.0
+	github.com/emersonary/appkit/messenger v0.0.0
 	github.com/emersonary/appkit/tenants v0.0.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/nats-io/nats.go v1.52.0
@@ -18,6 +19,7 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/coder/websocket v1.8.14 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
@@ -57,3 +59,5 @@ replace github.com/emersonary/appkit/tenants => ../blocks/tenant/go
 replace github.com/emersonary/appkit/social => ../blocks/social/go
 
 replace github.com/emersonary/appkit/menu => ../blocks/menu/go
+
+replace github.com/emersonary/appkit/messenger => ../blocks/messenger/go

@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package messenger.v1;
+
+option go_package = "github.com/emersonary/appkit/messenger/gen/messenger/v1;messengerv1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+enum UserType {
+  USER_TYPE_UNSPECIFIED = 0;
+  USER_TYPE_HUMAN = 1;
+  USER_TYPE_AGENT = 2;
+  USER_TYPE_SYSTEM = 3;
+}
+
+enum ChannelKind {
+  CHANNEL_KIND_UNSPECIFIED = 0;
+  CHANNEL_KIND_DIRECT = 1;
+  CHANNEL_KIND_GROUP = 2;
+}
+
+enum MessageKind {
+  MESSAGE_KIND_UNSPECIFIED = 0;
+  MESSAGE_KIND_USER = 1;
+  MESSAGE_KIND_SYSTEM = 2;
+}
+
+message MessengerUser {
+  string id = 1;
+  string tenant_id = 2;
+  UserType user_type = 3;
+  string display_name = 4;
+  string avatar_url = 5;
+  string account_id = 6;
+  string external_ref = 7;
+}
+
+message Channel {
+  string id = 1;
+  string tenant_id = 2;
+  ChannelKind kind = 3;
+  string title = 4;
+  string avatar_url = 5;
+  string created_by_user_id = 6;
+  int32 unread_count = 7;
+  string last_message_preview = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  repeated MessengerUser members = 10;
+}
+
+message Message {
+  string id = 1;
+  string channel_id = 2;
+  MessageKind kind = 3;
+  MessengerUser sender = 4;
+  string body = 5;
+  string event_type = 6;
+  google.protobuf.Struct event_payload = 7;
+  string client_ref = 8;
+  string reply_to_id = 9;
+  google.protobuf.Timestamp created_at = 10;
+}
+
+message ResolveMeRequest {
+  string tenant_id = 1;
+  string display_name = 2;
+}
+
+message ResolveMeResponse {
+  MessengerUser user = 1;
+}
+
+message CreateAgentUserRequest {
+  string tenant_id = 1;
+  string display_name = 2;
+  string external_ref = 3;
+  string avatar_url = 4;
+}
+
+message GetAgentUserRequest {
+  string tenant_id = 1;
+  string external_ref = 2;
+}
+
+message RegisterDeviceRequest {
+  string tenant_id = 1;
+  string device_key = 2;
+  string platform = 3;
+  string push_token = 4;
+}
+
+message RegisterDeviceResponse {
+  string device_id = 1;
+}
+
+message GetOrCreateDirectRequest {
+  string tenant_id = 1;
+  string other_user_id = 2;
+}
+
+message CreateGroupRequest {
+  string tenant_id = 1;
+  string title = 2;
+  repeated string member_user_ids = 3;
+}
+
+message ChannelResponse {
+  Channel channel = 1;
+}
+
+message ListChannelsRequest {
+  string tenant_id = 1;
+}
+
+message ListChannelsResponse {
+  repeated Channel channels = 1;
+}
+
+message ListMessagesRequest {
+  string tenant_id = 1;
+  string channel_id = 2;
+  string before_message_id = 3;
+  int32 limit = 4;
+}
+
+message ListMessagesResponse {
+  repeated Message messages = 1;
+}
+
+message SendMessageRequest {
+  string tenant_id = 1;
+  string channel_id = 2;
+  string body = 3;
+  string client_ref = 4;
+  string reply_to_id = 5;
+  string device_id = 6;
+}
+
+message SendSystemMessageRequest {
+  string tenant_id = 1;
+  string channel_id = 2;
+  string event_type = 3;
+  google.protobuf.Struct event_payload = 4;
+  string body = 5;
+}
+
+message MarkReadRequest {
+  string tenant_id = 1;
+  string channel_id = 2;
+  string message_id = 3;
+}
+
+message MarkReadResponse {}
+
+message SyncMessagesRequest {
+  string tenant_id = 1;
+  map<string, string> channel_cursors = 2;
+}
+
+message SyncMessagesResponse {
+  repeated ChannelSyncEntry entries = 1;
+}
+
+message ChannelSyncEntry {
+  Channel channel = 1;
+  repeated Message messages = 2;
+}
+
+message HandoffConversationRequest {
+  string tenant_id = 1;
+  string channel_id = 2;
+  string to_user_id = 3;
+  string reason = 4;
+  string context_summary = 5;
+}
+
+message HandoffConversationResponse {
+  Channel channel = 1;
+  Message system_message = 2;
+}
+
+service MessengerService {
+  rpc ResolveMe(ResolveMeRequest) returns (ResolveMeResponse);
+  rpc CreateAgentUser(CreateAgentUserRequest) returns (ResolveMeResponse);
+  rpc GetAgentUser(GetAgentUserRequest) returns (ResolveMeResponse);
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+  rpc GetOrCreateDirect(GetOrCreateDirectRequest) returns (ChannelResponse);
+  rpc CreateGroup(CreateGroupRequest) returns (ChannelResponse);
+  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
+  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
+  rpc SendMessage(SendMessageRequest) returns (Message);
+  rpc SendSystemMessage(SendSystemMessageRequest) returns (Message);
+  rpc MarkRead(MarkReadRequest) returns (MarkReadResponse);
+  rpc SyncMessages(SyncMessagesRequest) returns (SyncMessagesResponse);
+  rpc HandoffConversation(HandoffConversationRequest) returns (HandoffConversationResponse);
+}

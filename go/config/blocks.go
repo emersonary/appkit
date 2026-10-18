@@ -6,6 +6,7 @@ import (
 	"github.com/emersonary/appkit/currency"
 	"github.com/emersonary/appkit/email"
 	"github.com/emersonary/appkit/language"
+	"github.com/emersonary/appkit/messenger"
 	"github.com/emersonary/appkit/menu"
 	"github.com/emersonary/appkit/migrate"
 	"github.com/emersonary/appkit/permissions"
@@ -24,4 +25,5 @@ type Blocks struct {
 	DBHist           migrate.AppConfig        `mapstructure:"dbhist" json:"dbhist"`
 	Email            email.Config             `mapstructure:"email" json:"email"`
 	MailProvisioning email.ProvisioningConfig `mapstructure:"mail_provisioning" json:"mail_provisioning"`
+	Messenger        messenger.AppConfig      `mapstructure:"messenger" json:"messenger"`
 }
