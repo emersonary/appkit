@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `)
 CREATE TABLE IF NOT EXISTS `)
 	b.WriteString(history)
 	b.WriteString(` (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT platform.func_gen_uuid_v7(),
 	id_currency CHAR(3) NOT NULL REFERENCES `)
 	b.WriteString(currencies)
 	b.WriteString(` (id_currency) ON DELETE CASCADE,
