@@ -1,0 +1,89 @@
+# Source of truth — run from via-jeri api/: go run ./cmd/schemagen ../appkit/go/idempotency/schema.yaml
+package: idempotency
+
+tables:
+  - schema: idempotency
+    name: tbl_idempotency_records
+    go_type: IdempotencyRecord
+    audit: false
+    repo: false
+    pk: [str_scope, str_key]
+    columns:
+      - name: str_scope
+        type: text
+        not_null: true
+        go: Scope
+        resource: false
+      - name: str_key
+        type: text
+        not_null: true
+        go: Key
+        resource: false
+      - name: str_fingerprint
+        type: text
+        not_null: true
+        go: Fingerprint
+        resource: false
+      - name: str_status
+        type: text
+        not_null: true
+        go: Status
+        resource: false
+      - name: str_owner_token
+        type: text
+        go: OwnerToken
+        pointer: true
+        resource: false
+      - name: dt_started
+        type: timestamptz
+        not_null: true
+        default: clock_timestamp()
+        go: StartedAt
+        resource: false
+      - name: dt_completed
+        type: timestamptz
+        go: CompletedAt
+        pointer: true
+        resource: false
+      - name: dt_lease_until
+        type: timestamptz
+        go: LeaseUntil
+        pointer: true
+        resource: false
+      - name: dt_expires_at
+        type: timestamptz
+        go: ExpiresAt
+        pointer: true
+        resource: false
+      - name: byte_result
+        type: bytea
+        go: Result
+        resource: false
+      - name: str_error_message
+        type: text
+        go: ErrorMessage
+        pointer: true
+        resource: false
+      - name: str_row_status
+        type: "char(1)"
+        not_null: true
+        default: "'A'"
+        go: RowStatus
+        resource: false
+      - name: dt_created
+        type: timestamptz
+        not_null: true
+        default: now()
+        go: CreatedAt
+        resource: false
+      - name: dt_updated
+        type: timestamptz
+        not_null: true
+        default: now()
+        go: UpdatedAt
+        resource: false
+    checks:
+      - name: tbl_idempotency_records_status_check
+        expr: str_status IN ('PROCESSING','COMPLETED','FAILED','UNCERTAIN')
+      - name: tbl_idempotency_records_completed_check
+        expr: (str_status <> 'COMPLETED' OR dt_completed IS NOT NULL)
