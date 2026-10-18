@@ -2,13 +2,15 @@
 
 CREATE SCHEMA IF NOT EXISTS platform;
 
-CREATE OR REPLACE FUNCTION platform.func_gen_uuid_v7()
+-- Replace legacy zero-arg definition when upgrading.
+DROP FUNCTION IF EXISTS platform.func_gen_uuid_v7();
+
+CREATE OR REPLACE FUNCTION platform.func_gen_uuid_v7(ts timestamptz DEFAULT clock_timestamp())
 RETURNS uuid
 LANGUAGE plpgsql
 VOLATILE
 AS $$
 DECLARE
-  ts timestamptz := clock_timestamp();
   millis bigint;
   nanos bigint;
   nanos_after bigint;
@@ -44,7 +46,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION platform.func_gen_uuid_v7() IS 'UUID v7 (emersonary/uuidv7 layout); use for all platform PK defaults and repo fallbacks';
+COMMENT ON FUNCTION platform.func_gen_uuid_v7(timestamptz) IS 'UUID v7 (emersonary/uuidv7 layout); ts defaults to clock_timestamp(); use for all platform PK defaults and repo fallbacks';
 
 -- Integration tests: appkit/go/migrate/platform_uuid_v7_integration_test.go
 --   VIA_JERI_DATABASE_PORT=15433 go test -tags=integration ./migrate/... -count=1
