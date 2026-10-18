@@ -45,3 +45,6 @@ END;
 $$;
 
 COMMENT ON FUNCTION platform.func_gen_uuid_v7() IS 'UUID v7 (emersonary/uuidv7 layout); use for all platform PK defaults and repo fallbacks';
+
+-- Integration tests: appkit/go/migrate/platform_uuid_v7_integration_test.go
+--   VIA_JERI_DATABASE_PORT=15433 go test -tags=integration ./migrate/... -count=1
