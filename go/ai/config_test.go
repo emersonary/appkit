@@ -136,6 +136,38 @@ func TestServiceDetectUsesLocalRoute(t *testing.T) {
 	}
 }
 
+func TestWireMissingOpenAIKeyDisablesService(t *testing.T) {
+	os.Unsetenv("OPENAI_API_KEY")
+	cfg := AIConfig{
+		Enabled: true,
+		Providers: map[string]ProviderConfig{
+			"openai": {
+				Driver:       "openai",
+				APIKeyEnv:    "OPENAI_API_KEY",
+				BaseURL:      "https://example.test/v1",
+				DefaultModel: "gpt-4o-mini",
+			},
+			"local": {Driver: "local"},
+		},
+		Routes: map[string]any{
+			"translation": map[string]any{
+				"default": "openai",
+				"operations": map[string]any{
+					"detect": "local",
+				},
+			},
+		},
+	}
+
+	svc, err := Wire(context.Background(), cfg, WireOptions{})
+	if err != nil {
+		t.Fatalf("Wire: %v", err)
+	}
+	if svc != nil {
+		t.Fatal("expected nil service when openai credentials are missing")
+	}
+}
+
 func TestWireDisabled(t *testing.T) {
 	svc, err := Wire(context.Background(), AIConfig{Enabled: false}, WireOptions{})
 	if err != nil {

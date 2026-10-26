@@ -18,6 +18,15 @@ func Wire(ctx context.Context, cfg AIConfig, opts WireOptions) (*Service, error)
 		return nil, nil
 	}
 
+	if cfg.missingProviderCredentials() {
+		logger := opts.Logger
+		if logger == nil {
+			logger = zap.NewNop()
+		}
+		logger.Warn("ai disabled because a provider is missing credentials")
+		return nil, nil
+	}
+
 	resolved, err := ResolveBlockConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("resolve ai config: %w", err)

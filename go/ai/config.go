@@ -69,6 +69,19 @@ func (p *ProviderConfig) normalize(providerID string) {
 	}
 }
 
+func (c AIConfig) missingProviderCredentials() bool {
+	for id, provider := range c.Providers {
+		provider.normalize(id)
+		if !provider.isEnabled() {
+			continue
+		}
+		if normalizeDriver(provider.driver(id)) == defaultOpenAIDriver && provider.resolvedAPIKey() == "" {
+			return true
+		}
+	}
+	return false
+}
+
 func (p ProviderConfig) resolvedAPIKey() string {
 	if key := strings.TrimSpace(p.APIKey); key != "" {
 		return key
