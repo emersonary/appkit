@@ -263,7 +263,7 @@ func (m *Manager) HandleCallback(ctx context.Context, platformID string, w http.
 		return
 	}
 
-	target := m.frontend + "/admin?social=" + platformID + "_connected&lang=" + url.QueryEscape(st.Language)
+	target := m.frontend + "/admin/social-media-tokens/linkedin?social=" + platformID + "_connected&lang=" + url.QueryEscape(st.Language)
 	http.Redirect(w, r, target, http.StatusFound)
 }
 
@@ -305,7 +305,7 @@ func (m *Manager) failCallback(w http.ResponseWriter, r *http.Request, platformI
 	detail = sanitizeCallbackDetail(detail)
 	m.logCallbackError(platformID, reason, detail, r.URL.RawQuery)
 
-	target := m.frontend + "/admin?social=" + url.QueryEscape(platformID) + "_error&reason=" + url.QueryEscape(reason)
+	target := m.frontend + "/admin/social-media-tokens/linkedin?social=" + url.QueryEscape(platformID) + "_error&reason=" + url.QueryEscape(reason)
 	if language != "" {
 		target += "&lang=" + url.QueryEscape(language)
 	}
