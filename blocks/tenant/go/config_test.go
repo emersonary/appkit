@@ -7,14 +7,14 @@ import (
 )
 
 func TestValidateFeedID(t *testing.T) {
-	valid := []string{"sahar", "viajeri", "emersonarydev", "hubexpress", "solidia"}
+	valid := []string{"sahar", "viajeri", "emersonarydev", "hubexpress", "solidia", "spencer-ting", "via-jeri"}
 	for _, id := range valid {
 		if err := validateFeedID(id); err != nil {
 			t.Fatalf("expected valid feed id %q: %v", id, err)
 		}
 	}
 
-	invalid := []string{"", "via-jeri", "Bad-ID", "1abc", "a_b"}
+	invalid := []string{"", "1abc", "a_b", "-abc", "abc-", "spencer--ting"}
 	for _, id := range invalid {
 		if err := validateFeedID(id); err == nil {
 			t.Fatalf("expected invalid feed id %q", id)
@@ -35,12 +35,18 @@ func TestConfig_FixedModeValidatesFeedIDs(t *testing.T) {
 		Schema: "tenant",
 		Mode:   ModeFixed,
 		Feed: []FeedEntry{
-			{ID: "via-jeri", Name: "Via Jeri"},
+			{ID: "spencer-ting", Name: "Spencer Ting"},
 		},
 	}
 	cfg.normalize()
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("expected kebab-case feed id to be valid: %v", err)
+	}
+
+	cfg.Feed[0].ID = "a_b"
+	cfg.normalize()
 	if err := cfg.Validate(); err == nil {
-		t.Fatal("expected validation error for dashed feed id")
+		t.Fatal("expected validation error for underscored feed id")
 	}
 }
 

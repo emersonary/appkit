@@ -8,7 +8,7 @@ import (
 
 var identPattern = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
 var slugPattern = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
-var feedIDPattern = regexp.MustCompile(`^[a-z][a-z0-9]*$`)
+var feedIDPattern = regexp.MustCompile(`^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$`)
 
 func validateIdent(name string) error {
 	if !identPattern.MatchString(name) {
